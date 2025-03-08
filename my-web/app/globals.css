@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.text{
+  font-family: 'Josefin Sans', sans-serif;
+}
+.contBg{
+  background-color: rgba(255, 255, 255, 0.615);
+}
+.textLink{
+  text-decoration:underline;
+}
+.scrollBar::-webkit-scrollbar {
+  display: none;
+}
+
+.listDetails{
+  position: absolute;
+  /* top: 50%; */
+  bottom: 50%;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  /* min-height: 100%; */
+  width: 100%;
+  background: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+  color: white;
+  text-align: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+  opacity: 0; /* Initially hidden */
+  visibility: hidden; /* Hidden from view */
+  transition: opacity 0.3s, visibility 0.3s; /* Smooth transition */
+}
+.imageContainer:hover .listDetails{
+    opacity: 1; /* Show on hover */
+    visibility: visible; /* Visible on hover */
+}
+
+::-webkit-scrollbar{  
+  display : none
+}
+::selection{
+  color : rgb(198, 166, 6);
+  background : rgb(0 , 0 ,0)
+}
+.img_man::before , 
+.img_woman::before,
+.img_spicial::before{
+  position: absolute;
+  content:  "";
+  top:0;
+  left:0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: .8;
+  transition: .5s ease;
+}
+
+.img_man:hover::before ,
+.img_woman:hover::before,
+.img_spicial:hover::before{
+  background: transparent;  
+  opacity: 1;
+}
+.img_man {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40%;
+  height: 100%;
+  clip-path: polygon(25% 0%, 100% 0%, 100% 100%, 25% 100%, 0% 50%);
+}
+
+.img_spicial {
+  position: absolute;
+  top: 0;
+  left: 30%;
+  width: 40%;
+  height: 100%;
+  clip-path: polygon(100% 0%, 75% 50%, 100% 100%, 0% 100%, 25% 50%, 0 0);
+}
+
+.img_woman {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .img_man {
+    width: 100%;
+    height: 40%;
+    top: 60%;
+    right: 0;
+    clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 0% 100%);
+  }
+
+  .img_spicial {
+    width: 100%;
+    height: 40%;
+    top: 30%;
+    left: 0%;
+    clip-path: polygon(100% 0, 100% 100%, 50% 75%, 0% 100%, 0 0%, 50% 25%);
+  }
+
+  .img_woman {
+    width: 100%;
+    height: 40%;
+    top: 0;
+    left: 0;
+    clip-path: polygon(0 0, 100% 0%, 100% 75%, 50% 100%, 0 75%);
+  }
+}
