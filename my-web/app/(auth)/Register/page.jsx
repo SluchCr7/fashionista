@@ -11,7 +11,7 @@ const Register = () => {
     const [password, setPass] = useState("")
     const [message, setMessage] = useState("")
     const {Register} = useContext(UserContext)
-    const handleLogin = () => {
+    const handleRegister = () => {
         if(email === "" || password === "" || name === ""){
             setMessage("Enter Your Email And Password And Name")
             setTimeout(() => setMessage(""), 3000)
@@ -44,7 +44,7 @@ return (
                             <label htmlFor="Password">Password</label>
                             <input value={password} onChange={(e)=> setPass(e.target.value)} id='Password' type="password" className='p-2 w-[100%] rounded border border-black bg-transparent text-black' />
                         </div>
-                        <button onClick={handleLogin} className='bg-black p-4 w-full rounded-md text-white uppercase '>Login</button>
+                        <button onClick={handleRegister} className='bg-black p-4 w-full rounded-md text-white uppercase '>Register</button>
                         <span>Already Have An Account <Link href={"/Login"} className='font-bold'>Login</Link></span>
                     </div>
                 </div>
