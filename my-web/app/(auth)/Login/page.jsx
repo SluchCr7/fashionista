@@ -37,7 +37,7 @@ return (
                             <input value={password} onChange={(e)=> setPass(e.target.value)} id='Password' type="password" className='p-2 w-[100%] rounded border border-black bg-transparent text-black' />
                         </div>
                         <button onClick={handleLogin} className='bg-black p-4 w-full rounded-md text-white uppercase '>Login</button>
-                        <span>Don't have an Account? <Link href={"/Register"} className='font-bold'>SignUp</Link></span>
+                        <span>Don`&apos;`t have an Account? <Link href={"/Register"} className='font-bold'>SignUp</Link></span>
                     </div>
                 </div>
             </div>

@@ -111,8 +111,9 @@ const searchParams = useSearchParams();
             <div  className="flex flex-col gap-2">
                   <span className="font-bold text-base">Color</span>
                   <ul className="grid grid-cols-2 gap-3 text-base">
-                    {colors.map((color, index) => (
+                    {colors.map((color) => (
                         <div
+                            key={color}
                             className={`border border-gray-400 w-8 h-8 rounded-full cursor-pointer transition hover:scale-110 ${color.toLowerCase() === filters.color ? 'border-2 border-black' : ''}`}
                             style={{backgroundColor : color.toLowerCase()}}
                             onClick={() => handleChangeFilter({ target: { name: 'color', value: color } })}

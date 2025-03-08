@@ -59,7 +59,7 @@ const Admin = () => {
               {
                 users.map((user) => {
                   return (
-                    <div className="flex flex-col items-center bg-white shadow-md p-4 rounded-md">
+                    <div key={user._id} className="flex flex-col items-center bg-white shadow-md p-4 rounded-md">
                       <Image src={user?.profilePhoto?.url} alt="profile" width={50} height={50} className="w-12 h-12 rounded-full" />
                       <h2 className="font-semibold mt-2">{user.name}</h2>
                       <span className="text-gray-500">{user.ProfileName}</span>

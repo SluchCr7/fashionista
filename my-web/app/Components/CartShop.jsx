@@ -26,7 +26,7 @@ const CartShop = () => {
                     <span className='text-yellow font-bold uppercase tracking-[3]'>Your Cart</span>
                     {cart.map((prod, index) => {
                         return (        
-                            <div className='flex items-center gap-2 w-full border-b-[1px] border-black pb-2'>
+                            <div key={index} className='flex items-center gap-2 w-full border-b-[1px] border-black pb-2'>
                                 <div className='flex items-center gap-4 w-full'>
                                     <Image src={prod.img} alt='product_img' width={200} height={200} className='w-[80px] h-[80px] rounded-md' />
                                     <div className='flex items-start flex-col w-full'>

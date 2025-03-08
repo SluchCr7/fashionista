@@ -14,7 +14,7 @@ const Product = ({ params }) => {
         if (selectProduct) {
             setProduct(selectProduct);
         }
-    }, [id]);
+    }, [id , products]);
     return (
     <div>
         <div className='max-w-6xl mx-auto px-8 py-24'>

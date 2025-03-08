@@ -29,10 +29,10 @@ const Footer = () => {
                 <div className='flex flex-col gap-3'>
                     <h3 className='font-bold text-lg'>Shop</h3>
                     <ul className='text-sm space-y-2'>
-                        <li><Link href='/mens-topwear' className='hover:underline'>Men's Top Wear</Link></li>
-                        <li><Link href='/womens-topwear' className='hover:underline'>Women's Top Wear</Link></li>
-                        <li><Link href='/mens-bottomwear' className='hover:underline'>Men's Bottom Wear</Link></li>
-                        <li><Link href='/womens-bottomwear' className='hover:underline'>Women's Bottom Wear</Link></li>
+                        <li><Link href='/mens-topwear' className='hover:underline'>Men`&apos;`s Top Wear</Link></li>
+                        <li><Link href='/womens-topwear' className='hover:underline'>Women`&apos;`s Top Wear</Link></li>
+                        <li><Link href='/mens-bottomwear' className='hover:underline'>Men`&apos;`s Bottom Wear</Link></li>
+                        <li><Link href='/womens-bottomwear' className='hover:underline'>Women`&apos;`s Bottom Wear</Link></li>
                     </ul>
                 </div>
                 

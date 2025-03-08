@@ -11,7 +11,7 @@ const ClothesGender = ({gender , title , Para}) => {
           <div className='grid grid-cols-1 w-full md:grid-cols-2 lg:grid-cols-3 gap-3'>
             {
                 products.filter((prod)=> prod.gender === gender).map((prod , index) => (
-                    <div className='flex items-start flex-col w-full'>
+                    <div key={index} className='flex items-start flex-col w-full'>
                         <Image src={prod?.Photo[0]?.url} alt={"img_prod"} width={200} height={200} className='w-full h-auto rounded-md' />
                         <span className='text-black font-bold'>{prod?.name}</span>
                         <span className='text-DarkRed'>${prod?.price}</span>
