@@ -8,7 +8,9 @@ connectDB()
 
 // Middleware
 app.use(express.json()) 
-app.use(cors())
+app.use(cors({  
+    origin: process.env.FRONT_URL,
+}))
 
 // Routes
 app.get('/', (req, res) => {
