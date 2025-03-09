@@ -12,8 +12,8 @@ const jetBrainsMono = JetBrains_Mono({
   , style: ["normal", "italic"]
 })
 export const metadata = {
-  title: `Sluchawski.Co Store`,
-  description: "Sluchawski.Co Store",
+  title: `Fashionista`,
+  description: "Fashionista is a fashion website has been created to provide you with the best fashion products that you need.",
 };
 
 export default function RootLayout({ children }) {
