@@ -42,7 +42,7 @@ const Opinions = () => {
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [currentIndex , nextSlide]);
+  }, []);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);

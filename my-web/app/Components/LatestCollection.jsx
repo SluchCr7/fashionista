@@ -43,9 +43,6 @@ const LatestCollection = () => {
             }
         }
     },[])
-    useEffect(()=>{
-        console.log(products)
-    },[products])
   return (
     <div className="flex relative items-center justify-center flex-col gap-3 px-10 py-5">
       <Intro title="Latest Collection" para="Explore our latest products below and go to the shop!" />
