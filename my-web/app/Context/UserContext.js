@@ -69,23 +69,29 @@ const UserContextProvider = ({children}) => {
             console.log(err)
         })
     }, [])
-    const AddFavourite = async(prodId) => {
-        await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/favorite/${prodId}`, {}, 
-            {
-                headers:
-                    {
-                        Authorization: `Bearer ${user?.token}`
-                    }
-            }
-        )
-            .then((res) => {
-                setMessage(res.data.message)
-                setTimeout(() => setMessage(''), 3000)
-                window.location.reload()
-            })
-            .catch((err) => {
-                console.log(err)
-            })
+    const AddFavourite = async (prodId) => {
+        if (!user) {
+            setMessage("Please Login First")
+            setTimeout(() => setMessage(''), 3000)
+        }
+        else {            
+            await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/favorite/${prodId}`, {}, 
+                {
+                    headers:
+                        {
+                            Authorization: `Bearer ${user?.token}`
+                        }
+                }
+            )
+                .then((res) => {
+                    setMessage(res.data.message)
+                    setTimeout(() => setMessage(''), 3000)
+                    // window.location.reload()
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
     }
   return (
       <div className="relative">
