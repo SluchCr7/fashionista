@@ -1,6 +1,6 @@
 const { RegisterNewUser, LoginUser, getAllUsers, getUserById, DeleteUser, toggleFavorite } = require('../Controllers/AuthController')
 const route = require('express').Router()
-
+const {verifyToken , verifyAdmain} = require("../Middelware/verifyToken")
 
 route.route('/register')
     .post(RegisterNewUser) 
@@ -11,6 +11,6 @@ route.route('/:id')
     .get(getUserById)
 route.route("/")
     .get(getAllUsers)
-route.route('/favorite')
-    .post(toggleFavorite)
+route.route('/favorite/:id')
+    .post(verifyToken , toggleFavorite)
 module.exports = route

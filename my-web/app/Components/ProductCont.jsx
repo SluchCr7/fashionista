@@ -1,19 +1,24 @@
 'use client'
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState , useEffect } from 'react';
 import { CartContext } from '../Context/Cart';
 import { IoMdHeart, IoMdAdd, IoMdRemove } from 'react-icons/io';
 import Image from 'next/image';
 import { UserContext } from '../Context/UserContext';
 import { motion } from 'framer-motion';
+import { ProductContext } from '../Context/ProductContext';
+import { FaHeart } from "react-icons/fa6";
 
 const ProductCont = ({ product }) => {
     const [color, setColor] = useState('');
     const [size, setSize] = useState('');
     const [num, setNum] = useState(1);
-    const { user } = useContext(UserContext);
+    const { user , AddFavourite } = useContext(UserContext);
     const { addToCart, discount } = useContext(CartContext);
     const [notify, setNotify] = useState('');
     const FinalPrice = (product?.price * (1 - discount / 100)).toFixed(2)
+    useEffect(() => {
+        console.log(product?._id , user?._id)
+    },[product , user])
     const handleCart = () => {
         if (!user) {
             setNotify('Please Login First');
@@ -36,7 +41,6 @@ const ProductCont = ({ product }) => {
         }
         setTimeout(() => setNotify(''), 3000);
     };
-
     return (
         <div className='max-w-6xl mx-auto p-8'>
             {product ? (
@@ -53,7 +57,17 @@ const ProductCont = ({ product }) => {
                             />
                             <div className='absolute top-2 left-2 flex gap-3'>
                                 {discount && <span className='bg-red-500 px-3 py-1 text-white rounded-full'>{discount}% OFF</span>}
-                                <span className='bg-gray-800 p-2 rounded-full text-white'><IoMdHeart size={20} /></span>
+                                {
+                                    user?.favorites?.includes(product?._id) ? (
+                                        <span className='bg-white p-2 rounded-full cursor-pointer text-red-700' onClick={() => AddFavourite(product?._id)}>
+                                            <FaHeart size={20} />
+                                        </span>
+                                    ) : (
+                                        <span className='bg-white p-2 rounded-full cursor-pointer text-black' onClick={() => AddFavourite(product?._id)}>
+                                            <IoMdHeart size={20} />
+                                        </span>
+                                    )
+                                }
                             </div>
                         </motion.div>
                     </div>
