@@ -29,11 +29,12 @@ const Shop = () => {
   const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(true);
 
-  const categories = ["Top Wear", "Bottom Wear"];
-  const genders = ["men", "women"];
-  const materials = ["Cotton", "Wool", "Denim", "Polyester", "Linen"];
-  const colors = ["Red", "Blue", "Green", "Black", "White", "Yellow"];
-  const sizes = ["S", "M", "L", "XL", "XXL"];
+  const categories = [...new Set(products.map((product) => product.category))];
+  const genders = [...new Set(products.map((product) => product.gender))];
+  const materials = [... new Set(products.map((product) => product.material))];
+  const colors = ["Yellow" , "Black" , "White" , "Blue" , "Red" , "Green" , "Gray" , "Navy" , "Beige" , "Pink"];
+  const sizes = [...new Set(products.flatMap((product) => product.sizes))];
+  
   useEffect(() => {
     const params = Object.fromEntries([...searchParams]);
     setFilters({
@@ -50,7 +51,6 @@ const Shop = () => {
       params.maxPrice ? parseFloat(params.maxPrice) : 100,
     ]);
   }, [searchParams]);
-
   const handleFilterChange = (type, value) => {
     setFilters((prev) => {
       const newFilters = { ...prev };
@@ -173,7 +173,7 @@ const filteredProducts = useMemo(() => {
           {/* Color */}
           <div className="flex flex-col gap-2">
             <h3 className="text-md font-semibold text-gray-700">Color</h3>
-            <div className="flex flex-col gap-3 items-start">
+            <div className="grid grid-cols-4 gap-3">
               {colors.map((color, index) => (
                 <label
                   style={{ backgroundColor: color.toLowerCase() }}

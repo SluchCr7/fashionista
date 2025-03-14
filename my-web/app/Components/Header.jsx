@@ -90,10 +90,8 @@ const Header = () => {
                     <div className='text-xl'>
                         <IoIosSearch className='' onClick={() => setShowSearchBar(!showSearchBar)} />
                     </div>
-                    {/* <div className='flex md:hidden relative w-full' onClick={() => setShowSearchBar(!showSearchBar)}>
-                        <IoIosSearch className='text-2xl' />
-                    </div> */}
                     {/* User Icon or Login */}
+                    {user?.isAdmin ? <span className="bg-red-600 py-1 px-2 text-sm font-bold text-white">Admin</span> : ""}
                     {user ? (
                         <div className="flex items-center gap-2">
                             <Link href="/Profile" aria-label="User Account" className="text-xl">
@@ -127,7 +125,7 @@ const Header = () => {
             </div>
             {/* Search Results Dropdown */}
             {search !== "" && (
-                <div className="absolute top-32 md:top-[70px] left-0 right-0 z-40 px-6 lg:px-14 py-3 bg-white shadow-lg">
+                <div className="absolute top-32 md:top-[70px] left-0 w-[100%] md:w-[80%] mx-auto rounded-lg right-0 z-40 px-6 lg:px-14 py-3 bg-white shadow-lg">
                     <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap scrollbar-hide">
                         {filteredProducts.length > 0 ? (
                             filteredProducts.map((product) => (

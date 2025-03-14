@@ -43,11 +43,11 @@ const Hero = () => {
                             Grab Up To <span className="text-yellow-400">50% Off</span> on Selected Products
                         </span>
                         <p className="text-gray-200 text-md md:text-lg mt-4">
-                            Limited-time offer on our best-selling collections. Don`&apos;`t miss out on this exclusive deal!
+                            Limited-time offer on our best-selling collections. Do not miss out on this exclusive deal!
                         </p>
                         <Link 
                             href="/Shop" 
-                            className="bg-yellow-500 hover:bg-yellow-600 transition-all duration-300 text-black font-semibold text-lg mt-6 py-3 px-6 rounded-full shadow-lg"
+                            className="bg-DarkRed text-white transition-all duration-300 font-semibold text-lg mt-6 py-3 px-6 rounded-full shadow-lg"
                         >
                             Shop Now
                         </Link>

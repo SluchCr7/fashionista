@@ -7,6 +7,7 @@ import { UserContext } from '../Context/UserContext';
 import { motion } from 'framer-motion';
 import { ProductContext } from '../Context/ProductContext';
 import { FaHeart } from "react-icons/fa6";
+import { CiStar } from "react-icons/ci";
 
 const ProductCont = ({ product }) => {
     const [color, setColor] = useState('');
@@ -16,9 +17,6 @@ const ProductCont = ({ product }) => {
     const { addToCart, discount } = useContext(CartContext);
     const [notify, setNotify] = useState('');
     const FinalPrice = (product?.price * (1 - discount / 100)).toFixed(2)
-    useEffect(() => {
-        console.log(product?._id , user?._id)
-    },[product , user])
     const handleCart = () => {
         if (!user) {
             setNotify('Please Login First');
@@ -42,7 +40,7 @@ const ProductCont = ({ product }) => {
         setTimeout(() => setNotify(''), 3000);
     };
     return (
-        <div className='max-w-6xl mx-auto p-8'>
+        <div className='max-w-6xl mx-auto px-10 py-5'>
             {product ? (
                 <div className='flex flex-col md:flex-row gap-10'>
                     {/* Product Images */}
@@ -76,7 +74,21 @@ const ProductCont = ({ product }) => {
                     <div className='md:w-1/2 w-full flex flex-col gap-6'>
                         <h1 className='text-3xl font-bold'>{product?.name}</h1>
                         <p className='text-gray-600'>{product?.description}</p>
-                        
+                        <div>
+                            <div className='flex items-center gap-2'>
+                                <div className='flex items-center gap-1'>
+                                    {[1, 2, 3, 4, 5].map((star, index) => (
+                                        <motion.div 
+                                            key={index} 
+                                            whileHover={{ scale: 1.2 }}
+                                        >
+                                            <CiStar size={25} color={star <= product?.rating ? 'yellow' : 'gray'} />
+                                        </motion.div>
+                                    ))} 
+                                </div>
+                            </div>
+                            <span className='text-gray-500'>{product?.reviews?.length} Reviews</span>
+                        </div>
                         {/* Pricing */}
                         <div className='text-xl font-bold flex gap-4'>
                             <span className='text-red-500'>${FinalPrice}</span>
@@ -138,6 +150,7 @@ const ProductCont = ({ product }) => {
                             <div className='grid grid-cols-2 gap-4 mt-2'>
                                 <div className='text-sm'><span className='font-semibold'>Category:</span> {product?.category}</div>
                                 <div className='text-sm'><span className='font-semibold'>Material:</span> {product?.material}</div>
+                                <div className='text-sm'><span className='font-semibold'>Gender:</span> {product?.gender.charAt(0).toUpperCase() + product?.gender.slice(1).toLowerCase()}</div>
                             </div>
                         </div>
                     </div>

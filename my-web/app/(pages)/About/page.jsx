@@ -13,33 +13,43 @@ const About = () => {
     { num: 40, text: 'Architect Engineers' },
   ];
 
-  const team = [
-    { name: 'John Doe', role: 'Founder & CEO', img: '/assets/team1.jpg' },
-    { name: 'Jane Smith', role: 'Lead Designer', img: '/assets/team2.jpg' },
-    { name: 'Michael Brown', role: 'Marketing Head', img: '/assets/team3.jpg' },
-  ];
 
   return (
-    <div className="flex flex-col items-center gap-10 py-24 px-6 mx-auto max-w-9xl">
+    <div className="flex flex-col items-center gap-10 py-24 px-6 mx-auto max-w-7xl">
+      
+      {/* Hero Section */}
+      <div className="relative w-full h-[450px]">
+        <Image 
+          src="/Hero/h1_hero1.jpg.webp" 
+          layout="fill" 
+          objectFit="cover" 
+          alt="Fashion Collection" 
+          className="rounded-lg"
+        />
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <h1 className="text-white text-4xl font-bold uppercase">About Our Fashion Brand</h1>
+        </div>
+      </div>
+
       {/* About Section */}
       <div className="flex flex-col md:flex-row items-center gap-10">
         <Image 
           src="/assets/mens-collection.webp" 
-          className="w-[450px] h-[450px] rounded-lg shadow-lg" 
+          className="w-[450px] h-[550px] rounded-lg shadow-lg" 
           width={500} 
           height={500} 
           alt="About" 
         />
         <div className="flex flex-col gap-5 max-w-lg">
-          <h1 className="text-2xl font-bold text-DarkRed">About Us</h1>
+          <h2 className="text-2xl font-bold text-red-600">Who We Are</h2>
           <p className="text-gray-700">
-            Welcome to our premium fashion store! We pride ourselves on providing high-quality,
-            stylish, and sustainable clothing for modern individuals. Our designs are crafted to
-            match your personality, offering the perfect blend of comfort and elegance.
+            Welcome to our premium fashion store! We blend style, comfort, and sustainability 
+            to bring you an exclusive clothing collection. Our designs cater to individuals 
+            who value elegance and uniqueness.
           </p>
           <p className="text-gray-700">
-            With decades of experience in the fashion industry, our team ensures that every piece
-            is designed with passion and precision, giving you an unmatched shopping experience.
+            With years of expertise, we ensure that each piece is crafted with passion and precision, 
+            offering a seamless shopping experience.
           </p>
         </div>
       </div>
@@ -53,33 +63,44 @@ const About = () => {
           </div>
         ))}
       </div>
-      
-      {/* Why Choose Us Section */}
-      <div className="flex flex-col items-center gap-6 max-w-6xl text-center">
-        <h2 className="text-2xl font-bold text-red-600">Why Choose Us?</h2>
-        <p className="text-gray-700">
-          We go beyond selling clothes. Our goal is to provide a seamless shopping experience
-          with quality you can trust.
+
+      {/* Our Mission & Values */}
+      <div className="flex bg-gray-100 flex-col gap-6 items-center text-center p-6 max-w-6xl">
+        <h2 className="text-2xl font-bold text-red-600">Our Mission & Values</h2>
+        <p className="text-gray-700 text-sm">
+          We are committed to redefining fashion with high-quality, sustainable materials and 
+          exceptional craftsmanship. Our goal is to create timeless pieces that empower individuals 
+          to express themselves effortlessly.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-4 border-l-4 border-red-500 bg-gray-100 rounded-md shadow-md">
-            <h3 className="font-semibold text-lg">Sustainable Fabrics</h3>
-            <p className="text-sm text-gray-600">We use eco-friendly materials that are soft, durable, and ethically sourced.</p>
+            <h3 className="font-semibold text-lg">Sustainability</h3>
+            <p className="text-sm text-gray-600">Eco-friendly fabrics and ethical production.</p>
           </div>
           <div className="p-4 border-l-4 border-red-500 bg-gray-100 rounded-md shadow-md">
-            <h3 className="font-semibold text-lg">Premium Craftsmanship</h3>
-            <p className="text-sm text-gray-600">Each item is designed with precision to offer superior fit and comfort.</p>
+            <h3 className="font-semibold text-lg">Quality Craftsmanship</h3>
+            <p className="text-sm text-gray-600">Each piece is crafted with precision and passion.</p>
           </div>
           <div className="p-4 border-l-4 border-red-500 bg-gray-100 rounded-md shadow-md">
-            <h3 className="font-semibold text-lg">Fast & Secure Shipping</h3>
-            <p className="text-sm text-gray-600">We ensure timely delivery with multiple shipping options for convenience.</p>
+            <h3 className="font-semibold text-lg">Customer Satisfaction</h3>
+            <p className="text-sm text-gray-600">Your satisfaction is our priority.</p>
           </div>
           <div className="p-4 border-l-4 border-red-500 bg-gray-100 rounded-md shadow-md">
-            <h3 className="font-semibold text-lg">Customer-Centric Approach</h3>
-            <p className="text-sm text-gray-600">Our 24/7 support ensures you have a hassle-free shopping experience.</p>
+            <h3 className="font-semibold text-lg">Innovation</h3>
+            <p className="text-sm text-gray-600">We stay ahead of the fashion curve.</p>
+          </div>
+          <div className="p-4 border-l-4 border-red-500 bg-gray-100 rounded-md shadow-md">
+            <h3 className="font-semibold text-lg">Community Engagement</h3>
+            <p className="text-sm text-gray-600">We believe in giving back to the community.</p>
+          </div>
+          <div className="p-4 border-l-4 border-red-500 bg-gray-100 rounded-md shadow-md">
+            <h3 className="font-semibold text-lg">Accessibility</h3>
+            <p className="text-sm text-gray-600">We design for everyone, from small to big.</p>
           </div>
         </div>
-    </div>
+      </div>
+
+
     </div>
   );
 };

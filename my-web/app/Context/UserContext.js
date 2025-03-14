@@ -85,8 +85,19 @@ const UserContextProvider = ({children}) => {
             )
                 .then((res) => {
                     setMessage(res.data.message)
-                    setTimeout(() => setMessage(''), 3000)
-                    // window.location.reload()
+                    setTimeout(() => {
+                        setMessage('')
+                        window.location.reload()
+                    }, 3000)
+                    // Change Favourite array in User Object in LocalStorage and add New Product
+                    const userData = JSON.parse(localStorage.getItem('Data'))
+                    if(res.data.message.includes("Added")){
+                        userData.favorites.push(prodId)
+                    }
+                    else if (res.data.message.includes("Removed")){
+                        userData.favorites.splice(userData.favorites.indexOf(prodId), 1)
+                    }
+                    localStorage.setItem('Data', JSON.stringify(userData))
                 })
                 .catch((err) => {
                     console.log(err)
