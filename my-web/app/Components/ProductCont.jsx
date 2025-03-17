@@ -154,7 +154,7 @@ const ProductCont = memo(({ product }) => {
                             Add To Cart
                         </motion.button>
                     </div>
-                    <div className='border border-gray-400 pt-3 grid grid-cols-1 md:grid-cols-2 gap-2'>
+                    <div className='border-t border-gray-400 pt-3 grid grid-cols-1 md:grid-cols-2 gap-2'>
                         <div className='flex items-center gap-2'>
                             <span className='font-semibold'>Category:</span>
                             <span>{product?.category}</span>
