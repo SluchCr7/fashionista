@@ -3,15 +3,9 @@ import Image from 'next/image';
 import React from 'react';
 import CountUp from 'react-countup';
 import { motion } from 'framer-motion';
-
+import { stats } from '@/app/Data';
 const About = () => {
-  const stats = [
-    { num: 50, text: 'Years of Experience' },
-    { num: 70, text: 'Projects Completed' },
-    { num: 200, text: 'Awards Won' },
-    { num: 100, text: 'Happy Clients' },
-    { num: 40, text: 'Architect Engineers' },
-  ];
+
 
 
   return (

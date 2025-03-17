@@ -4,8 +4,8 @@ import { MdLocationOn } from "react-icons/md";
 import { MdOutlinePhone } from "react-icons/md";
 import { MdOutlineEmail } from "react-icons/md";
 import { TiSocialSkype } from "react-icons/ti";
-import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 import Intro from '../../Components/Intro';
+import { socialLinks } from '@/app/Data';
 const Contact = () => {
     const [name , setName] = useState("")
     const [phone , setPhone] = useState("")
@@ -27,11 +27,7 @@ const Contact = () => {
             setter : setEmail
         }
     ] 
-    const socialLinks = [
-        { icon: <FaFacebook />, link: "/", ariaLabel: "Facebook" },
-        { icon: <FaInstagram />, link: "/", ariaLabel: "Instagram" },
-        { icon: <FaTwitter />, link: "/", ariaLabel: "Twitter" }
-    ];
+
   return (
     <div className='w-full min-h-[100vh] px-10 py-20 flex items-start justify-center flex-col'>
         <Intro title={"Contact With Us"} para={"Contact With Us if you want have any suggestions"} /> 

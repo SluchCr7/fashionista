@@ -7,7 +7,7 @@ export const ProductContext = createContext();
 const ProductContextProvider = ({children}) => {
     const [message, setMessage] = useState('')
     const [products , setProducts] = useState([])
-    // Add New Product
+    // Add New Product Function
     const AddProduct = (name , description , price , quantity , category , gender , collections , sizes , colors , material , img) => {
         const formData = new FormData()
         formData.append('image', img)
@@ -35,6 +35,7 @@ const ProductContextProvider = ({children}) => {
                 console.log(err)
             })
     }
+    // Get All Products
     useEffect(() => {
         axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product`)
         .then((res) => {
@@ -43,7 +44,8 @@ const ProductContextProvider = ({children}) => {
             .catch((err) => {
             console.log(err)
         })
-    },[])
+    }, [])
+    // Delete Product
     const deleteProduct = (prodId) => {
         axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product/${prodId}`)
             .then((res) => {

@@ -1,13 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
-import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
-
+import { socialLinks } from '../Data';
 const Footer = () => {
-    const socialLinks = [
-        { icon: <FaFacebook />, link: "/" },
-        { icon: <FaInstagram />, link: "/" },
-        { icon: <FaTwitter />, link: "/" }
-    ];
 
     return (
         <div className='flex flex-col w-full bg-gray-100 text-black'>

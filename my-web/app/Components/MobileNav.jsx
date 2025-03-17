@@ -6,16 +6,9 @@ import { IoIosLogOut } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { navLinks } from '../Data';
 const MobileNav = () => {
     const pathname = usePathname()
-    const Links = [
-        { name: "Home", link: "/" },
-        { name: "Men", link: "/Men" },
-        { name: "Women", link: "/Women" },
-        { name: "Shop", link: "/Shop" },
-        { name: "Kids", link: "/Kids" },
-        { name: "Shoes", link: "/Shoes" },
-    ];
   return (
     <div>
         <Sheet>
@@ -39,7 +32,7 @@ const MobileNav = () => {
                 <div className='flex flex-col items-center gap-4 justify-center w-full min-h-[100vh]'>                         
                     <nav className='flex flex-col items-center gap-4 mt-20 text-center'>
                     {
-                        Links.map((link, index) => {
+                        navLinks.map((link, index) => {
                             return (
                                 <Link href={link.link} className={`text-lg ${link.link === pathname ? 'text-yellow-700 font-bold' : 'text-yellow-700 font-medium'}`} key={index}>
                                     {link.name}

@@ -10,7 +10,6 @@ const CartShop = () => {
     const {numInCart , cart , finalCart , SubmitCart , discount} = useContext(CartContext)
     const handleCart =()=>{
         SubmitCart(cart);
-        // window.location.href = "/Checkout"
     }
   return (
     <div>

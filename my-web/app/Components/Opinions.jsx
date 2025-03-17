@@ -1,39 +1,23 @@
 'use client';
 import Image from 'next/image';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { FaQuoteLeft, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Intro from './Intro';
 import { motion, AnimatePresence } from "framer-motion";
+import { testimonials } from '../Data';
 
-const Opinions = () => {
-  const testimonials = [
-    {
-      name: "Arnold Adam",
-      img: "/Openions/testimonial1-1.jpg",
-      job: "AI Developer",
-      opinion: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vitae, maiores? Adipisci soluta tempora explicabo excepturi ea corporis fugiat dicta facilis."
-    },
-    {
-      name: "Androw Jadd",
-      img: "/Openions/testimonial2-1.jpg",
-      job: "Software Engineer",
-      opinion: "Enim, quo magnam quidem reprehenderit quisquam facere! Soluta tempora explicabo excepturi ea corporis fugiat dicta facilis."
-    },
-    { 
-      name: "Sophia Carter",
-      img: "/Openions/testimonial3-1.jpg",
-      job: "Data Scientist",
-      opinion: "Sequi repellat architecto enim, quo magnam quidem reprehenderit quisquam facere!"
-    },
-    {
-      name: "Michael Ross",
-      img: "/Openions/testimonial4-1.jpg",
-      job: "Product Manager",
-      opinion: "Adipisci soluta tempora explicabo excepturi ea corporis fugiat dicta facilis sequi repellat architecto enim."
-    },
-  ];
-
+const Opinions = memo(() => {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextSlide = useCallback(() => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
+    );
+  }, []);
 
   // Auto-slide every 5 seconds
   useEffect(() => {
@@ -42,17 +26,8 @@ const Opinions = () => {
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, [currentIndex, nextSlide]);
 
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
-    );
-  };
 
   return (
     <div className="relative w-full py-20 overflow-hidden bg-fixed bg-center bg-cover" 
@@ -123,6 +98,6 @@ const Opinions = () => {
       </div>
     </div>
   );
-}
+});
 
 export default Opinions;

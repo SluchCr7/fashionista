@@ -1,9 +1,9 @@
 'use client'
-import React , {useContext} from 'react'
+import React , {memo, useContext} from 'react'
 import Intro from './Intro'
 import Image from 'next/image'
 import { ProductContext } from '../Context/ProductContext'
-const ClothesGender = ({gender , title , Para}) => {
+const ClothesGender = memo(({gender , title , Para}) => {
   const {products} = useContext(ProductContext)
   return (
     <div className='flex items-center flex-col gap-3 w-[100%] px-10 py-5'>
@@ -21,6 +21,6 @@ const ClothesGender = ({gender , title , Para}) => {
           </div>
     </div>
   )
-}
+})
 
 export default ClothesGender

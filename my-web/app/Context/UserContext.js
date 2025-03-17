@@ -56,12 +56,14 @@ const UserContextProvider = ({children}) => {
             })
             .catch(err => toast.error("Logout Failed"))
     }
+    // Get User
     useEffect(() => {
         const user = localStorage.getItem('Data')
         if(user){
             setUser(JSON.parse(user))
         }
     }, []) 
+    // Get All Users
     useEffect(() => {
         axios.get('http://localhost:3001/api/auth').then((res) => {
             setUsers(res.data)
@@ -69,6 +71,7 @@ const UserContextProvider = ({children}) => {
             console.log(err)
         })
     }, [])
+    // Add Favourite Product
     const AddFavourite = async (prodId) => {
         if (!user) {
             setMessage("Please Login First")

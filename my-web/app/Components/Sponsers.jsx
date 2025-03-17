@@ -1,13 +1,8 @@
 import Image from 'next/image'
 import React from 'react'
-
+import { Companies } from '../Data'
 const Sponsers = () => {
-  const images = [
-    "/sponsers/06Oct24 Anis Pro Upload.png",
-    "/sponsers/Black and White Y2K Streetwear Clothing Logo.png",
-    "/sponsers/Red Minimalist Fashion Woman Free Logo.png",
-    "/sponsers/White and Black Apparel Clothing Business Logo.png",
-  ]
+
   return (
     <div className='w-[100%]'>
       <div className='grid grid-cols-1 md:grid-cols-2 w-[70%] mx-auto lg:grid-cols-4 gap-8'>

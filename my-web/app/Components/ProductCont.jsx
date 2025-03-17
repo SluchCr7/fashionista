@@ -1,23 +1,27 @@
 'use client'
-import React, { useContext, useState , useEffect } from 'react';
+import React, { useContext, useState, useEffect, memo, useCallback, useMemo } from 'react';
 import { CartContext } from '../Context/Cart';
 import { IoMdHeart, IoMdAdd, IoMdRemove } from 'react-icons/io';
 import Image from 'next/image';
 import { UserContext } from '../Context/UserContext';
 import { motion } from 'framer-motion';
-import { ProductContext } from '../Context/ProductContext';
 import { FaHeart } from "react-icons/fa6";
 import { CiStar } from "react-icons/ci";
 
-const ProductCont = ({ product }) => {
+const ProductCont = memo(({ product }) => {
     const [color, setColor] = useState('');
     const [size, setSize] = useState('');
     const [num, setNum] = useState(1);
-    const { user , AddFavourite } = useContext(UserContext);
-    const { addToCart, discount } = useContext(CartContext);
     const [notify, setNotify] = useState('');
-    const FinalPrice = (product?.price * (1 - discount / 100)).toFixed(2)
-    const handleCart = () => {
+    
+    const { user, AddFavourite } = useContext(UserContext);
+    const { addToCart, discount } = useContext(CartContext);
+
+    // Memoized final price calculation
+    const FinalPrice = useMemo(() => (product?.price * (1 - discount / 100)).toFixed(2), [product?.price, discount]);
+
+    // Memoized function to handle adding to cart
+    const handleCart = useCallback(() => {
         if (!user) {
             setNotify('Please Login First');
         } else if (color && size) {
@@ -38,7 +42,16 @@ const ProductCont = ({ product }) => {
             setNotify('Please Select Color and Size');
         }
         setTimeout(() => setNotify(''), 3000);
-    };
+    }, [user, color, size, num, FinalPrice, addToCart, product]);
+
+    // Memoized handlers to prevent unnecessary re-renders
+    const selectColor = useCallback((clr) => setColor(clr), []);
+    const selectSize = useCallback((sz) => setSize(sz), []);
+    const incrementNum = useCallback(() => setNum((prev) => prev + 1), []);
+    const decrementNum = useCallback(() => setNum((prev) => Math.max(prev - 1, 1)), []);
+
+    console.log("Product Rendered");
+
     return (
         <div className='max-w-6xl mx-auto px-10 py-5'>
             {product ? (
@@ -78,10 +91,7 @@ const ProductCont = ({ product }) => {
                             <div className='flex items-center gap-2'>
                                 <div className='flex items-center gap-1'>
                                     {[1, 2, 3, 4, 5].map((star, index) => (
-                                        <motion.div 
-                                            key={index} 
-                                            whileHover={{ scale: 1.2 }}
-                                        >
+                                        <motion.div key={index} whileHover={{ scale: 1.2 }}>
                                             <CiStar size={25} color={star <= product?.rating ? 'yellow' : 'gray'} />
                                         </motion.div>
                                     ))} 
@@ -102,7 +112,7 @@ const ProductCont = ({ product }) => {
                                 {product?.colors?.map((clr, index) => (
                                     <motion.div 
                                         key={index} 
-                                        onClick={() => setColor(clr)}
+                                        onClick={() => selectColor(clr)}
                                         style={{ backgroundColor: clr.toLowerCase() }}
                                         className={`w-10 h-10 rounded-full cursor-pointer transition-all ${color === clr ? 'border-4 border-black' : 'border border-gray-300'}`}
                                         whileHover={{ scale: 1.1 }}
@@ -118,7 +128,7 @@ const ProductCont = ({ product }) => {
                                 {product?.sizes?.map((sz, index) => (
                                     <motion.div 
                                         key={index} 
-                                        onClick={() => setSize(sz)} 
+                                        onClick={() => selectSize(sz)} 
                                         className={`px-4 py-2 border rounded-md cursor-pointer transition-all ${size === sz ? 'bg-yellow-400 border-black text-black' : 'border-gray-300'}`}
                                         whileHover={{ scale: 1.1 }}
                                     >
@@ -130,9 +140,9 @@ const ProductCont = ({ product }) => {
                         
                         {/* Quantity Selection */}
                         <div className='flex items-center gap-3'>
-                            <button onClick={() => setNum(prev => Math.max(prev - 1, 1))} className='border p-2 rounded-md'><IoMdRemove /></button>
+                            <button onClick={decrementNum} className='border p-2 rounded-md'><IoMdRemove /></button>
                             <span className='text-lg font-bold'>{num}</span>
-                            <button onClick={() => setNum(prev => prev + 1)} className='border p-2 rounded-md'><IoMdAdd /></button>
+                            <button onClick={incrementNum} className='border p-2 rounded-md'><IoMdAdd /></button>
                         </div>
                         
                         {/* Add to Cart Button */}
@@ -143,15 +153,19 @@ const ProductCont = ({ product }) => {
                         >
                             Add To Cart
                         </motion.button>
-                        
-                        {/* Product Characteristics */}
-                        <div className='border-t pt-2'>
-                            <span className='font-bold'>Product Details:</span>
-                            <div className='grid grid-cols-2 gap-4 mt-2'>
-                                <div className='text-sm'><span className='font-semibold'>Category:</span> {product?.category}</div>
-                                <div className='text-sm'><span className='font-semibold'>Material:</span> {product?.material}</div>
-                                <div className='text-sm'><span className='font-semibold'>Gender:</span> {product?.gender.charAt(0).toUpperCase() + product?.gender.slice(1).toLowerCase()}</div>
-                            </div>
+                    </div>
+                    <div className='border border-gray-400 pt-3 grid grid-cols-1 md:grid-cols-2 gap-2'>
+                        <div className='flex items-center gap-2'>
+                            <span className='font-semibold'>Category:</span>
+                            <span>{product?.category}</span>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                            <span className='font-semibold'>Material:</span>
+                            <span>{product?.material}</span>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                            <span className='font-semibold'>Gender:</span>
+                            <span>{product?.gender}</span>
                         </div>
                     </div>
                 </div>
@@ -162,6 +176,6 @@ const ProductCont = ({ product }) => {
             )}
         </div>
     );
-};
+});
 
 export default ProductCont;

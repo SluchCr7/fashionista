@@ -13,7 +13,7 @@ import Image from 'next/image';
 import { IoIosSearch } from "react-icons/io";
 import { FaHeart } from "react-icons/fa6";
 import {IoMdHeart} from 'react-icons/io'
-
+import { navLinks } from '../Data';
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [showSearchBar , setShowSearchBar] = useState(false)
@@ -50,15 +50,6 @@ const Header = () => {
             setFilteredProducts(filtered);
         }
     }, [search, products]);
-
-    const navLinks = [
-        {name: "Men", link: "/Men" },
-        { name: "Women", link: "/Women" },
-        { name: "Shop", link: "/Shop" },
-        { name: "Kids", link: "/Kids" },
-        { name: "Shoes", link: "/Shoes" },
-    ];
-
     return (
         <header className="w-full flex flex-col gap-3">
             {/* Navigation Bar */}
