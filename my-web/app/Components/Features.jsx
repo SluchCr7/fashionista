@@ -35,9 +35,9 @@ const Features = () => {
       {features.map(({ icon, text, id, paragraph }) => (
         <div
           key={id}
-          className="flex flex-col items-center text-center bg-white shadow-lg rounded-2xl p-6 transition-transform transform hover:scale-105"
+          className="flex flex-col items-center text-center p-6 transition-transform transform hover:scale-105"
         >
-          <span className="text-5xl text-red-600 mb-3">{icon}</span>
+          <span className="text-5xl text-DarkRed mb-3">{icon}</span>
           <span className="text-lg font-bold text-gray-800">{text}</span>
           <p className="text-sm text-gray-500 mt-2">{paragraph}</p>
         </div>

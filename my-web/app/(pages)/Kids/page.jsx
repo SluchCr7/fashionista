@@ -7,7 +7,7 @@ import React from 'react'
 const Kids = () => {
   return (
     <div className='flex items-center flex-col w-full gap-3'>
-        <Image src={'/Hero/bg_kids.jpg'} width={1000} height={1000} className='w-full h-auto' alt='bg-picture' />
+        <Image src={'/Hero/bg_kids.avif'} width={1000} height={1000} className='w-full min-h-[100vh]' alt='bg-picture' />
         <div className='flex items-center flex-col gap-3 w-[80%] px-10 py-5'>
             <ClothesGender gender={"kid"} title={"Top Kids Clothes"} Para={"Discover New And high Kids Wears in Store"} />
         </div>

@@ -11,6 +11,8 @@ import { UserContext } from '../Context/UserContext';
 import { ProductContext } from '../Context/ProductContext';
 import Image from 'next/image';
 import { IoIosSearch } from "react-icons/io";
+import { FaHeart } from "react-icons/fa6";
+import {IoMdHeart} from 'react-icons/io'
 
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -18,7 +20,7 @@ const Header = () => {
     const [search, setSearch] = useState("");
     const [filteredProducts, setFilteredProducts] = useState([]);
     const pathname = usePathname();
-    const isHomePage = pathname === "/" || pathname === "/Men" || pathname === "/Women" || pathname === "/Kids"; // Check if on the home page
+    const isHomePage = pathname === "/" || pathname === "/Men" || pathname === "/Women" || pathname === "/Kids" || pathname === "/Shoes"; // Check if on the home page
     const { user } = useContext(UserContext);
     const { products } = useContext(ProductContext);
 
@@ -50,10 +52,11 @@ const Header = () => {
     }, [search, products]);
 
     const navLinks = [
-        { name: "Men", link: "/Men" },
+        {name: "Men", link: "/Men" },
         { name: "Women", link: "/Women" },
-        { name: "Kids", link: "/Kids" },
         { name: "Shop", link: "/Shop" },
+        { name: "Kids", link: "/Kids" },
+        { name: "Shoes", link: "/Shoes" },
     ];
 
     return (
@@ -63,12 +66,12 @@ const Header = () => {
                 ${isScrolled ? 'bg-white text-black shadow-md' : 'bg-transparent text-white'}`}>
                 
                 {/* Logo & Nav Links */}
-                <div className="flex items-center gap-6">
-                    <Link href="/" className="text-xl font-bold tracking-wide">Fashionista</Link>
+                <div className="flex items-center gap-9">
+                    <Link href="/" className="text-2xl font-bold tracking-wide uppercase">Fashionista</Link>
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center gap-5">
                         {navLinks.map(({ name, link }, index) => (
-                            <Link key={index} href={link} className="text-sm uppercase font-medium transition-all duration-300 hover:text-red-500">
+                            <Link key={index} href={link} className="text-base uppercase font-medium transition-all duration-300 text-gray-400 hover:text-DarkRed">
                                 {name}
                             </Link>
                         ))}
@@ -76,35 +79,38 @@ const Header = () => {
                 </div>
 
                 {/* Search, User, Cart, and Mobile Nav */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-7">
                     {/* Search Bar */}
                     <div className="relative w-full hidden md:flex flex-row gap-3 items-center">
                         <input 
                             value={search} 
                             onChange={(e) => setSearch(e.target.value)} 
                             type="text" 
-                            className={`border  px-3 py-2 ${showSearchBar ? 'opacity-100 w-full' : "opacity-0 w-0 pointer-events-none"} transition-all duration-700 border-gray-400 focus:outline-none rounded-md bg-white text-black`}
+                            className={`border px-3 py-2 ${showSearchBar ? 'opacity-100 w-full' : "opacity-0 w-0 pointer-events-none"} transition-all duration-700 border-gray-400 focus:outline-none rounded-lg bg-white text-black`}
                             placeholder="Search products..."
                         />
                     </div>
-                    <div className='text-xl'>
+                    <div className='text-2xl'>
                         <IoIosSearch className='' onClick={() => setShowSearchBar(!showSearchBar)} />
                     </div>
                     {/* User Icon or Login */}
                     {user?.isAdmin ? <span className="bg-red-600 py-1 px-2 text-sm font-bold text-white">Admin</span> : ""}
                     {user ? (
                         <div className="flex items-center gap-2">
-                            <Link href="/Profile" aria-label="User Account" className="text-xl">
+                            <Link href="/Profile" aria-label="User Account" className="text-2xl">
                                 <CiUser />
                             </Link>
                             {user.isAdmin && <span className="bg-red-600 py-1 px-2 text-sm font-bold text-white">Admin</span>}
                         </div>
                     ) : (
-                        <Link href="/Login" className="text-xl transition-all duration-300 hover:text-red-500">
+                        <Link href="/Login" className="text-2xl transition-all duration-300 hover:text-red-500">
                             <TbLogin2 />
                         </Link>
                     )}
-
+                    {/* Heart Icon */}
+                    <Link href="/Wishlist" className="text-2xl transition-all duration-300 hover:text-red-500">
+                        <IoMdHeart />
+                    </Link>
                     {/* Cart Icon */}
                     <CartShop />
 

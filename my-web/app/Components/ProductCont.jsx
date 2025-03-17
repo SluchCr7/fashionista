@@ -54,7 +54,7 @@ const ProductCont = ({ product }) => {
                                 className='w-full object-cover rounded-xl shadow-lg'
                             />
                             <div className='absolute top-2 left-2 flex gap-3'>
-                                {discount && <span className='bg-red-500 px-3 py-1 text-white rounded-full'>{discount}% OFF</span>}
+                                {discount && <span className='bg-red-500 px-3 py-1 text-white rounded-full'>{discount}%</span>}
                                 {
                                     user?.favorites?.includes(product?._id) ? (
                                         <span className='bg-white p-2 rounded-full cursor-pointer text-red-700' onClick={() => AddFavourite(product?._id)}>

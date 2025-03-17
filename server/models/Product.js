@@ -14,10 +14,6 @@ const ProductSchema = new mongoose.Schema({
         type: String,
         default : "Product Description"
     },
-    // rating: {
-    //     type : Number,
-    //     default : 0
-    // },
     quantity: {
         type: Number,
         required : true
@@ -53,6 +49,10 @@ const ProductSchema = new mongoose.Schema({
     category: {
         type: String,   
         required : true
+    },
+    rating: {
+        type: String, 
+        default : 0
     }
 }, { timestamps : true })
 

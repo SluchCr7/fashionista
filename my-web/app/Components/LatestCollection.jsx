@@ -45,23 +45,29 @@ const LatestCollection = () => {
     },[])
   return (
     <div className="flex relative items-center justify-center flex-col gap-3 px-10 py-5">
-      <Intro title="Latest Collection" para="Explore our latest products below and go to the shop!" />
-
+    <Intro title="Latest Collection" para="Explore our latest products below and go to the shop!" />
         <div ref={ScrollRef} className="scrollBar mx-auto overflow-x-auto flex space-x-6 relative">
             {
                 products.map((product , index) => {
                     return (
                         <>
                             <div className='min-w-[100%] sm:min-w-[50%] lg:min-w-[30%] relative'>
-                                <Image src={product?.Photo[0]?.url} alt={'product_img'} width={200} height={200}
-                                    className='w-full h-[500px] rounded-lg object-cover'
-                                />
-                                <div className='absolute bottom-0 left-0 right-0 bg-opacity-50 backdrop-blur-md rounded-b-lg p-4 text-white'>
-                                    <Link href={`/Product/${product._id}`} className="block">
-                                        <span className='font-bold'>{product?.name}</span>
-                                        <span className='text-sm'>{product?.price}</span>
-                                    </Link>
-                                </div>
+                                {/* <Link href={`/Product/${product?._id}`}> */}
+                                    <Image src={product?.Photo[0]?.url} alt={'product_img'} width={200} height={200}
+                                        className='w-full h-[500px] rounded-lg object-cover'
+                                    />
+                                {/* </Link> */}
+                                <Link href={`/Product/${product?._id}`} className='flex items-center flex-col gap-1 py-4'>
+                                    <span className='text-black font-bold'>{product?.name}</span>
+                                    <span className='text-DarkRed'>${product?.price}</span>
+                                    {/* <div className='flex items-center gap-1'>
+                                        <CiStar />
+                                        <CiStar />
+                                        <CiStar />
+                                        <CiStar />
+                                        <CiStar />
+                                    </div> */}
+                                </Link>
                             </div>
                         </>
                     )
@@ -69,20 +75,23 @@ const LatestCollection = () => {
             }
         </div>
         {/* Navigation buttons */}
-        <div className='flex items-center gap-3'>
-            <button
-                onClick={()=> scroll("left")}
-                className={`absolute top-1/2 left-6 z-50 ${canScrollLeft ? "bg-yellow text-white" : "bg-gray-200 text-gray-400 pointer-events-none"} p-2 rounded-full shadow-lg`}
-            >
-                <FaLongArrowAltLeft />
-            </button>
-            <button
-                onClick={()=> scroll("right")}
-                className={` absolute top-1/2 right-6 z-50 ${canScrollRight ? "bg-yellow text-white" : "bg-gray-200 text-gray-400 pointer-events-none"} p-2 rounded-full shadow-lg`}
-            >
-                <FaLongArrowAltRight />
-            </button>
-        </div>
+        {
+            products.length > 0 &&
+            <div className='flex items-center gap-3'>
+                <button
+                    onClick={()=> scroll("left")}
+                    className={`absolute top-1/2 left-6 z-50 ${canScrollLeft ? "bg-yellow text-white" : "bg-gray-200 text-gray-400 pointer-events-none"} p-2 rounded-full shadow-lg`}
+                >
+                    <FaLongArrowAltLeft />
+                </button>
+                <button
+                    onClick={()=> scroll("right")}
+                    className={` absolute top-1/2 right-6 z-50 ${canScrollRight ? "bg-yellow text-white" : "bg-gray-200 text-gray-400 pointer-events-none"} p-2 rounded-full shadow-lg`}
+                >
+                    <FaLongArrowAltRight />
+                </button>
+            </div>
+        }
       </div>        
   );
 };

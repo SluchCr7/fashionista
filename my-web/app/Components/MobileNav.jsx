@@ -10,10 +10,11 @@ const MobileNav = () => {
     const pathname = usePathname()
     const Links = [
         { name: "Home", link: "/" },
-        { name: "About", link: "/About" },
-        { name: "Contact", link: "/Contact" },
+        { name: "Men", link: "/Men" },
+        { name: "Women", link: "/Women" },
         { name: "Shop", link: "/Shop" },
-        { name: "Orders", link: "/Order" },
+        { name: "Kids", link: "/Kids" },
+        { name: "Shoes", link: "/Shoes" },
     ];
   return (
     <div>

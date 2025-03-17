@@ -23,7 +23,6 @@ const Shop = () => {
     minPrice: 0,
     maxPrice: 100,
   });
-
   const [priceRange, setPriceRange] = useState([0, 100]);
   const [sortPrice, setSortPrice] = useState("default");
   const [page, setPage] = useState(0);
@@ -32,7 +31,7 @@ const Shop = () => {
   const categories = [...new Set(products.map((product) => product.category))];
   const genders = [...new Set(products.map((product) => product.gender))];
   const materials = [... new Set(products.map((product) => product.material))];
-  const colors = ["Yellow" , "Black" , "White" , "Blue" , "Red" , "Green" , "Gray" , "Navy" , "Beige" , "Pink"];
+  const colors = ["Yellow" , "Black" , "White" , "Blue" , "Red" , "Green" , "Brown" , "Orange" , "Purple" , "Silver" , "Gold", "Gray" , "Navy" , "Beige" , "Pink"];
   const sizes = [...new Set(products.flatMap((product) => product.sizes))];
   
   useEffect(() => {
