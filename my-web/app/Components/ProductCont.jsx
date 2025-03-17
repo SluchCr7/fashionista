@@ -87,7 +87,7 @@ const ProductCont = memo(({ product }) => {
                     <div className='md:w-1/2 w-full flex flex-col gap-6'>
                         <h1 className='text-3xl font-bold'>{product?.name}</h1>
                         <p className='text-gray-600'>{product?.description}</p>
-                        <div>
+                        <div className="flex items-center gap-5">
                             <div className='flex items-center gap-2'>
                                 <div className='flex items-center gap-1'>
                                     {[1, 2, 3, 4, 5].map((star, index) => (
@@ -97,7 +97,7 @@ const ProductCont = memo(({ product }) => {
                                     ))} 
                                 </div>
                             </div>
-                            <span className='text-gray-500'>{product?.reviews?.length} Reviews</span>
+                            <span className='text-gray-500'>{product?.rating} Reviews</span>
                         </div>
                         {/* Pricing */}
                         <div className='text-xl font-bold flex gap-4'>
