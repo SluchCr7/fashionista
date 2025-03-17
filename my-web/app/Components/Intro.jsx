@@ -1,3 +1,4 @@
+'use client'
 import React, { memo } from 'react'
 
 const Intro = memo(({title , para}) => {
@@ -9,5 +10,7 @@ const Intro = memo(({title , para}) => {
     </div>
   )
 })
+
+Intro.displayName = "Intro"
 
 export default Intro

@@ -11,4 +11,6 @@ const Notify =memo(({Notify}) => {
   )
 })
 
+Notify.displayName = "Notify"
+
 export default Notify

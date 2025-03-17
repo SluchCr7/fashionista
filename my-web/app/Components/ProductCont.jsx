@@ -178,4 +178,6 @@ const ProductCont = memo(({ product }) => {
     );
 });
 
+ProductCont.displayName = 'ProductCont';
+
 export default ProductCont;

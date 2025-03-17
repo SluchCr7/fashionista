@@ -100,4 +100,7 @@ const Opinions = memo(() => {
   );
 });
 
+
+Opinions.displayName = "Opinions";
+
 export default Opinions;

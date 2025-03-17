@@ -23,4 +23,6 @@ const ClothesGender = memo(({gender , title , Para}) => {
   )
 })
 
+ClothesGender.displayName = "ClothesGender"
+
 export default ClothesGender
