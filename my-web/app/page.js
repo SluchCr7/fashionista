@@ -7,6 +7,8 @@ import HomePage from "./Components/HomePage";
 import Opinions from "./Components/Opinions";
 import { useRef } from "react";
 import Features from "./Components/Features";
+import Categories from "./Components/Categories";
+import Ads from "./Components/Ads";
 
 export default function Home() {
   // const lastPage = useRef();
@@ -21,11 +23,13 @@ export default function Home() {
         <HomePage />
       </div>
       <div className="flex flex-col items-center w-full gap-3 py-4">
-        <LatestCollection/>
+        <Categories/>
+        <LatestCollection />
         <Hero />
         <BestSeller />
-        <Opinions />
+        <Ads/>
         <Features/>
+        <Opinions />
       </div>
     </div>
   );

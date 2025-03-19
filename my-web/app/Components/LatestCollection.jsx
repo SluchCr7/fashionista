@@ -44,9 +44,9 @@ const LatestCollection = () => {
         }
     },[])
   return (
-    <div className="flex relative items-center justify-center flex-col gap-3 px-10 py-5">
+    <div className="flex relative items-center justify-center max-w-[1370px] w-full flex-col gap-3 px-10 py-5">
     <Intro title="Latest Collection" para="Explore our latest products below and go to the shop!" />
-        <div ref={ScrollRef} className="scrollBar mx-auto overflow-x-auto flex space-x-6 relative">
+        <div ref={ScrollRef} className="scrollBar mx-auto w-full overflow-x-auto flex space-x-6 relative">
             {
                 products.map((product , index) => {
                     return (
@@ -60,13 +60,6 @@ const LatestCollection = () => {
                                 <Link href={`/Product/${product?._id}`} className='flex items-center flex-col gap-1 py-4'>
                                     <span className='text-black font-bold'>{product?.name}</span>
                                     <span className='text-DarkRed'>${product?.price}</span>
-                                    {/* <div className='flex items-center gap-1'>
-                                        <CiStar />
-                                        <CiStar />
-                                        <CiStar />
-                                        <CiStar />
-                                        <CiStar />
-                                    </div> */}
                                 </Link>
                             </div>
                         </>
@@ -80,13 +73,13 @@ const LatestCollection = () => {
             <div className='flex items-center gap-3'>
                 <button
                     onClick={()=> scroll("left")}
-                    className={`absolute top-1/2 left-6 z-50 ${canScrollLeft ? "bg-yellow text-white" : "bg-gray-200 text-gray-400 pointer-events-none"} p-2 rounded-full shadow-lg`}
+                    className={`absolute top-[40%] left-[5px] md:left-0 z-50 ${canScrollLeft ? "bg-yellow text-white" : "bg-gray-200 text-gray-400 pointer-events-none"} p-2 rounded-full shadow-lg`}
                 >
                     <FaLongArrowAltLeft />
                 </button>
                 <button
                     onClick={()=> scroll("right")}
-                    className={` absolute top-1/2 right-6 z-50 ${canScrollRight ? "bg-yellow text-white" : "bg-gray-200 text-gray-400 pointer-events-none"} p-2 rounded-full shadow-lg`}
+                    className={` absolute top-[40%] right-[5px] md:right-0 z-50 ${canScrollRight ? "bg-yellow text-white" : "bg-gray-200 text-gray-400 pointer-events-none"} p-2 rounded-full shadow-lg`}
                 >
                     <FaLongArrowAltRight />
                 </button>

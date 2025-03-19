@@ -12,8 +12,8 @@ const UserContextProvider = ({children}) => {
     const [users, setUsers] = useState([])
     const [message , setMessage] = useState("")
     // Register 
-    const Register = (email , name , password) => {
-        axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/register`, {email , name, password})
+    const Register = async(email , name , password) => {
+        await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/register`, {email , name, password})
         .then((res) => {
             swal("Good job!", res.data.message, "success");
             setTimeout(() => {
@@ -25,8 +25,8 @@ const UserContextProvider = ({children}) => {
         })
     }
     // Login
-    const Login = (email , password) => {
-        axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`, { email, password }).then((res) => {
+    const Login = async(email , password) => {
+        await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`, { email, password }).then((res) => {
                 setUser(res.data)
                 localStorage.setItem('Data', JSON.stringify(res.data))
                 setMessage("Enter Your Email And Password")

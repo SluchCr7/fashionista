@@ -8,7 +8,7 @@ const ProductContextProvider = ({children}) => {
     const [message, setMessage] = useState('')
     const [products , setProducts] = useState([])
     // Add New Product Function
-    const AddProduct = (name , description , price , quantity , category , gender , collections , sizes , colors , material , img) => {
+    const AddProduct = async(name , description , price , quantity , category , gender , collections , sizes , colors , material , img) => {
         const formData = new FormData()
         formData.append('image', img)
         formData.append('name', name)
@@ -25,7 +25,7 @@ const ProductContextProvider = ({children}) => {
             formData.append('colors', color)
         })   
         formData.append('material', material)   
-        axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product` , formData)
+        await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product` , formData)
             .then(res => {
                 setMessage("Product Add Successfully")
                 setTimeout(()=> setMessage('') , 3000)
@@ -46,8 +46,8 @@ const ProductContextProvider = ({children}) => {
         })
     }, [])
     // Delete Product
-    const deleteProduct = (prodId) => {
-        axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product/${prodId}`)
+    const deleteProduct = async(prodId) => {
+        await axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product/${prodId}`)
             .then((res) => {
                 setMessage("Product Delete Successfully")
                 setTimeout(()=> setMessage('') , 3000)

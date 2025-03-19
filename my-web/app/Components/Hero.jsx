@@ -5,33 +5,8 @@ import { Carousel } from 'react-responsive-carousel'; // Import the Carousel com
 import Link from 'next/link';
 
 const Hero = () => {
-    const pages = [
-        {
-            image: "/Hero/16.jpg.webp",
-            text: "",
-            para: "“Discover your own style. Don't try to repeat what has already been written - have the courage to do your own thing and don't be afraid to do something different.”"
-        },
-        {
-            image: "/Hero/h1_hero1.jpg.webp",
-            text: "Minimal Menz Style",
-            para: "Consectetur adipisicing elit. Laborum fuga incidunt laboriosam voluptas iure, delectus dignissimos facilis neque nulla earum."
-        },
-    ];
-
     return (
         <div className="w-full min-h-[100vh]">
-            {/* <Carousel
-                showThumbs={false}
-                showStatus={false}
-                infiniteLoop={true}
-                autoPlay={true}
-                interval={5000}
-                stopOnHover={false}
-                showIndicators={false}
-                className="w-full h-[100vh]"
-            > */}
-                {/* {pages.map(({ image, text, para }, index) => ( */}
-                {/* // key={index} */}
                 <div
                     style={{ backgroundImage: `url(/Hero/16.jpg.webp)` }}
                     className="w-full min-h-[100vh] flex flex-col items-center justify-center bg-cover bg-center bg-fixed relative px-5 md:px-0"
@@ -53,9 +28,6 @@ const Hero = () => {
                         </Link>
                     </div>
                 </div>
-
-                {/* // ))} */}
-            {/* </Carousel> */}
         </div>
     );
 };

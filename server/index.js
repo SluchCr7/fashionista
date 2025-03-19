@@ -20,6 +20,8 @@ app.get('/', (req, res) => {
 app.use("/api/auth" , require('./routes/authRoute'))
 app.use("/api/product" , require('./routes/productRoute'))
 app.use("/api/order", require('./routes/orderRoute'))
+app.use("/api/ads", require('./routes/adRoute'))
+app.use("/api/review", require('./routes/reviewRoute'))
 
 // Listen Server
 app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`))

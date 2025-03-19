@@ -20,8 +20,8 @@ const CartContextProvider = ({children}) => {
     const SubmitCart = (Cart) => {
       setFinalCart(Cart)
     }
-    const submitOrder = (Products , address , phoneNumber , total) => {
-      axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order`, { Products, address, phoneNumber, total },
+    const submitOrder = async (Products , address , phoneNumber , total) => {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order`, { Products, address, phoneNumber, total },
         {
             headers:
                 { Authorization: `Bearer ${user.token}` }
@@ -42,8 +42,8 @@ const CartContextProvider = ({children}) => {
         })
         .catch(err => console.log(err))
     },[])
-  const deleteOrder = (id) => {
-      axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order/${id}` , {} , 
+    const deleteOrder = async(id) => {
+      await axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order/${id}` , {} , 
       )
         .then(res => {
             setMessage("Order Delete Successfully")

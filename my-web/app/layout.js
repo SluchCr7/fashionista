@@ -1,7 +1,9 @@
 import Footer from "./Components/Footer";
 import Header from "./Components/Header";
+import AdContextProvider from "./Context/AdsContext";
 import CartContextProvider from "./Context/Cart";
 import ProductContextProvider from "./Context/ProductContext";
+import ReviewContextProvider, { ReviewContext } from "./Context/ReviewContext";
 import UserContextProvider from "./Context/UserContext";
 import "./globals.css";
 import { JetBrains_Mono } from "next/font/google";
@@ -25,9 +27,13 @@ export default function RootLayout({ children }) {
         <UserContextProvider>
           <CartContextProvider>
             <ProductContextProvider>
-              <Header />
-              {children}
-              <Footer/>
+              <AdContextProvider>
+                <ReviewContextProvider>
+                  <Header />
+                  {children}
+                  <Footer/>
+                </ReviewContextProvider>
+              </AdContextProvider>
             </ProductContextProvider>
           </CartContextProvider>
         </UserContextProvider>

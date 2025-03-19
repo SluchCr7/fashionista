@@ -30,15 +30,8 @@ const Opinions = memo(() => {
 
 
   return (
-    <div className="relative w-full py-20 overflow-hidden bg-fixed bg-center bg-cover" 
-      style={{ backgroundImage: "url('/Hero/bg.jpg.webp')" }}>
-      
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/50"></div>
-
-      {/* Content */}
-      <div className="relative z-10 flex flex-col gap-6 justify-center items-center text-white px-6">
-        <Intro title="Testimonials" para="What Our Clients Say About Us" />
+    <div className="relative w-full py-20 overflow-hidden bg-fixed bg-center bg-cover bg-gray-100">
+      <div className="relative z-10 flex flex-col gap-6 justify-center items-center px-6">
 
         {/* Testimonials Container */}
         <div className="relative w-full max-w-4xl overflow-hidden">
@@ -52,8 +45,8 @@ const Opinions = memo(() => {
                 exit={{ opacity: 0, x: -100 }}
                 transition={{ duration: 0.5 }}
               >
-                <FaQuoteLeft className="text-4xl text-gray-300" />
-                <p className="text-white/90 text-lg italic">{testimonials[currentIndex].opinion}</p>
+                <FaQuoteLeft className="text-4xl text-DarkRed" />
+                <p className="text-black text-lg italic">{testimonials[currentIndex].opinion}</p>
                 <Image 
                   src={testimonials[currentIndex].img} 
                   alt={testimonials[currentIndex].name} 
@@ -63,38 +56,38 @@ const Opinions = memo(() => {
                 />
                 <div className="flex flex-col items-center">
                   <span className="text-lg font-semibold">{testimonials[currentIndex].name}</span>
-                  <span className="text-sm text-white/70">{testimonials[currentIndex].job}</span>
+                  <span className="text-sm text-DarkRed">{testimonials[currentIndex].job}</span>
                 </div>
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
-
-        {/* Navigation Arrows */}
-        <button 
-          className="absolute top-1/2 left-4 -translate-y-1/2 p-3 bg-white/20 backdrop-blur-md rounded-full shadow-md hover:bg-white/30 transition" 
-          onClick={prevSlide}
-        >
-          <FaChevronLeft size={20} className="text-white" />
-        </button>
-        <button 
-          className="absolute top-1/2 right-4 -translate-y-1/2 p-3 bg-white/20 backdrop-blur-md rounded-full shadow-md hover:bg-white/30 transition" 
-          onClick={nextSlide}
-        >
-          <FaChevronRight size={20} className="text-white" />
-        </button>
-
-        {/* Dots Navigation */}
+        {/* Navigation */}
         <div className="flex items-center justify-center gap-3 mt-6">
+          <button 
+            className="p-1 bg-black backdrop-blur-md rounded-full shadow-md hover:bg-white/30 transition" 
+            onClick={prevSlide}
+          >
+            <FaChevronLeft size={20} className="text-white" />
+          </button>
+          {/* Dots Navigation */}
           {testimonials.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-4 h-4 rounded-full transition-all duration-300 border border-white
-                ${currentIndex === index ? "bg-white scale-125 shadow-lg" : "bg-transparent"}`}
+              className={`w-4 h-4 rounded-full transition-all duration-300 border border-black
+                ${currentIndex === index ? "bg-black scale-125 shadow-lg" : "bg-transparent"}`}
             ></button>
           ))}
+          {/* Navigation Arrows */}
+          <button 
+            className="p-1 bg-black backdrop-blur-md rounded-full shadow-md hover:bg-white/30 transition" 
+            onClick={nextSlide}
+          >
+            <FaChevronRight size={20} className="text-white" />
+          </button>
         </div>
+
       </div>
     </div>
   );

@@ -7,12 +7,14 @@ import { ProductContext } from '../Context/ProductContext';
 import { UserContext } from '../Context/UserContext';
 import { MdDelete } from "react-icons/md";
 import { CartContext } from '../Context/Cart';
+import { AdContext } from '../Context/AdsContext';
 
 const Admin = () => {
   const [page, setPage] = useState('Users');
   const [image, setImage] = useState(null);
   const [size, setSize] = useState("")
-  const [color , setColor] = useState('')
+  const [color, setColor] = useState('')
+  const [isHovered, setIsHovered] = useState("Products");
   const { products, AddProduct, deleteProduct } = useContext(ProductContext)
   const {orders , deleteOrder} = useContext(CartContext)
   const {users} = useContext(UserContext)
@@ -28,7 +30,6 @@ const Admin = () => {
     colors: [],
     sizes: [],
   });
-
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -38,7 +39,7 @@ const Admin = () => {
       
       {/* Navigation */}
       <nav className="flex w-full justify-center bg-white shadow-lg rounded-md overflow-hidden">
-        {['Users', 'Products', 'Orders', 'Create Product'].map((item, index) => (
+        {['Users', 'Products', 'Orders', 'Add New'].map((item, index) => (
           <button
             key={index}
             onClick={() => setPage(item)}
@@ -149,7 +150,7 @@ const Admin = () => {
                             #{index}
                             </td>
                             {/* Order Details */}
-                            <td className="p-4 text-center font-semibold">{order.User.name}</td>
+                            <td className="p-4 text-center font-semibold">{order.user.name}</td>
                             <td className="p-4 text-center">{new Date(order.createdAt).toLocaleDateString()}</td>
                             <td className="p-4 text-center">{order.address}</td>
                             <td className="p-4 text-center">{order.phoneNumber}</td>
@@ -167,45 +168,47 @@ const Admin = () => {
           )}
         </AnimatePresence>
         <AnimatePresence>
-          {page === 'Create Product' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="bg-gray-100 p-6 rounded-md w-full max-w-2xl mx-auto shadow-md">
-              <h2 className="text-lg font-bold text-red-600 mb-4">Create New Product</h2>
-              <form className="flex flex-col gap-4">
-                <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleInputChange} className="p-3 border rounded-md" />
-                <textarea name="description" placeholder="Product Description" value={formData.description} onChange={handleInputChange} className="p-3 border rounded-md h-24"></textarea>
-                <input type="number" name="price" placeholder="Product Price" value={formData.price} onChange={handleInputChange} className="p-3 border rounded-md" />
-                <div className="grid grid-cols-2 gap-4">
-                  <input type="text" name="category" placeholder="Category" value={formData.category} onChange={handleInputChange} className="p-3 border rounded-md" />
-                  <input type="text" name="gender" placeholder="Gender" value={formData.gender} onChange={handleInputChange} className="p-3 border rounded-md" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <input type="text" name="material" placeholder="Material" value={formData.material} onChange={handleInputChange} className="p-3 border rounded-md" />
-                  <input type="number" name="quantity" placeholder="Quantity" value={formData.quantity} onChange={handleInputChange} className="p-3 border rounded-md" />
-                </div>
-                <input type="type" name="collection" placeholder="Product Collection" value={formData.collection} onChange={handleInputChange} className="p-3 border rounded-md" />
-                <div className='flex items-center w-full flex-col md:flex-row gap-2'>
-                  <input type="text" name="color" placeholder="Color" value={color} onChange={(e) => setColor(e.target.value)} className="p-3 border w-[100%] md:w-[75%] rounded-md" />
-                  <button onClick={(e) => { e.preventDefault(); setFormData({ ...formData, colors: [...formData.colors, color] }) }} className='w-[100%] md:w-[25%] bg-DarkRed p-3 rounded-md text-white'>Add Color</button>
-                </div>
-                <div className='flex items-center w-full flex-col md:flex-row gap-2'>
-                  <input type="text" name="size" placeholder="Size" value={size} onChange={(e) => setSize(e.target.value)} className="p-3 w-[100%] md:w-[75%] border rounded-md" />
-                  <button onClick={(e) => { e.preventDefault(); setFormData({ ...formData, sizes: [...formData.sizes, size] }) }} className='w-[100%] md:w-[25%] bg-DarkRed p-3 rounded-md text-white'>Add Size</button>
-                </div>
-                <div className="w-full flex justify-center">
-                  <input type="file" id="file" className="hidden" onChange={(e) => setImage(e.target.files[0])} />
-                  {image ? (
-                    <label htmlFor="file" className="cursor-pointer">
-                      <Image src={URL.createObjectURL(image)} alt="upload" width={80} height={80} className="rounded-md" />
-                    </label>
-                  ) : (
-                    <label htmlFor="file" className="bg-red-600 text-white px-4 py-2 rounded-md flex items-center cursor-pointer">
-                      <FaUpload className="mr-2" /> Upload Image
-                    </label>
-                  )}
-                </div>
-                <button onClick={(e) => { e.preventDefault(); AddProduct(formData.name , formData.description , formData.price , formData.quantity , formData.category ,formData.gender , formData.collection , formData.sizes , formData.colors , formData.material , image) }} className="bg-red-600 text-white py-3 rounded-md hover:scale-105 transition">Create</button>
-              </form>
-            </motion.div>
+          {page === 'Add New' && (
+            <div className='flex items-center flex-col gap-5'>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="bg-gray-100 p-6 rounded-md w-full max-w-5xl mx-auto shadow-md">
+                <h2 className="text-lg font-bold text-red-600 mb-4">Create New Product</h2>
+                <form className="flex flex-col gap-4">
+                  <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleInputChange} className="p-3 border rounded-md" />
+                  <textarea name="description" placeholder="Product Description" value={formData.description} onChange={handleInputChange} className="p-3 border rounded-md h-24"></textarea>
+                  <input type="number" name="price" placeholder="Product Price" value={formData.price} onChange={handleInputChange} className="p-3 border rounded-md" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <input type="text" name="category" placeholder="Category" value={formData.category} onChange={handleInputChange} className="p-3 border rounded-md" />
+                    <input type="text" name="gender" placeholder="Gender" value={formData.gender} onChange={handleInputChange} className="p-3 border rounded-md" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <input type="text" name="material" placeholder="Material" value={formData.material} onChange={handleInputChange} className="p-3 border rounded-md" />
+                    <input type="number" name="quantity" placeholder="Quantity" value={formData.quantity} onChange={handleInputChange} className="p-3 border rounded-md" />
+                  </div>
+                  <input type="type" name="collection" placeholder="Product Collection" value={formData.collection} onChange={handleInputChange} className="p-3 border rounded-md" />
+                  <div className='flex items-center w-full flex-col md:flex-row gap-2'>
+                    <input type="text" name="color" placeholder="Color" value={color} onChange={(e) => setColor(e.target.value)} className="p-3 border w-[100%] md:w-[75%] rounded-md" />
+                    <button onClick={(e) => { e.preventDefault(); setFormData({ ...formData, colors: [...formData.colors, color] }) }} className='w-[100%] md:w-[25%] bg-DarkRed p-3 rounded-md text-white'>Add Color</button>
+                  </div>
+                  <div className='flex items-center w-full flex-col md:flex-row gap-2'>
+                    <input type="text" name="size" placeholder="Size" value={size} onChange={(e) => setSize(e.target.value)} className="p-3 w-[100%] md:w-[75%] border rounded-md" />
+                    <button onClick={(e) => { e.preventDefault(); setFormData({ ...formData, sizes: [...formData.sizes, size] }) }} className='w-[100%] md:w-[25%] bg-DarkRed p-3 rounded-md text-white'>Add Size</button>
+                  </div>
+                  <div className="w-full flex justify-center">
+                    <input type="file" id="file" className="hidden" onChange={(e) => setImage(e.target.files[0])} />
+                    {image ? (
+                      <label htmlFor="file" className="cursor-pointer">
+                        <Image src={URL.createObjectURL(image)} alt="upload" width={80} height={80} className="rounded-md" />
+                      </label>
+                    ) : (
+                      <label htmlFor="file" className="bg-red-600 text-white px-4 py-2 rounded-md flex items-center cursor-pointer">
+                        <FaUpload className="mr-2" /> Upload Image
+                      </label>
+                    )}
+                  </div>
+                  <button onClick={(e) => { e.preventDefault(); AddProduct(formData.name, formData.description, formData.price, formData.quantity, formData.category, formData.gender, formData.collection, formData.sizes, formData.colors, formData.material, image) }} className="bg-red-600 text-white py-3 rounded-md hover:scale-105 transition">Create</button>
+                </form>
+              </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </div>
