@@ -38,7 +38,7 @@ const Footer = () => {
                             {
                                 pages.map((page) => {
                                     return (
-                                        <li><Link href={page.link} className='hover:underline'>{page.name}</Link></li>
+                                        <li key={page.name}><Link href={page.link} className='hover:underline'>{page.name}</Link></li>
                                     )
                                 })
                             }
