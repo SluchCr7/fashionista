@@ -5,10 +5,14 @@ import LatestCollection from "./Components/LatestCollection";
 import BestSeller from "./Components/BestSeller";
 import HomePage from "./Components/HomePage";
 import Opinions from "./Components/Opinions";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import Features from "./Components/Features";
 import Categories from "./Components/Categories";
 import Ads from "./Components/Ads";
+import Sponsers from "./Components/Sponsers";
+import HeroPage from "./Components/HeroPage";
+import { IoIosArrowForward } from "react-icons/io";
+import { CartContext } from "./Context/Cart";
 
 export default function Home() {
   // const lastPage = useRef();
@@ -17,19 +21,31 @@ export default function Home() {
   //     behavior: "smooth",
   //   })
   // }
+  const {discount}  = useContext(CartContext)
   return (
     <div className="flex items-center flex-col relative">
       <div className="relative w-full">
-        <HomePage />
+        <HeroPage/>
       </div>
       <div className="flex flex-col items-center w-full gap-3 py-4">
         <Categories/>
         <LatestCollection />
-        <Hero />
+        <HomePage />
+        {/* <Hero /> */}
         <BestSeller />
+        {
+          discount > 0 &&
+          <div className="w-full bg-DarkRed p-4 py-24">
+            <div className="max-w-4xl flex mx-auto items-center flex-col md:flex-row justify-between">
+              <span className="text-white text-3xl uppercase font-bold">Grant {discount}% off on all products</span>
+              <button className="bg-transparent border-y-2 border-r border-white text-white pr-9 pl-2 py-2 flex items-center gap-4">Shop Now <IoIosArrowForward /></button>
+            </div>
+          </div>
+        }
         <Ads/>
         <Features/>
         <Opinions />
+        <Sponsers/>
       </div>
     </div>
   );

@@ -47,11 +47,27 @@ export const features = [
 
 
 export const Companies = [
-    "/sponsers/06Oct24 Anis Pro Upload.png",
-    "/sponsers/Black and White Y2K Streetwear Clothing Logo.png",
-    "/sponsers/Red Minimalist Fashion Woman Free Logo.png",
-    "/sponsers/White and Black Apparel Clothing Business Logo.png",
+  "/sponsers/Spo1.png",
+  "/sponsers/Spo2.png",
+  "/sponsers/Spo3.png",
+  "/sponsers/Spo4.png",
+  "/sponsers/Spo5.png",
+  "/sponsers/Spo6.png",
+  "/sponsers/Spo7.png",
+  "/sponsers/Logo1.svg",
+  "/sponsers/Logo2.svg",
+  "/sponsers/Logo3.svg",
+  "/sponsers/Logo4.svg",
+  "/sponsers/Logo5.svg",
 ]
+
+export const brands = [
+  { name: 'Adidas', image: '/brands/brand1.png' },
+  { name: 'Nike', image: '/brands/brand2.png' },
+  { name: 'Puma', image: '/brands/brand3.png' },
+  { name: 'New Balance', image: '/brands/brand4.png' }
+];
+
 
 // testimonials
 

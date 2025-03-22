@@ -16,8 +16,9 @@ const Admin = () => {
   const [color, setColor] = useState('')
   const [isHovered, setIsHovered] = useState("Products");
   const { products, AddProduct, deleteProduct } = useContext(ProductContext)
-  const {orders , deleteOrder} = useContext(CartContext)
+  const {orders , deleteOrder , AddDiscount} = useContext(CartContext)
   const {users} = useContext(UserContext)
+  const [discount , setDiscount] = useState(0)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -169,8 +170,8 @@ const Admin = () => {
         </AnimatePresence>
         <AnimatePresence>
           {page === 'Add New' && (
-            <div className='flex items-center flex-col gap-5'>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="bg-gray-100 p-6 rounded-md w-full max-w-5xl mx-auto shadow-md">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='flex items-start flex-col md:flex-row gap-5 max-w-7xl'>
+              <div className="bg-gray-100 p-6 rounded-md w-full md:w-[70%] mx-auto shadow-md">
                 <h2 className="text-lg font-bold text-red-600 mb-4">Create New Product</h2>
                 <form className="flex flex-col gap-4">
                   <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleInputChange} className="p-3 border rounded-md" />
@@ -207,8 +208,15 @@ const Admin = () => {
                   </div>
                   <button onClick={(e) => { e.preventDefault(); AddProduct(formData.name, formData.description, formData.price, formData.quantity, formData.category, formData.gender, formData.collection, formData.sizes, formData.colors, formData.material, image) }} className="bg-red-600 text-white py-3 rounded-md hover:scale-105 transition">Create</button>
                 </form>
-              </motion.div>
-            </div>
+              </div>
+              <div className="bg-gray-100 p-6 rounded-md w-full md:w-[30%] mx-auto shadow-md">
+                <h2 className="text-lg font-bold text-red-600 mb-4">Add New Discount</h2>
+                <form className="flex flex-col gap-4">
+                  <input type="number" name="discount" placeholder="Discount Percentage" value={discount} onChange={(e) => setDiscount(e.target.value)} className="p-3 border rounded-md" />
+                  <button onClick={(e) => { e.preventDefault(); AddDiscount(discount) }} className="bg-red-600 text-white py-3 rounded-md hover:scale-105 transition">Create</button>
+                </form> 
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>

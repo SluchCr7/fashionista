@@ -1,6 +1,12 @@
 const asyncHandler = require('express-async-handler')
 const { Review, ReviewValidate } = require('../models/Review')
 
+/**
+ * @method POST
+ * @access public
+ * @route /api/review
+ * @desc Create a new Review
+ */
 
 const AddNewReview = asyncHandler(async (req, res) => {
     const { error } = ReviewValidate(req.body);
@@ -31,10 +37,24 @@ const AddNewReview = asyncHandler(async (req, res) => {
 });
 
 
+/**
+ * @method GET
+ * @access public
+ * @route /api/review
+ * @desc get all reviews
+ */
+
 const getAllReviews = asyncHandler(async (req, res) => {
     const reviews = await Review.find()
     res.status(200).json(reviews)
 })
+
+/**
+ * @method GET
+ * @access public
+ * @route /api/review/:id
+ * @desc get review by id
+ */
 
 const getReview = asyncHandler(async (req, res) => {
     const review = await Review.findById(req.params.id)
@@ -43,6 +63,13 @@ const getReview = asyncHandler(async (req, res) => {
     }
     res.status(200).json(review)
 })
+
+/**
+ * @method DELETE
+ * @access public
+ * @route /api/review/:id
+ * @desc delete review by id
+ */
 
 const deleteReview = asyncHandler(async (req, res) => {
     const review = await Review.findById(req.params.id)

@@ -8,9 +8,11 @@ import { ProductContext } from '../Context/ProductContext'
 import ProductCont from './ProductCont'
 import { CiStar } from "react-icons/ci";
 import Link from 'next/link'
+import { ReviewContext } from '../Context/ReviewContext'
 
 const BestSeller = () => {
     const { products } = useContext(ProductContext)
+    const {Reviews} = useContext(ReviewContext)
     return (
         <div className='max-w-[1370px] py-10 w-full mx-auto flex items-center flex-col'>
             <Intro title="Best Seller" para="Check out our best-selling products!" />
@@ -25,7 +27,7 @@ const BestSeller = () => {
                                 <span className='text-DarkRed'>${prod?.price}</span>
                                 <div className='flex items-center gap-2'>
                                     <CiStar className='text-yellow-400' />
-                                    <span className='text-gray-500'>{prod?.rating} Reviews</span>   
+                                    <span className='text-gray-500'>{Reviews.filter(review => review?.product?._id === prod?._id).length} Reviews</span>   
                                 </div>
                             </div>
                         </Link>

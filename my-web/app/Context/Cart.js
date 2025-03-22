@@ -11,8 +11,11 @@ const CartContextProvider = ({children}) => {
   const [finalCart, setFinalCart] = useState([])
   const [message, setMessage] = useState('')
   const [orders , setOrders] = useState([])
-  const discount =  20
-  const {user} = useContext(UserContext)
+  const [discount , setDiscount] = useState(0)
+  const { user } = useContext(UserContext)
+  useEffect(() => {
+    console.log(discount);
+  },[discount])
     const addToCart = (product , quantity) => {
         setCart([...cart, { ...product, quantity , discount}])
         setNumInCart((prev) => prev + 1)
@@ -52,10 +55,25 @@ const CartContextProvider = ({children}) => {
         })
         .catch(err => console.log(err))
     }
+    useEffect(() => {
+      axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/discount`)
+        .then((res) => {
+          setDiscount(res.data[res.data.length - 1]?.discount)
+        })
+        .catch(err => console.log(err))
+    },[])
+  const AddDiscount = (discount) => {
+    axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/discount`, { discount })
+        .then((res) => {
+          setMessage(res.data.message)
+          setTimeout(() => setMessage(''), 3000)
+        })
+        .catch(err => console.log(err))
+    }
   return (
     <div className="relative">
         <Notify Notify={message}/>
-        <CartContext.Provider value={{cart , addToCart , numInCart , finalCart , SubmitCart, submitOrder , orders , deleteOrder , discount}}>
+        <CartContext.Provider value={{cart , addToCart , numInCart , finalCart , SubmitCart, submitOrder , orders , deleteOrder , discount , AddDiscount}}>
             {children}
         </CartContext.Provider>
       </div>

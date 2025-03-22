@@ -22,6 +22,7 @@ app.use("/api/product" , require('./routes/productRoute'))
 app.use("/api/order", require('./routes/orderRoute'))
 app.use("/api/ads", require('./routes/adRoute'))
 app.use("/api/review", require('./routes/reviewRoute'))
+app.use("/api/discount", require('./routes/discountRoute'))
 
 // Listen Server
 app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`))

@@ -6,7 +6,7 @@ const Sponsers = () => {
   return (
     <div className='w-[100%]'>
       <div className='grid grid-cols-1 md:grid-cols-2 w-[70%] mx-auto lg:grid-cols-4 gap-8'>
-        {images.map((image, index) => (
+        {Companies.map((image, index) => (
           <Image
             key={index}
             src={image}
@@ -15,7 +15,8 @@ const Sponsers = () => {
             width={400}
             height={400}
           />
-        ))}
+        )).slice(0 , 4)
+        }
       </div>
     </div>
   )

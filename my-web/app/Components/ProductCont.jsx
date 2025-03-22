@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { UserContext } from '../Context/UserContext';
 import { motion } from 'framer-motion';
 import { FaHeart } from "react-icons/fa6";
-import { CiStar } from "react-icons/ci";
 import { ReviewContext } from '../Context/ReviewContext';
 import { FaStar } from "react-icons/fa";
 
@@ -15,7 +14,7 @@ const ProductCont = memo(({ product }) => {
     const [size, setSize] = useState('');
     const [num, setNum] = useState(1);
     const [notify, setNotify] = useState('');
-    const { deleteReview, AddNewReview , Reviews } = useContext(ReviewContext);
+    const {AddNewReview , Reviews } = useContext(ReviewContext);
     const { user, AddFavourite } = useContext(UserContext);
     const { addToCart, discount } = useContext(CartContext);
     const [productReviews , setProductReviews] = useState([])
@@ -84,7 +83,7 @@ const ProductCont = memo(({ product }) => {
                                 className='w-full object-cover rounded-xl shadow-lg'
                             />
                             <div className='absolute top-2 left-2 flex gap-3'>
-                                {discount && <span className='bg-red-500 px-3 py-1 text-white rounded-full'>{discount}%</span>}
+                                {discount > 0 && <span className='bg-red-500 px-3 py-1 text-white rounded-full'>{discount}%</span>}
                                 {user?.favorites?.includes(product?._id) ? (
                                     <span className='bg-white p-2 rounded-full cursor-pointer text-red-700' onClick={() => AddFavourite(product?._id)}>
                                         <FaHeart size={20} />
@@ -114,7 +113,7 @@ const ProductCont = memo(({ product }) => {
                                             className="cursor-pointer"
                                             whileHover={{ scale: 1.2 }}
                                         >
-                                            <FaStar size={25} color={star <= determineStarRating ? 'yellow' : 'gray'} />
+                                            <FaStar size={25} color={star <= determineStarRating ? 'yellow' : 'white'} />
                                         </motion.div>
                                     ))}
                                 </div>
@@ -124,7 +123,7 @@ const ProductCont = memo(({ product }) => {
                             {/* Pricing */}
                             <div className='text-xl font-bold flex gap-4'>
                                 <span className='text-red-500'>${FinalPrice}</span>
-                                {discount && <span className='line-through text-gray-400 text-lg'>${product?.price}</span>}
+                                {discount > 0 && <span className='line-through text-gray-400 text-lg'>${product?.price}</span>}
                             </div>
 
                             {/* Color Selection */}

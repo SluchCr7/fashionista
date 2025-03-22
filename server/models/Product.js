@@ -28,7 +28,7 @@ const ProductSchema = new mongoose.Schema({
     },
     material: {
         type: String,
-        required : true
+        // required : true
     },
     sizes: {
         type: Array,
@@ -44,7 +44,7 @@ const ProductSchema = new mongoose.Schema({
     },
     collections: {
         type: String,
-        required : true
+        // required : true
     },
     category: {
         type: String,   
@@ -64,10 +64,10 @@ const ProductValidate = (obj) => {
         price: joi.number().required(),
         description: joi.string(),
         quantity: joi.number().required(),
-        material: joi.string().required(),
+        material: joi.string(),
         sizes : joi.array().required(),
         colors: joi.array().required(),
-        collections: joi.string().required(),
+        collections: joi.string(),
         gender : joi.string().required(),
         // rating : joi.number(),
         model: joi.string(),
