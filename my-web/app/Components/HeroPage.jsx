@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import React from "react";
+import Link from "next/link";
 
 const HeroPage = () => {
   return (
@@ -43,7 +44,7 @@ const HeroPage = () => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          Shop Now
+          <Link href="/Shop">Shop Now</Link>
         </motion.button>
       </motion.div>
     </div>
