@@ -19,7 +19,7 @@ const Wishlist = () => {
     }, [user, products])
 
     return (
-        <div className='max-w-7xl mx-auto py-24 px-5'>
+        <div className='max-w-7xl mx-auto py-8 px-5'>
             <h1 className='text-3xl font-bold text-center text-red-600 mb-6'>My Wishlist</h1>
             {myProducts.length > 0 ? (
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>

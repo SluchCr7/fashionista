@@ -29,7 +29,7 @@ const Shop = () => {
   const [showFilters, setShowFilters] = useState(true);
 
   const categories = [...new Set(products.map((product) => product.category))];
-  const genders = [...new Set(products.map((product) => product.gender))];
+  const genders = [...new Set(products.map((product) => product.gender.toLowerCase()))];
   const materials = [... new Set(products.map((product) => product.material))];
   const colors = ["Yellow" , "Black" , "White" , "Blue" , "Red" , "Green" , "Brown" , "Orange" , "Purple" , "Silver" , "Gold", "Gray" , "Navy" , "Beige" , "Pink"];
   const sizes = [...new Set(products.flatMap((product) => product.sizes))];
@@ -102,7 +102,7 @@ const filteredProducts = useMemo(() => {
   }, [sortPrice, filteredProducts]);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 px-6 py-24 bg-gray-100 min-h-screen">
+    <div className="flex flex-col lg:flex-row gap-6 px-6 py-8 bg-gray-100 min-h-screen">
       {/* Filters Sidebar */}
       <div
         className={`w-full lg:w-[20%] bg-white shadow-lg rounded-lg p-6 transition-all ${

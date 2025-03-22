@@ -16,7 +16,7 @@ const Profile = () => {
     }
   }, [orders, user])
   return (
-    <div className='flex flex-col md:flex-row gap-6 px-6 py-20 min-h-screen w-full'>
+    <div className='flex flex-col md:flex-row gap-6 px-6 py-8 min-h-screen w-full'>
       
       {/* Profile Card */}
       <div className='w-full md:w-[40%] flex justify-center'>
