@@ -203,4 +203,24 @@ export const socialLinks = [
         }
       ]
     }
-  ];
+];
+  
+
+export const pages = [
+    {
+        name: "About",
+        link : "/About"
+    },
+    {
+        name: "Contact",
+        link : "/Contact"
+    },
+    {
+        name: "FAQ",
+        link : "/FAQ"
+    },
+    {
+        name: "Privacy",
+        link: "/Privacy"
+    },
+]

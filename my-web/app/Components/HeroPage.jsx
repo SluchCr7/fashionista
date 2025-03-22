@@ -5,7 +5,7 @@ import React from "react";
 
 const HeroPage = () => {
   return (
-    <div className="relative w-full h-[100vh] mt-24 flex items-center justify-center">
+    <div className="relative w-full h-[100vh] flex items-center justify-center">
       {/* Background Image */}
       <Image
         src="/Hero/home-slider2.jpg"

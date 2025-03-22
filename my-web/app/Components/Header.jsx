@@ -13,7 +13,7 @@ import Image from 'next/image';
 import { IoIosSearch } from "react-icons/io";
 import { FaHeart } from "react-icons/fa6";
 import {IoMdHeart} from 'react-icons/io'
-import { navLinks , socialLinks } from '../Data';
+import { navLinks , pages, socialLinks } from '../Data';
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [showSearchBar , setShowSearchBar] = useState(false)
@@ -51,19 +51,33 @@ const Header = () => {
         }
     }, [search, products]);
     return (
-        <header className="w-full fixed top-0 left-0 z-50">
+        <header className="w-full z-50">
             {/* Top Bar */}
             <div className="hidden md:flex w-full px-8 py-2 bg-gray-900 text-gray-300 justify-between items-center">
                 <div className="flex gap-3">
-                <FaFacebook className="hover:text-white cursor-pointer" />
-                <FaInstagram className="hover:text-white cursor-pointer" />
-                <FaTwitter className="hover:text-white cursor-pointer" />
+                    {
+                        pages.map((page , index) => (
+                            <Link key={index} href={page.link} className="hover:text-white text-xs cursor-pointer">
+                                {page.name}
+                            </Link>
+                        ))
+                    }
                 </div>
                 <span className="text-xs">Free Shipping on Orders Over $100</span>
-                <div className='flex gap-3 items-center text-xs'>
-                    <span>English</span>
-                    <span>|</span>
-                    <span>Arabic</span>
+                <div className='flex items-center gap-6'>
+                    <div className='flex items-center gap-2 text-xs font-bold'>
+                        <Link href="/Wishlist">My Wishlist</Link>
+                        <Link href="/Profile">My Account</Link>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                        {
+                            socialLinks.map((social , index) => (
+                                <Link key={index} href={social.link} className="hover:text-white cursor-pointer">
+                                    {social.icon}
+                                </Link>
+                            ))
+                        }
+                    </div>
                 </div>
             </div>
 
@@ -112,19 +126,12 @@ const Header = () => {
 
                 {/* User Icon */}
                 {user ? (
-                    <Link href="/Profile" className="text-2xl text-gray-600 hover:text-black">
-                    <CiUser />
-                    </Link>
+                    null
                 ) : (
                     <Link href="/Login" className="text-2xl text-gray-600 hover:text-red-500">
                     <TbLogin2 />
                     </Link>
                 )}
-
-                {/* Wishlist Icon */}
-                <Link href="/Wishlist" className="text-2xl text-gray-600 hover:text-red-500">
-                    <IoMdHeart />
-                </Link>
 
                 {/* Cart Icon */}
                 <CartShop />

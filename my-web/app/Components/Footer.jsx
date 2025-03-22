@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
-import { Companies, socialLinks } from '../Data';
+import { Companies, socialLinks , pages } from '../Data';
 import Image from 'next/image';
 const Footer = () => {
 
@@ -35,11 +35,13 @@ const Footer = () => {
                     <div className='flex flex-col gap-3'>
                         <h3 className='font-bold text-lg'>Support</h3>
                         <ul className='text-sm space-y-2'>
-                            <li><Link href='/Contact' className='hover:underline'>Contact Us</Link></li>
-                            <li><Link href='/About' className='hover:underline'>About Us</Link></li>
-                            <li><Link href='/Privacy' className='hover:underline'>Privacy Policy</Link></li>
-                            <li><Link href='/Terms' className='hover:underline'>Terms & Conditions</Link></li>
-                            <li><Link href='/FAQ' className='hover:underline'>FAQ</Link></li>
+                            {
+                                pages.map((page) => {
+                                    return (
+                                        <li><Link href={page.link} className='hover:underline'>{page.name}</Link></li>
+                                    )
+                                })
+                            }
                         </ul>
                     </div>
                     
