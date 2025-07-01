@@ -19,7 +19,6 @@ const Contact = () => {
 
     return (
         <div className="w-full min-h-screen px-5 py-16 bg-[#f6f5f3] flex flex-col items-center">
-            <Intro title="Get in Touch" para="We’d love to hear from you. Send us a message!" />
             
             <div className="w-full max-w-6xl mt-10 flex flex-col md:flex-row rounded-xl overflow-hidden shadow-lg bg-white">
                 {/* Left Side - Info */}
