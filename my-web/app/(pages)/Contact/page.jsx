@@ -1,91 +1,101 @@
 'use client'
 import React, { useState } from 'react'
-import { MdLocationOn } from "react-icons/md";
-import { MdOutlinePhone } from "react-icons/md";
-import { MdOutlineEmail } from "react-icons/md";
+import { MdLocationOn, MdOutlinePhone, MdOutlineEmail } from "react-icons/md";
 import { TiSocialSkype } from "react-icons/ti";
-import Intro from '../../Components/Intro';
 import { socialLinks } from '@/app/Data';
-const Contact = () => {
-    const [name , setName] = useState("")
-    const [phone , setPhone] = useState("")
-    const [email , setEmail] = useState("")
-    const inputsData = [
-        {
-            text: "Name",
-            value: name,
-            setter : setName
-        },
-        {
-            text: "Phone",
-            value: phone,
-            setter : setPhone
-        },
-        {
-            text: "Email",
-            value: email,
-            setter : setEmail
-        }
-    ] 
+import Intro from '../../Components/Intro';
 
-  return (
-    <div className='w-full min-h-[100vh] px-10 py-20 flex items-start justify-center flex-col'>
-        <Intro title={"Contact With Us"} para={"Contact With Us if you want have any suggestions"} /> 
-      <div className='flex items-start flex-col md:flex-row justify-center mx-auto py-7 w-[100%] lg:w-[60%] h-fit lg:h-[600px]'>
-            <div className='bg-white shadow-xl flex-2 p-5 flex items-start h-full flex-col gap-5 rounded-l-lg w-full lg:w-[50%]'>
-                <span className='text-yellow-700 '>Let is Go In Touch</span>
-                <p className='w-[70%] text-gray-700'>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Cum veritatis impedit veniam vero ratione sit exercitationem.</p>
-                <ul className='flex items-start gap-4 flex-col py-3'>
-                    <li className='flex items-start md:items-center flex-col md:flex-row gap-2 text-white'>
-                        <MdLocationOn className='text-2xl text-black' />
-                        <span className='text-black'>15th Street, New York</span>
-                    </li>
-                    <li className='flex items-start md:items-center flex-col md:flex-row gap-2 text-white'>
-                        <MdOutlinePhone className='text-2xl text-black' />
-                        <span className='text-black'>+1 (123) 456-7890</span>
-                    </li>
-                    <li className='flex items-start md:items-center flex-col md:flex-row gap-2 text-white'>
-                        <MdOutlineEmail className='text-2xl text-black' />
-                        <span className='text-black'>info@example.com</span>
-                    </li>
-                    <li className='flex items-start md:items-center flex-col md:flex-row gap-2 text-white'>
-                        <TiSocialSkype className='text-2xl text-black' />
-                        <span className='text-black'>info@example.com</span>
-                    </li>
-                </ul>
-                <div className='flex items-center gap-3'>                    
-                    {
-                        socialLinks.map((icon) => {
-                            return(
-                                <span key={icon.id} className='w-7 h-7 rounded-full border-[1px] border-yellow text-yellow flex items-center justify-center'>{icon.icon}</span>
-                            )
-                        })
-                    }
-                </div>
-            </div>
-            <div className='bg-black flex-2 p-5 flex items-start flex-col gap-5 rounded-r-lg w-full lg:w-[50%] h-full'>
-                <span className='text-white'>Contuct Us</span>
-                <div className='flex items-start flex-col gap-5 w-full'>
-                    {
-                        inputsData.map((input , index)=>{
-                            return(
-                                <div key={index} className='flex items-start flex-col gap-1 w-full'>
-                                    <span className='text-yellow text-sm font-bold tracking-[3px]'>{input.text}</span>
-                                    <input value={input.value} onChange={(e)=> input.setter(e.target.value)} type="text" className='w-[80%] p-2 rounded-sm bg-transparent border-[1px] text-yellow-700 border-yellow-700' />
-                                </div>
-                            )
-                        })
-                    }
-                    <div className='flex items-start flex-col gap-1 w-full'>
-                        <span className='text-yellow text-sm font-bold tracking-[3px]'>Message</span>
-                        <textarea className='w-[80%] text-yellow-700 p-2 rounded-sm bg-transparent border-[1px] border-yellow-700' />
+const Contact = () => {
+    const [name, setName] = useState("")
+    const [phone, setPhone] = useState("")
+    const [email, setEmail] = useState("")
+    const [message, setMessage] = useState("")
+
+    const inputsData = [
+        { text: "Name", value: name, setter: setName },
+        { text: "Phone", value: phone, setter: setPhone },
+        { text: "Email", value: email, setter: setEmail }
+    ]
+
+    return (
+        <div className="w-full min-h-screen px-5 py-16 bg-[#f6f5f3] flex flex-col items-center">
+            <Intro title="Get in Touch" para="We’d love to hear from you. Send us a message!" />
+            
+            <div className="w-full max-w-6xl mt-10 flex flex-col md:flex-row rounded-xl overflow-hidden shadow-lg bg-white">
+                {/* Left Side - Info */}
+                <div className="w-full md:w-1/2 bg-black text-white p-8 flex flex-col gap-6 justify-between">
+                    <div>
+                        <h3 className="text-2xl font-bold mb-3 text-yellow-500">Contact Details</h3>
+                        <p className="text-gray-300 mb-5">Have a question about our products or need help with your order? Reach out anytime.</p>
+                        <ul className="space-y-4">
+                            <li className="flex items-center gap-3">
+                                <MdLocationOn className="text-yellow-500 text-xl" />
+                                <span>15th Street, New York</span>
+                            </li>
+                            <li className="flex items-center gap-3">
+                                <MdOutlinePhone className="text-yellow-500 text-xl" />
+                                <span>+1 (123) 456-7890</span>
+                            </li>
+                            <li className="flex items-center gap-3">
+                                <MdOutlineEmail className="text-yellow-500 text-xl" />
+                                <span>info@example.com</span>
+                            </li>
+                            <li className="flex items-center gap-3">
+                                <TiSocialSkype className="text-yellow-500 text-xl" />
+                                <span>live:example</span>
+                            </li>
+                        </ul>
                     </div>
-                    <button className='w-[50%] p-3 rounded-md bg-yellow-600'>Send</button>
+                    <div className="flex gap-3 mt-6">
+                        {
+                            socialLinks.map((icon) => (
+                                <span key={icon.id} className="w-9 h-9 rounded-full border border-yellow-500 flex items-center justify-center text-yellow-500 hover:bg-yellow-500 hover:text-black transition duration-300">
+                                    {icon.icon}
+                                </span>
+                            ))
+                        }
+                    </div>
+                </div>
+
+                {/* Right Side - Form */}
+                <div className="w-full md:w-1/2 p-8 bg-white">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-6">Send a Message</h3>
+                    <form className="flex flex-col gap-5">
+                        {
+                            inputsData.map((input, i) => (
+                                <div key={i} className="flex flex-col">
+                                    <label className="text-sm font-medium text-gray-600 mb-1">{input.text}</label>
+                                    <input
+                                        type="text"
+                                        value={input.value}
+                                        onChange={(e) => input.setter(e.target.value)}
+                                        className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-yellow-500 transition"
+                                        placeholder={`Your ${input.text}`}
+                                    />
+                                </div>
+                            ))
+                        }
+                        <div className="flex flex-col">
+                            <label className="text-sm font-medium text-gray-600 mb-1">Message</label>
+                            <textarea
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                rows="5"
+                                className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-yellow-500 transition"
+                                placeholder="Type your message here..."
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-6 rounded transition duration-300"
+                        >
+                            Send Message
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
-  )
+    )
 }
 
 export default Contact
