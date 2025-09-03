@@ -87,7 +87,7 @@ const Page = () => {
           </button>
         </form>
         <p className="text-gray-500 text-sm mt-4 text-center">
-          📧 We'll get back to you within 24 hours.
+          📧 We&apos;ll get back to you within 24 hours.
         </p>
       </div>
     </div>
