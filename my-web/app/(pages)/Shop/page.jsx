@@ -3,7 +3,6 @@ import React, { useState, useMemo, useEffect, useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { IoIosArrowDown } from "react-icons/io";
 import { IoMdHeart } from "react-icons/io";
 import { ProductContext } from "@/app/Context/ProductContext";
 import { CartContext } from "@/app/Context/Cart";
@@ -19,21 +18,21 @@ const Shop = () => {
     gender: "",
     material: [],
     color: [],
-    size : [],
+    size: [],
     minPrice: 0,
     maxPrice: 100,
   });
   const [priceRange, setPriceRange] = useState([0, 100]);
   const [sortPrice, setSortPrice] = useState("default");
   const [page, setPage] = useState(0);
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
 
-  const categories = [...new Set(products.map((product) => product.category))];
-  const genders = [...new Set(products.map((product) => product.gender.toLowerCase()))];
-  const materials = [... new Set(products.map((product) => product.material))];
-  const colors = ["Yellow" , "Black" , "White" , "Blue" , "Red" , "Green" , "Brown" , "Orange" , "Purple" , "Silver" , "Gold", "Gray" , "Navy" , "Beige" , "Pink"];
-  const sizes = [...new Set(products.flatMap((product) => product.sizes))];
-  
+  const categories = [...new Set(products.map((p) => p.category))];
+  const genders = [...new Set(products.map((p) => p.gender.toLowerCase()))];
+  const materials = [...new Set(products.map((p) => p.material))];
+  const colors = ["Yellow", "Black", "White", "Blue", "Red", "Green", "Brown", "Orange", "Purple", "Silver", "Gold", "Gray", "Navy", "Beige", "Pink"];
+  const sizes = [...new Set(products.flatMap((p) => p.sizes))];
+
   useEffect(() => {
     const params = Object.fromEntries([...searchParams]);
     setFilters({
@@ -50,6 +49,19 @@ const Shop = () => {
       params.maxPrice ? parseFloat(params.maxPrice) : 100,
     ]);
   }, [searchParams]);
+
+  const updateUrlParams = (newFilters) => {
+    const params = new URLSearchParams();
+    Object.keys(newFilters).forEach((key) => {
+      if (Array.isArray(newFilters[key]) && newFilters[key].length > 0) {
+        params.append(key, newFilters[key].join(","));
+      } else if (newFilters[key]) {
+        params.append(key, newFilters[key]);
+      }
+    });
+    router.push(`?${params.toString()}`);
+  };
+
   const handleFilterChange = (type, value) => {
     setFilters((prev) => {
       const newFilters = { ...prev };
@@ -65,33 +77,31 @@ const Shop = () => {
     });
   };
 
-  const updateUrlParams = (newFilters) => {
-    const params = new URLSearchParams();
-    Object.keys(newFilters).forEach((key) => {
-      if (Array.isArray(newFilters[key]) && newFilters[key].length > 0) {
-        params.append(key, newFilters[key].join(","));
-      } else if (newFilters[key]) {
-        params.append(key, newFilters[key]);
-      }
+  const resetFilters = () => {
+    setFilters({
+      category: "",
+      gender: "",
+      material: [],
+      color: [],
+      size: [],
+      minPrice: 0,
+      maxPrice: 100,
     });
-    router.push(`?${params.toString()}`);
+    setPriceRange([0, 100]);
+    router.push("?");
   };
 
-const filteredProducts = useMemo(() => {
-  return products.filter((product) => {
-    const matchesCategory = !filters.category || product.category === filters.category;
-    const matchesGender = !filters.gender || product.gender === filters.gender;
-    const matchesMaterial = filters.material.length === 0 || filters.material.includes(product.material);
-    
-    // Check if at least one selected color exists in product's color array
-    const matchesColor = filters.color.length === 0 || product.colors.some((c) => filters.color.includes(c));
-    const matchesSize = filters.size.length === 0 || product.sizes.some((s) => filters.size.includes(s));
-    const matchesPrice = product.price >= filters.minPrice && product.price <= filters.maxPrice;
-
-    return matchesCategory && matchesGender && matchesMaterial && matchesColor && matchesSize && matchesPrice;
-  });
-}, [filters, products]);
-
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      const matchesCategory = !filters.category || p.category === filters.category;
+      const matchesGender = !filters.gender || p.gender === filters.gender;
+      const matchesMaterial = filters.material.length === 0 || filters.material.includes(p.material);
+      const matchesColor = filters.color.length === 0 || p.colors.some((c) => filters.color.includes(c));
+      const matchesSize = filters.size.length === 0 || p.sizes.some((s) => filters.size.includes(s));
+      const matchesPrice = p.price >= filters.minPrice && p.price <= filters.maxPrice;
+      return matchesCategory && matchesGender && matchesMaterial && matchesColor && matchesSize && matchesPrice;
+    });
+  }, [filters, products]);
 
   const sortedProducts = useMemo(() => {
     return sortPrice === "lowToHigh"
@@ -103,160 +113,132 @@ const filteredProducts = useMemo(() => {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 px-6 py-8 bg-gray-100 min-h-screen">
-      {/* Filters Sidebar */}
-      <div
-        className={`w-full lg:w-[20%] bg-white shadow-lg rounded-lg p-6 transition-all ${
-          showFilters ? "block" : "hidden lg:block"
-        }`}
-      >
-        <div className="flex justify-between items-center w-full mb-4">
-          <h2 className="text-lg font-bold text-gray-800">Filters</h2>
-          <button onClick={() => setShowFilters(!showFilters)} className="lg:hidden text-black">
-            ✕
-          </button>
+      {/* Sidebar (Filters) */}
+      <div className={`fixed lg:static z-40 top-0 left-0 h-full w-3/4 lg:w-[20%] bg-white shadow-lg p-6 transition-transform transform ${showFilters ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-bold">Filters</h2>
+          <button onClick={() => setShowFilters(false)} className="lg:hidden">✕</button>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-6 overflow-y-auto h-[80vh]">
           {/* Category */}
           <div>
-            <h3 className="text-md font-semibold text-gray-700">Category</h3>
-            {categories.map((category, index) => (
-              <label key={index} className="flex items-center gap-2 mt-2">
-                <input
-                  type="radio"
-                  name="category"
-                  value={category}
-                  checked={filters.category === category}
-                  onChange={() => handleFilterChange("category", category)}
-                  className="h-4 w-4"
-                />
-                {category}
+            <h3 className="font-semibold mb-2">Category</h3>
+            {categories.map((c) => (
+              <label key={c} className="flex items-center gap-2">
+                <input type="radio" checked={filters.category === c} onChange={() => handleFilterChange("category", c)} />
+                {c}
               </label>
             ))}
           </div>
-
           {/* Gender */}
           <div>
-            <h3 className="text-md font-semibold text-gray-700">Gender</h3>
-            {genders.map((gender, index) => (
-              <label key={index} className="flex items-center gap-2 mt-2">
-                <input
-                  type="radio"
-                  name="gender"
-                  value={gender}
-                  checked={filters.gender === gender}
-                  onChange={() => handleFilterChange("gender", gender)}
-                  className="h-4 w-4"
-                />
-                {gender}
+            <h3 className="font-semibold mb-2">Gender</h3>
+            {genders.map((g) => (
+              <label key={g} className="flex items-center gap-2">
+                <input type="radio" checked={filters.gender === g} onChange={() => handleFilterChange("gender", g)} />
+                {g}
               </label>
             ))}
           </div>
-
           {/* Material */}
-          <div className="flex flex-col gap-2">
-            <span className="font-bold text-base">Material</span>
-            <ul className="flex flex-col gap-3 text-base">
-              {materials.map((material, index) => (
-                <div key={material} className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    checked={filters.material.includes(material)}
-                    onChange={() => handleFilterChange("material", material)}
-                    value={material}
-                    type="checkbox" name="material" id=""
-                    className='h-4 w-f text-blue-500 focus:ring-blue-400 border-gray-300 mr-2' />
-                    <li className='text-gray-900'>{material}</li>
-                </div>
-              ))}
-            </ul>
+          <div>
+            <h3 className="font-semibold mb-2">Material</h3>
+            {materials.map((m) => (
+              <label key={m} className="flex items-center gap-2">
+                <input type="checkbox" checked={filters.material.includes(m)} onChange={() => handleFilterChange("material", m)} />
+                {m}
+              </label>
+            ))}
           </div>
-          {/* Color */}
-          <div className="flex flex-col gap-2">
-            <h3 className="text-md font-semibold text-gray-700">Color</h3>
-            <div className="grid grid-cols-4 gap-3">
-              {colors.map((color, index) => (
-                <label
-                  style={{ backgroundColor: color.toLowerCase() }}
-                  key={index}
-                  className={`w-7 h-7 ${filters.color.includes(color) ? "border-2 border-gray-500" : "border border-gray-200"}  rounded-full flex items-center justify-center cursor-pointer p-1`}>
-                  <input
-                    type="checkbox"
-                    name="color"
-                    value={color}
-                    checked={filters.color.includes(color)}
-                    onChange={() => handleFilterChange("color", color)}
-                    className="h-4 w-4 hidden"
-                  />
-                  {/* {color} */}
+          {/* Colors */}
+          <div>
+            <h3 className="font-semibold mb-2">Color</h3>
+            <div className="grid grid-cols-6 gap-2">
+              {colors.map((c) => (
+                <label key={c} style={{ backgroundColor: c.toLowerCase() }} className={`w-7 h-7 rounded-full cursor-pointer border ${filters.color.includes(c) ? "ring-2 ring-black" : ""}`}>
+                  <input type="checkbox" checked={filters.color.includes(c)} onChange={() => handleFilterChange("color", c)} className="hidden" />
                 </label>
               ))}
             </div>
           </div>
           {/* Size */}
-          <div className="flex flex-col gap-2">
-            <span className="font-bold text-base">Size</span>
-            <ul className="flex flex-col gap-3 text-base">
-              {sizes.map((s, index) => (
-                <div key={s} className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    checked={filters.size.includes(s)}
-                    onChange={() => handleFilterChange("size", s)}
-                    value={s}
-                    type="checkbox" name="material" id=""
-                    className='h-4 w-f text-blue-500 focus:ring-blue-400 border-gray-300 mr-2' />
-                    <li className='text-gray-900'>{s}</li>
-                </div>
-              ))}
-            </ul>
-          </div>
-          {/* Price Range */}
           <div>
-            <h3 className="text-md font-semibold text-gray-700">Price</h3>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={priceRange[1]}
-              onChange={(e) => handleFilterChange("maxPrice", parseFloat(e.target.value))}
-              className="w-full"
-            />
-            <div className="flex justify-between text-gray-500 text-sm mt-2">
+            <h3 className="font-semibold mb-2">Size</h3>
+            <div className="flex flex-wrap gap-2">
+              {sizes.map((s) => (
+                <button key={s} onClick={() => handleFilterChange("size", s)} className={`px-3 py-1 border rounded ${filters.size.includes(s) ? "bg-black text-white" : "bg-white"}`}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Price */}
+          <div>
+            <h3 className="font-semibold mb-2">Price</h3>
+            <input type="range" min="0" max="100" value={priceRange[1]} onChange={(e) => handleFilterChange("maxPrice", parseFloat(e.target.value))} className="w-full" />
+            <div className="flex justify-between text-sm text-gray-500">
               <span>${priceRange[0]}</span>
               <span>${priceRange[1]}</span>
             </div>
           </div>
+          {/* Reset */}
+          <button onClick={resetFilters} className="w-full mt-4 py-2 bg-gray-200 hover:bg-gray-300 rounded">Clear All</button>
         </div>
       </div>
 
-      {/* Product Section */}
+      {/* Products Section */}
       <div className="w-full lg:w-[80%]">
-        {/* Sort */}
+        {/* Top Bar */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Products</h2>
-          <select
-            value={sortPrice}
-            onChange={(e) => setSortPrice(e.target.value)}
-            className="border p-2 rounded-md"
-          >
+          <button className="lg:hidden px-4 py-2 border rounded" onClick={() => setShowFilters(true)}>☰ Filters</button>
+          <select value={sortPrice} onChange={(e) => setSortPrice(e.target.value)} className="border p-2 rounded">
             <option value="default">Default</option>
             <option value="lowToHigh">Price: Low to High</option>
             <option value="highToLow">Price: High to Low</option>
           </select>
         </div>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {sortedProducts.slice(page * 9, page * 9 + 9).map((prod, index) => (
-            <Link key={index} href={`/Product/${prod._id}`} className="bg-white p-4 rounded-lg shadow hover:scale-105 transition">
-              <Image alt="img_product" src={prod.Photo[0].url} width={200} height={200} className="rounded-lg w-full" />
-              <h3 className="font-bold mt-2">{prod.name}</h3>
-              <span className="text-red-500">${prod.price}</span>
-            </Link>
+        {/* Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+          {sortedProducts.slice(page * 8, page * 8 + 8).map((prod) => (
+            <div key={prod._id} className="relative group bg-white rounded-lg shadow p-3 hover:shadow-lg transition">
+              {/* Wishlist */}
+              <button className="absolute top-3 right-3 text-gray-500 hover:text-red-500">
+                <IoMdHeart size={22} />
+              </button>
+              {/* Discount */}
+              {discount && (
+                <span className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                  -{discount}%
+                </span>
+              )}
+              {/* Image */}
+              <Link href={`/Product/${prod._id}`}>
+                <Image src={prod.Photo[0].url} alt={prod.name} width={300} height={300} className="w-full h-52 object-cover rounded-md group-hover:scale-105 transition" />
+              </Link>
+              {/* Info */}
+              <h3 className="font-semibold mt-2">{prod.name}</h3>
+              <div className="flex items-center gap-2">
+                <span className="text-red-600 font-bold">${prod.price}</span>
+                {discount && <span className="line-through text-gray-400 text-sm">${prod.price + discount}</span>}
+              </div>
+              {/* CTA */}
+              <button className="hidden group-hover:block w-full mt-3 py-2 bg-black text-white rounded-md transition">
+                Add to Cart
+              </button>
+            </div>
           ))}
         </div>
-        <div className='flex items-center justify-center gap-2 my-4 '>
-          {[...Array(Math.ceil(sortedProducts.length / 9)).keys()].map((index) => (
-            <button key={index} onClick={() => setPage(index)} className={`border-black border-[1px] px-2 py-1 rounded-sm ${page === index ? "bg-black text-white" : ""}`}>{index + 1}</button>
+
+        {/* Pagination */}
+        <div className="flex justify-center items-center gap-2 mt-6">
+          <button disabled={page === 0} onClick={() => setPage(page - 1)} className="px-3 py-1 border rounded disabled:opacity-50">Prev</button>
+          {[...Array(Math.ceil(sortedProducts.length / 8)).keys()].map((i) => (
+            <button key={i} onClick={() => setPage(i)} className={`px-3 py-1 border rounded ${page === i ? "bg-black text-white" : ""}`}>
+              {i + 1}
+            </button>
           ))}
+          <button disabled={page === Math.ceil(sortedProducts.length / 8) - 1} onClick={() => setPage(page + 1)} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
         </div>
       </div>
     </div>
