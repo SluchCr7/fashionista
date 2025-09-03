@@ -12,7 +12,7 @@ const Opinions = memo(() => {
   const sliderRef = useRef<HTMLDivElement | null>(null)
 
   const count = testimonials?.length || 0
-  const safeIndex = (i: number) => (count ? (i + count) % count : 0)
+  const safeIndex = (i) => (count ? (i + count) % count : 0)
 
   const nextSlide = useCallback(() => {
     if (!count) return
@@ -33,7 +33,7 @@ const Opinions = memo(() => {
 
   // Keyboard navigation
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
+    const onKey = (e) => {
       if (e.key === 'ArrowRight') nextSlide()
       if (e.key === 'ArrowLeft') prevSlide()
     }
@@ -42,7 +42,7 @@ const Opinions = memo(() => {
   }, [nextSlide, prevSlide])
 
   // Star rating (uses testimonial.rating if available, else 5)
-  const Stars = ({ rating = 5 }: { rating?: number }) => (
+  const Stars = ({ rating = 5 }) => (
     <div className="flex items-center gap-1" aria-label={`Rating ${rating} out of 5`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <span key={i} className={i < Math.round(rating) ? 'text-yellow-400' : 'text-gray-300'}>
@@ -55,7 +55,7 @@ const Opinions = memo(() => {
   if (!count) return null
 
   const t = testimonials[currentIndex]
-  const rating = typeof (t as any).rating === 'number' ? (t as any).rating : 5
+  const rating = typeof (t).rating === 'number' ? (t).rating : 5
 
   return (
     <section
