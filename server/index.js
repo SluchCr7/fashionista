@@ -3,6 +3,7 @@ const app = express()
 const connectDB = require('./Config/db')
 require('dotenv').config()
 const cors = require('cors')
+const path = require('path')
 // Connect DB 
 connectDB()
 
@@ -14,7 +15,7 @@ app.use(cors({
 
 // Routes
 app.get('/', (req, res) => {
-    res.send('Hello Server')
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 })
 
 app.use("/api/auth" , require('./routes/authRoute'))

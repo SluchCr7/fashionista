@@ -1,5 +1,6 @@
 const { RegisterNewUser, LoginUser, getAllUsers, getUserById, DeleteUser, toggleFavorite } = require('../Controllers/AuthController')
-const route = require('express').Router()
+const express = require('express')
+const route = express.Router()
 const {verifyToken , verifyAdmain} = require("../Middelware/verifyToken")
 
 route.route('/register')

@@ -25,10 +25,10 @@ const Footer = () => {
                     <div className='flex flex-col gap-3'>
                         <h3 className='font-bold text-lg'>Shop</h3>
                         <ul className='text-sm space-y-2'>
-                            <li><Link href='https://fashionista-flax.vercel.app/Shop?category=Top+Wear&gender=men&material=&color=&size=&maxPrice=100' className='hover:underline'>Mens Top Wear</Link></li>
-                            <li><Link href='https://fashionista-flax.vercel.app/Shop?category=Top+Wear&gender=women&material=&color=&size=&maxPrice=100' className='hover:underline'>Womens Top Wear</Link></li>
-                            <li><Link href='https://fashionista-flax.vercel.app/Shop?category=Bottom+Wear&gender=men&material=&color=&size=&maxPrice=100' className='hover:underline'>Mens Bottom Wear</Link></li>
-                            <li><Link href='https://fashionista-flax.vercel.app/Shop?category=Bottom+Wear&gender=women&material=&color=&size=&maxPrice=100' className='hover:underline'>Womens Bottom Wear</Link></li>
+                            <li><Link href='https://fashionista-two.vercel.app/Shop?category=Top+Wear&gender=men&material=&color=&size=&maxPrice=100' className='hover:underline'>Mens Top Wear</Link></li>
+                            <li><Link href='https://fashionista-two.vercel.app/Shop?category=Top+Wear&gender=women&material=&color=&size=&maxPrice=100' className='hover:underline'>Womens Top Wear</Link></li>
+                            <li><Link href='https://fashionista-two.vercel.app/Shop?category=Bottom+Wear&gender=men&material=&color=&size=&maxPrice=100' className='hover:underline'>Mens Bottom Wear</Link></li>
+                            <li><Link href='https://fashionista-two.vercel.app/Shop?category=Bottom+Wear&gender=women&material=&color=&size=&maxPrice=100' className='hover:underline'>Womens Bottom Wear</Link></li>
                         </ul>
                     </div>
                     

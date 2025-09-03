@@ -1,5 +1,6 @@
 const { AddNewReview, getAllReviews, getReview, deleteReview } = require('../Controllers/ReviewController')
-const route = require('express').Router()
+const express = require('express')
+const route = express.Router()
 const {verifyToken , verifyAdmain} = require("../Middelware/verifyToken")
 
 route.route('/')

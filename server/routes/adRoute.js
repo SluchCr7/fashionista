@@ -1,6 +1,7 @@
 const { getAd, newAd, getAllAds, deleteAd } = require('../Controllers/AdController')
-const route = require('express').Router()
-const  photoUpload  = require('../Middelware/uploadPhoto')
+const express = require('express')
+const route = express.Router()
+const photoUpload  = require('../Middelware/uploadPhoto')
 
 route.route('/')
     .get(getAllAds)

@@ -1,6 +1,6 @@
 const { getDiscount, newDiscount } = require("../Controllers/DiscountController")
-const route = require("express").Router()
-
+const express = require('express')
+const route = express.Router()
 route.route("/")
     .get(getDiscount)
     .post(newDiscount)

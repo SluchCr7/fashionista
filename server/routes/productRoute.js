@@ -1,5 +1,6 @@
 const { getAllProduct, getProduct, deleteProduct, NewProduct } = require('../Controllers/ProductController')
-const route = require('express').Router()
+const express = require('express')
+const route = express.Router()
 const  photoUpload  = require('../Middelware/uploadPhoto')
 route.route('/')
     .get(getAllProduct)
