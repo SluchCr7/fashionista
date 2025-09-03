@@ -9,7 +9,8 @@ import { testimonials } from '../Data'
 const Opinions = memo(() => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
-  const sliderRef = useRef<HTMLDivElement | null>(null)
+  const sliderRef = useRef(null)
+
 
   const count = testimonials?.length || 0
   const safeIndex = (i) => (count ? (i + count) % count : 0)
