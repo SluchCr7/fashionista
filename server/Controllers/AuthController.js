@@ -73,7 +73,11 @@ const getAllUsers = asyncHandler(async (req, res) => {
         select: "Photo name description price gender",
       },
     ],
-  });
+  }).populate({
+      path: "favorites",
+      model: "Product",
+      select: "Photo name description price category gender material",
+    });
 
   res.status(200).json(users);
 });
@@ -83,23 +87,28 @@ const getAllUsers = asyncHandler(async (req, res) => {
  * @route GET /api/auth/:id
  * @access Public
  */
-
 const getUserById = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).populate({
-    path: "orders",
-    populate: [
-      {
-        path: "user",
-        model: "User",
-        select: "ProfileName profilePhoto name",
-      },
-      {
-        path: "Products", // ✅ نفس الحرف الكبير كما هو في OrderSchema
-        model: "Product",
-        select: "Photo name description price gender",
-      },
-    ],
-  });
+  const user = await User.findById(req.params.id)
+    .populate({
+      path: "orders",
+      populate: [
+        {
+          path: "user",
+          model: "User",
+          select: "ProfileName profilePhoto name",
+        },
+        {
+          path: "Products", // ✅ نفس الحرف الكبير كما في OrderSchema
+          model: "Product",
+          select: "Photo name description price gender category",
+        },
+      ],
+    })
+    .populate({
+      path: "favorites",
+      model: "Product",
+      select: "Photo name description price category gender material",
+    });
 
   if (!user) {
     return res.status(404).json({ message: "User Not Found" });
@@ -107,6 +116,7 @@ const getUserById = asyncHandler(async (req, res) => {
 
   res.status(200).json(user);
 });
+
 
 
 
