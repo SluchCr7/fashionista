@@ -1,103 +1,134 @@
+'use client'
 import Link from 'next/link'
 import React from 'react'
 import { socialLinks } from '../Data'
-import Image from 'next/image'
 import { FaCcVisa, FaCcMastercard, FaCcPaypal, FaApplePay } from 'react-icons/fa'
+import { motion } from 'framer-motion'
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-gray-100 text-gray-700">
-      {/* Top Section */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-16 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10">
-        
-        {/* Brand + Newsletter */}
-        <div className="flex flex-col gap-4">
-          <h2 className="text-2xl font-extrabold uppercase">Fashionista</h2>
-          <p className="text-sm leading-relaxed">
-            Discover the latest trends in fashion. Premium clothing for men, women & kids.
+    <footer className="relative bg-[#0f0f0f] text-gray-300 overflow-hidden">
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"></div>
+
+      {/* Container */}
+      <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-16 py-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 z-10">
+
+        {/* Brand & Newsletter */}
+        <div className="flex flex-col gap-5">
+          <h2 className="text-3xl font-extrabold tracking-wide text-white uppercase">
+            Fashionista
+          </h2>
+          <p className="text-sm text-gray-400 leading-relaxed">
+            Discover the latest in fashion and lifestyle. Elevate your style with our curated collections.
           </p>
-          <div className="flex w-full mt-2">
+
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="mt-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden flex"
+          >
             <input
               type="email"
-              placeholder="Enter your email"
-              className="w-2/3 px-3 py-2 border border-gray-400 rounded-l-md outline-none"
+              placeholder="Your email address"
+              className="flex-1 bg-transparent px-4 py-3 text-sm text-gray-100 placeholder-gray-400 outline-none"
             />
-            <button className="w-1/3 bg-black text-white font-semibold py-2 rounded-r-md hover:bg-gray-800 transition">
+            <button className="bg-gradient-to-r from-red-600 to-pink-600 px-5 text-white font-semibold hover:brightness-110 transition">
               Subscribe
             </button>
-          </div>
-          <span className="text-xs text-gray-500 mt-1">Join & get 10% off your first order</span>
+          </motion.div>
+          <span className="text-xs text-gray-500">Get 10% off your first order 🎁</span>
         </div>
 
-        {/* Shop Links */}
+        {/* Shop */}
         <div>
-          <h3 className="font-bold text-lg mb-3">Shop</h3>
-          <ul className="text-sm space-y-2">
-            <li><Link href="/Men" className="hover:underline">Men</Link></li>
-            <li><Link href="/Women" className="hover:underline">Women</Link></li>
-            <li><Link href="/Kids" className="hover:underline">Kids</Link></li>
-            <li><Link href="/Shoes" className="hover:underline">Shoes</Link></li>
-            <li><Link href="/Accessories" className="hover:underline">Accessories</Link></li>
+          <h3 className="font-semibold text-lg text-white mb-4">Shop</h3>
+          <ul className="space-y-2 text-sm text-gray-400">
+            {["Men", "Women", "Kids", "Shoes", "Accessories"].map((item) => (
+              <li key={item}>
+                <Link href={`/Shop/${item}`} className="hover:text-white transition">
+                  {item}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
-        {/* Company Links */}
+        {/* Company */}
         <div>
-          <h3 className="font-bold text-lg mb-3">Company</h3>
-          <ul className="text-sm space-y-2">
-            <li><Link href="/About" className="hover:underline">About Us</Link></li>
-            <li><Link href="/Careers" className="hover:underline">Careers</Link></li>
-            <li><Link href="/Blog" className="hover:underline">Blog</Link></li>
-            <li><Link href="/Sustainability" className="hover:underline">Sustainability</Link></li>
+          <h3 className="font-semibold text-lg text-white mb-4">Company</h3>
+          <ul className="space-y-2 text-sm text-gray-400">
+            {["About", "Careers", "Blog", "Sustainability"].map((item) => (
+              <li key={item}>
+                <Link href={`/${item}`} className="hover:text-white transition">
+                  {item}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
-        {/* Support Links */}
+        {/* Support */}
         <div>
-          <h3 className="font-bold text-lg mb-3">Support</h3>
-          <ul className="text-sm space-y-2">
-            <li><Link href="/FAQ" className="hover:underline">FAQ</Link></li>
-            <li><Link href="/Shipping" className="hover:underline">Shipping & Delivery</Link></li>
-            <li><Link href="/Returns" className="hover:underline">Returns & Exchanges</Link></li>
-            <li><Link href="/Contact" className="hover:underline">Contact Us</Link></li>
+          <h3 className="font-semibold text-lg text-white mb-4">Support</h3>
+          <ul className="space-y-2 text-sm text-gray-400">
+            {["FAQ", "Shipping", "Returns", "Contact"].map((item) => (
+              <li key={item}>
+                <Link href={`/${item}`} className="hover:text-white transition">
+                  {item}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
         {/* Social & Payments */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <div>
-            <h3 className="font-bold text-lg">Follow Us</h3>
-            <div className="flex gap-4 mt-2">
+            <h3 className="font-semibold text-lg text-white mb-3">Follow Us</h3>
+            <div className="flex gap-3">
               {socialLinks.map((item, index) => (
-                <Link key={index} href={item.link} className="text-2xl hover:text-gray-900">
-                  {item.icon}
-                </Link>
+                <motion.div
+                  key={index}
+                  whileHover={{ scale: 1.15 }}
+                  className="w-10 h-10 flex items-center justify-center rounded-full border border-white/10 hover:border-red-500 hover:bg-red-600/10 text-gray-400 hover:text-white transition"
+                >
+                  <Link href={item.link}>{item.icon}</Link>
+                </motion.div>
               ))}
             </div>
           </div>
+
           <div>
-            <h3 className="font-bold text-lg">We Accept</h3>
-            <div className="flex gap-3 text-3xl mt-2 text-gray-700">
-              <FaCcVisa />
-              <FaCcMastercard />
-              <FaCcPaypal />
-              <FaApplePay />
+            <h3 className="font-semibold text-lg text-white mb-3">We Accept</h3>
+            <div className="flex gap-4 text-3xl text-gray-400">
+              <FaCcVisa className="hover:text-white transition" />
+              <FaCcMastercard className="hover:text-white transition" />
+              <FaCcPaypal className="hover:text-white transition" />
+              <FaApplePay className="hover:text-white transition" />
             </div>
           </div>
         </div>
       </div>
 
+      {/* Divider */}
+      <div className="border-t border-white/10"></div>
+
       {/* Bottom Bar */}
-      <div className="w-full border-t border-gray-300 bg-gray-200">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-4 px-6 text-sm text-gray-600">
-          <span>&copy; 2025 Fashionista. All rights reserved.</span>
-          <div className="flex gap-4 mt-2 md:mt-0">
-            <Link href="/Terms" className="hover:underline">Terms</Link>
-            <Link href="/Privacy" className="hover:underline">Privacy</Link>
-            <Link href="/Sitemap" className="hover:underline">Sitemap</Link>
-          </div>
+      <div className="max-w-7xl mx-auto px-6 md:px-10 py-6 flex flex-col sm:flex-row justify-between items-center text-xs sm:text-sm text-gray-500 gap-4 z-10 relative">
+        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+          &copy; {new Date().getFullYear()} <span className="text-white font-semibold">Fashionista</span>. All rights reserved.
+        </motion.span>
+        <div className="flex gap-5">
+          {["Terms", "Privacy", "Sitemap"].map((link, i) => (
+            <Link key={i} href={`/${link}`} className="hover:text-white transition">
+              {link}
+            </Link>
+          ))}
         </div>
       </div>
+
+      {/* Floating Gradient Line */}
+      <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-red-600 via-yellow-400 to-pink-600"></div>
     </footer>
   )
 }
