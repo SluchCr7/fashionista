@@ -1,5 +1,5 @@
 'use client'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Link from 'next/link'
 import { Sheet, SheetTrigger, SheetContent } from '@/components/ui/sheet'
 import Image from 'next/image'
@@ -12,7 +12,9 @@ const CartShop = () => {
   const handleCart = () => {
     SubmitCart(cart)
   }
-
+  useEffect(() => {
+    console.log(cart)
+  }, [cart])
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
 
   return (
