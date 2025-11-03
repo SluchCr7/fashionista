@@ -11,14 +11,13 @@ const Profile = () => {
   const [myOrders, setMyOrders] = useState([])
   const { orders, deleteOrder } = useContext(CartContext)
   const { user, Logout } = useContext(UserContext)
-
   useEffect(() => {
     if (user) {
       const filteredOrders = orders.filter(order => order?.user?._id === user?._id)
       setMyOrders(filteredOrders)
     }
   }, [orders, user])
-
+  // Helper function to determine order status
   const deliveredCount = useMemo(() => myOrders.filter(o => o.status === "Delivered").length, [myOrders])
   const pendingCount = useMemo(() => myOrders.filter(o => o.status === "Pending").length, [myOrders])
 

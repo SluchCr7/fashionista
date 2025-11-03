@@ -57,6 +57,9 @@ const CartContextProvider = ({children}) => {
       )
         .then(res => {
           setFinalCart([])
+          setCart([])
+          setNumInCart(0)
+          localStorage.removeItem("cart")
           setMessage("Order Submitted Successfully")
           setTimeout(() => setMessage(""), 3000)
           window.location.href = "/Order"

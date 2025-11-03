@@ -38,9 +38,6 @@ const CheckoutPage = () => {
     const ProductsIds = finalCart.map((prod) => prod._id);
     setProductsArrayOrder(ProductsIds);
   }, [finalCart]);
-  useEffect(()=>{
-    console.log(ProductsArrOrder)
-  },[ProductsArrOrder])
   return (
     <>
       <Notify Notify={message}/>
