@@ -60,11 +60,6 @@ const Opinions = memo(() => {
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-yellow-300/20 rounded-full blur-[180px]" />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12">
-        <Intro
-          title="What Our Customers Say"
-          para="Trusted by thousands of happy customers worldwide"
-        />
-
         {/* === Main Card Slider === */}
         <div
           className="relative mt-12"
@@ -98,7 +93,7 @@ const Opinions = memo(() => {
 
                   <Stars rating={rating} />
 
-                  <div className="mt-8">
+                  <div className="mt-8 flex items-center gap-4 flex-col">
                     <Image
                       src={t.img}
                       alt={t.name}
