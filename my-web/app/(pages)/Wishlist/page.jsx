@@ -89,7 +89,7 @@ const Wishlist = () => {
                 className="group relative bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-gray-100 transition-all duration-300"
               >
                 {/* Image */}
-                <div className="relative overflow-hidden">
+                {/* <div className="relative overflow-hidden">
                   <Link href={`/product/${product._id}`}>
                     <Image
                       src={product.Photo[0]?.url || '/placeholder.png'}
@@ -98,8 +98,16 @@ const Wishlist = () => {
                       className="w-full h-64 object-cover transform group-hover:scale-110 transition duration-500"
                       alt={product.name}
                     />
+                  </Link> */}
+                <div className="relative overflow-hidden aspect-square"> {/* أو aspect-[4/3] حسب شكل الصور */}
+                  <Link href={`/product/${product._id}`}>
+                    <Image
+                      src={product.Photo[0]?.url || '/placeholder.png'}
+                      fill
+                      className="object-contain transition duration-500 group-hover:scale-105"
+                      alt={product.name}
+                    />
                   </Link>
-
                   {/* Overlay Gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
 
