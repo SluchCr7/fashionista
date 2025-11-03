@@ -43,7 +43,7 @@ const CartShop = () => {
                 cart.map((prod) => (
                   <div key={prod.id} className='flex items-center gap-3 border-b pb-3'>
                     <Image 
-                      src={prod.img} 
+                      src={prod.Photo[0].url} 
                       alt={prod.name} 
                       width={80} 
                       height={80} 
