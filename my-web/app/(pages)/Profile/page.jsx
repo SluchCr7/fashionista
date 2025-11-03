@@ -6,17 +6,28 @@ import Image from 'next/image'
 import { MdDelete, MdLogout } from "react-icons/md"
 import { FaUserShield } from "react-icons/fa"
 import { motion, AnimatePresence } from 'framer-motion'
+import axios from 'axios'
 
 const Profile = () => {
   const [myOrders, setMyOrders] = useState([])
   const { orders, deleteOrder } = useContext(CartContext)
   const { user, Logout } = useContext(UserContext)
   useEffect(() => {
-    if (user) {
-      const filteredOrders = orders.filter(order => String(order?.user?._id) === String(user?._id))
-      setMyOrders(filteredOrders)
+    const fetchUserData = async () => {
+      if (user?._id && user?.token) {
+        try {
+          const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/${user._id}`, {
+            headers: { Authorization: `Bearer ${user.token}` },
+          });
+          setMyOrders(res.data?.orders || []);
+        } catch (err) {
+          console.log(err);
+        }
+      }
     }
-  }, [orders, user])
+
+    fetchUserData();
+  },[user?._id, user?.token])
   // Helper function to determine order status
   const deliveredCount = useMemo(() => myOrders.filter(o => o.status === "Delivered").length, [myOrders])
   const pendingCount = useMemo(() => myOrders.filter(o => o.status === "Pending").length, [myOrders])

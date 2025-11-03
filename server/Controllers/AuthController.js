@@ -85,12 +85,29 @@ const getAllUsers = asyncHandler(async (req, res) => {
  */
 
 const getUserById = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id)
-    if (!user) {
-        return res.status(404).json({ message: "User Not Found" })
-    }
-    res.status(200).json(user)
-})
+  const user = await User.findById(req.params.id).populate({
+    path: "orders",
+    populate: [
+      {
+        path: "user",
+        model: "User",
+        select: "ProfileName profilePhoto name",
+      },
+      {
+        path: "Products", // ✅ نفس الحرف الكبير كما هو في OrderSchema
+        model: "Product",
+        select: "Photo name description price gender",
+      },
+    ],
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "User Not Found" });
+  }
+
+  res.status(200).json(user);
+});
+
 
 
 /**
@@ -155,18 +172,3 @@ const toggleFavorite = asyncHandler(async (req, res) => {
 });
 
 module.exports = {DeleteUser , toggleFavorite, LoginUser , RegisterNewUser , getAllUsers , getUserById}
-
-    // const isPostLikedByUser = post.likes.find(
-    //     (user) => user.toString() === req.user._id
-    // )
-    // if (isPostLikedByUser) {
-    //     post = await Post.findByIdAndUpdate(req.params.id, {
-    //         $pull: { likes: req.user._id },
-    //     } , {new : true}) 
-    // }
-    // else {
-    //     post = await Post.findByIdAndUpdate(req.params.id, {
-    //         $push: { likes: req.user._id },
-    //     }, { new : true })
-    // }
-    // res.status(200).json(post)
