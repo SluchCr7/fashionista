@@ -53,8 +53,14 @@ const ProductSchema = new mongoose.Schema({
     rating: {
         type: Number, 
         default : 0
-    }
+    },
 }, { timestamps : true })
+
+ProductSchema.virtual("reviews", {
+  ref: "Review",      
+  localField: "_id",        
+  foreignField: "product",  
+});
 
 const Product = mongoose.model("Product", ProductSchema)
 

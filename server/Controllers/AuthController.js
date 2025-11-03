@@ -126,49 +126,38 @@ const DeleteUser = asyncHandler(async (req, res) => {
 })
 
 const toggleFavorite = asyncHandler(async (req, res) => {
-    // try {
-    //     const userId = req.user._id
-    //     const productId = req.params.id
-    //     // Find user
-    //     const user = await User.findById(userId);
-    //     if (!user) return res.status(404).json({ message: 'User not found' });
+  const productId = req.params.id;
+  const user = await User.findById(req.user._id);
 
-    //     // Check if product exists
-    //     const product = await Product.findById(productId);
-    //     if (!product) return res.status(404).json({ message: 'Product not found' });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
 
-    //     // Check if product is already in favorites
-    //     const index = user.favorites.indexOf(productId);
+  const product = await Product.findById(productId);
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
 
-    //     if (index === -1) {
-    //         // Add to favorites
-    //         user.favorites.push(productId);
-    //         await user.save();
-    //         return res.status(200).json({ message: 'Added to favorites'});
-    //     } else {
-    //         // Remove from favorites
-    //         user.favorites.splice(index, 1);
-    //         await user.save();
-    //         return res.status(200).json({ message: 'Removed from favorites'});
-    //     }
-    // } catch (error) {
-    //     console.error(error);
-    //     res.status(500).json({ message: 'Server error' });
-    // }
-    let product = await Product.findById(req.params.id)
-    if(!product){
-        return res.status(404).json({message : "Product Not Found"})
-    }
-    let user =  await User.findById(req.user._id)
-    if(user.favorites.includes(product._id)){
-        user.favorites.pull(product._id)
-        await user.save()
-        res.status(200).json({message : "Removed from favorites"})
-    }else{
-        user.favorites.push(product._id)
-        await user.save()
-        res.status(200).json({message : "Added to favorites"})
-    }
+  const isFavorite = user.favorites.includes(productId);
+
+  if (isFavorite) {
+    user.favorites.pull(productId);
+    await user.save();
+    return res.status(200).json({
+      message: "Removed from favorites",
+      isFavorite: false,
+      favoritesCount: user.favorites.length
+    });
+  } else {
+    user.favorites.push(productId);
+    await user.save();
+    return res.status(200).json({
+      message: "Added to favorites",
+      isFavorite: true,
+      favoritesCount: user.favorites.length
+    });
+  }
 });
+
 
 module.exports = {DeleteUser , toggleFavorite, LoginUser , RegisterNewUser , getAllUsers , getUserById}

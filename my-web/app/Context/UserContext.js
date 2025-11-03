@@ -88,35 +88,46 @@ const UserContextProvider = ({ children }) => {
   }, []);
 
   // ✅ إضافة / إزالة منتج من المفضلة
-  const AddFavourite = async (prodId) => {
+    const AddFavourite = async (prodId) => {
     if (!user) {
-      setMessage('Please login first');
-      setTimeout(() => setMessage(''), 3000);
-      return;
+        setMessage('Please login first');
+        setTimeout(() => setMessage(''), 3000);
+        return;
     }
 
     try {
-      const res = await axios.post(
+        const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/favorite/${prodId}`,
         {},
         { headers: { Authorization: `Bearer ${user.token}` } }
-      );
+        );
 
-      setMessage(res.data.message);
-      setTimeout(() => setMessage(''), 2500);
+        const { message, isFavorite } = res.data;
+        setMessage(message);
+        setTimeout(() => setMessage(''), 2500);
 
-      // تحديث البيانات في LocalStorage
-      const userData = JSON.parse(localStorage.getItem('Data'));
-      if (res.data.message.includes('Added')) {
-        userData.favorites.push(prodId);
-      } else if (res.data.message.includes('Removed')) {
-        userData.favorites = userData.favorites.filter((id) => id !== prodId);
-      }
-      localStorage.setItem('Data', JSON.stringify(userData));
+        // تحديث بيانات المستخدم في LocalStorage
+        const storedData = JSON.parse(localStorage.getItem('Data'));
+        if (storedData) {
+        if (isFavorite) {
+            if (!storedData.favorites.includes(prodId)) {
+            storedData.favorites.push(prodId);
+            }
+        } else {
+            storedData.favorites = storedData.favorites.filter((id) => id !== prodId);
+        }
+        localStorage.setItem('Data', JSON.stringify(storedData));
+        }
+
+        // إرجاع الحالة الجديدة لتحديث الـ UI
+        return isFavorite;
     } catch (err) {
-      console.log(err);
+        console.error(err);
+        setMessage('Something went wrong');
+        setTimeout(() => setMessage(''), 3000);
     }
-  };
+    };
+
 
   return (
     <div className="relative">

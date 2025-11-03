@@ -69,10 +69,22 @@ const NewProduct = async (req, res) => {
  * @desc ALL Product
  */
 
-const getAllProduct = asyncHandler(async(req, res) => {
-    const products = await Product.find()
-    res.status(200).json(products)
-})
+const getAllProduct = asyncHandler(async (req, res) => {
+  const products = await Product.find()
+    .populate({
+      path: "reviews",
+      model: "Review",
+      select: "user rating comment",
+      populate: {
+        path: "user",
+        model: "User",
+        select: "name email profilePhoto"
+      }
+    });
+
+  res.status(200).json(products);
+});
+
 
 /**
  * @method GET
