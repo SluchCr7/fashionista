@@ -28,7 +28,7 @@ const ProductSchema = new mongoose.Schema({
     },
     material: {
         type: String,
-        // required : true
+        default : "Leather"
     },
     sizes: {
         type: Array,

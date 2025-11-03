@@ -59,7 +59,19 @@ const LoginUser = asyncHandler(async (req, res) => {
  */
 
 const getAllUsers = asyncHandler(async (req, res) => {
-    const users = await User.find()
+    const users = await User.find().populate({
+    path: "orders",
+        populate: {
+            path: "user",
+            model: "User",
+            select: "ProfileName profilePhoto name",
+        },
+        populate: {
+            path: "products",
+            model: "Product",
+            select : "Photo name description price gender",
+        },
+    })
     res.status(200).json(users)
 })
 

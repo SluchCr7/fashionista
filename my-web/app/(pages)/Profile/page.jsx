@@ -13,7 +13,7 @@ const Profile = () => {
   const { user, Logout } = useContext(UserContext)
   useEffect(() => {
     if (user) {
-      const filteredOrders = orders.filter(order => order?.user?._id === user?._id)
+      const filteredOrders = orders.filter(order => String(order?.user?._id) === String(user?._id))
       setMyOrders(filteredOrders)
     }
   }, [orders, user])

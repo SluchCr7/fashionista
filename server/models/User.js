@@ -42,6 +42,14 @@ const UserSchema = new mongoose.Schema({
     ] // Store favorite product IDs
 }, {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+
+UserSchema.virtual("orders", {
+  ref: "Order",      
+  localField: "_id",        
+  foreignField: "user",  
 });
 
 const User = mongoose.model("User", UserSchema);

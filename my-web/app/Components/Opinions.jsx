@@ -52,7 +52,7 @@ const Opinions = memo(() => {
 
   return (
     <section
-      className="relative w-full py-24 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100"
+      className="relative w-full py-24 overflow-hidden"
       aria-label="Customer Testimonials"
     >
       {/* Subtle gradient blobs for luxury feel */}

@@ -6,7 +6,7 @@ import { Companies } from '../Data'
 
 const Sponsors = () => {
   return (
-    <section className="relative w-full py-16 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+    <section className="relative w-full py-16 ">
       {/* Subtle top divider */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
 
