@@ -68,7 +68,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
         select: "ProfileName profilePhoto name",
       },
       {
-        path: "products",
+        path: "Products",
         model: "Product",
         select: "Photo name description price gender",
       },
