@@ -7,150 +7,142 @@ import Intro from './Intro'
 import { testimonials } from '../Data'
 
 const Opinions = memo(() => {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isHovered, setIsHovered] = useState(false)
-  const sliderRef = useRef(null)
-
-
+  const [index, setIndex] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
   const count = testimonials?.length || 0
+
   const safeIndex = (i) => (count ? (i + count) % count : 0)
 
-  const nextSlide = useCallback(() => {
-    if (!count) return
-    setCurrentIndex((p) => safeIndex(p + 1))
-  }, [count])
+  const next = useCallback(() => setIndex((i) => safeIndex(i + 1)), [count])
+  const prev = useCallback(() => setIndex((i) => safeIndex(i - 1)), [count])
 
-  const prevSlide = useCallback(() => {
-    if (!count) return
-    setCurrentIndex((p) => safeIndex(p - 1))
-  }, [count])
-
-  // Auto-play (pause on hover)
+  // Auto play
   useEffect(() => {
-    if (!count || isHovered) return
-    const id = setInterval(nextSlide, 5000)
+    if (isPaused || !count) return
+    const id = setInterval(next, 6000)
     return () => clearInterval(id)
-  }, [count, isHovered, nextSlide])
+  }, [isPaused, count, next])
 
   // Keyboard navigation
   useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === 'ArrowRight') nextSlide()
-      if (e.key === 'ArrowLeft') prevSlide()
+    const handleKey = (e) => {
+      if (e.key === 'ArrowRight') next()
+      if (e.key === 'ArrowLeft') prev()
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [nextSlide, prevSlide])
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [next, prev])
 
-  // Star rating (uses testimonial.rating if available, else 5)
-  const Stars = ({ rating = 5 }) => (
-    <div className="flex items-center gap-1" aria-label={`Rating ${rating} out of 5`}>
+  if (!count) return null
+  const t = testimonials[index]
+  const rating = typeof t.rating === 'number' ? t.rating : 5
+
+  const Stars = ({ rating }) => (
+    <div className="flex justify-center gap-1 mt-2">
       {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} className={i < Math.round(rating) ? 'text-yellow-400' : 'text-gray-300'}>
+        <span
+          key={i}
+          className={`text-lg ${i < Math.round(rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+        >
           ★
         </span>
       ))}
     </div>
   )
 
-  if (!count) return null
-
-  const t = testimonials[currentIndex]
-  const rating = typeof (t).rating === 'number' ? (t).rating : 5
-
   return (
     <section
-      className="relative w-full py-20 overflow-hidden"
+      className="relative w-full py-24 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100"
       aria-label="Customer Testimonials"
     >
-      {/* Background gradient + subtle shapes */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100" />
-      <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-red-200/30 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-yellow-200/30 blur-3xl" />
+      {/* Subtle gradient blobs for luxury feel */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-red-300/20 rounded-full blur-[180px]" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-yellow-300/20 rounded-full blur-[180px]" />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12">
         <Intro
           title="What Our Customers Say"
-          para="Real feedback from our happy shoppers"
+          para="Trusted by thousands of happy customers worldwide"
         />
 
-        {/* Slider */}
+        {/* === Main Card Slider === */}
         <div
-          ref={sliderRef}
-          className="relative mt-8"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          className="relative mt-12"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
         >
-          {/* Card */}
-          <div className="relative w-full">
-            <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 40, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -40, scale: 0.98 }}
+              transition={{ duration: 0.5 }}
+              className="mx-auto max-w-3xl text-center"
+            >
               <motion.div
-                key={currentIndex}
-                className="mx-auto w-full max-w-3xl"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.45 }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                onDragEnd={(_, info) => {
+                  if (info.offset.x < -80) next()
+                  if (info.offset.x > 80) prev()
+                }}
+                className="cursor-grab active:cursor-grabbing"
               >
-                <motion.div
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  onDragEnd={(_, info) => {
-                    if (info.offset.x < -80 || info.velocity.x < -300) nextSlide()
-                    if (info.offset.x > 80 || info.velocity.x > 300) prevSlide()
-                  }}
-                  className="w-full cursor-grab active:cursor-grabbing select-none"
-                >
-                  <div className="flex flex-col items-center gap-5 text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition">
-                    <FaQuoteLeft aria-hidden className="text-4xl text-DarkRed" />
-                    <p className="text-gray-700 text-lg md:text-xl italic leading-relaxed">
-                      {t.opinion}
-                    </p>
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-10 flex flex-col items-center">
+                  <FaQuoteLeft className="text-4xl text-red-500 mb-6 opacity-80" />
 
-                    <Stars rating={rating} />
+                  <p className="text-gray-700 text-lg md:text-xl italic leading-relaxed max-w-2xl">
+                    “{t.opinion}”
+                  </p>
 
+                  <Stars rating={rating} />
+
+                  <div className="mt-8">
                     <Image
                       src={t.img}
                       alt={t.name}
-                      width={88}
-                      height={88}
-                      className="w-22 h-22 rounded-full object-cover border-4 border-red-100"
+                      width={90}
+                      height={90}
+                      className="rounded-full object-cover border-4 border-white shadow-md"
                     />
-                    <div className="flex flex-col items-center">
-                      <span className="text-lg font-semibold text-gray-900">{t.name}</span>
-                      <span className="text-sm text-DarkRed">{t.job}</span>
-                    </div>
+                    <h3 className="mt-4 text-xl font-semibold text-gray-900">
+                      {t.name}
+                    </h3>
+                    <p className="text-sm text-red-600 font-medium">{t.job}</p>
                   </div>
-                </motion.div>
+                </div>
               </motion.div>
-            </AnimatePresence>
-          </div>
+            </motion.div>
+          </AnimatePresence>
 
           {/* Arrows */}
-          <button
-            aria-label="Previous testimonial"
-            onClick={prevSlide}
-            className="absolute left-0 md:left-[-24px] top-1/2 -translate-y-1/2 p-3 rounded-full bg-white shadow-md hover:bg-gray-100 transition"
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            aria-label="Previous"
+            onClick={prev}
+            className="absolute left-0 md:left-[-50px] top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-3 hover:bg-gray-100 transition"
           >
-            <FaChevronLeft className="text-gray-800" />
-          </button>
-          <button
-            aria-label="Next testimonial"
-            onClick={nextSlide}
-            className="absolute right-0 md:right-[-24px] top-1/2 -translate-y-1/2 p-3 rounded-full bg-white shadow-md hover:bg-gray-100 transition"
+            <FaChevronLeft className="text-gray-700 text-lg" />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            aria-label="Next"
+            onClick={next}
+            className="absolute right-0 md:right-[-50px] top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-3 hover:bg-gray-100 transition"
           >
-            <FaChevronRight className="text-gray-800" />
-          </button>
+            <FaChevronRight className="text-gray-700 text-lg" />
+          </motion.button>
 
           {/* Dots */}
-          <div className="mt-6 flex items-center justify-center gap-2">
+          <div className="mt-8 flex justify-center gap-2">
             {testimonials.map((_, i) => (
               <button
                 key={i}
                 aria-label={`Go to testimonial ${i + 1}`}
-                onClick={() => setCurrentIndex(i)}
+                onClick={() => setIndex(i)}
                 className={`h-2.5 rounded-full transition-all duration-300 ${
-                  currentIndex === i ? 'w-6 bg-black' : 'w-2.5 bg-gray-300 hover:bg-gray-400'
+                  index === i ? 'w-6 bg-red-500' : 'w-2.5 bg-gray-300 hover:bg-gray-400'
                 }`}
               />
             ))}
@@ -158,10 +150,10 @@ const Opinions = memo(() => {
         </div>
 
         {/* CTA */}
-        <div className="mt-10 flex justify-center">
+        <div className="mt-12 flex justify-center">
           <a
             href="/Reviews"
-            className="inline-flex items-center justify-center rounded-full bg-black px-7 py-3 text-white font-semibold hover:bg-red-600 transition"
+            className="inline-flex items-center gap-2 bg-red-600 text-white font-semibold px-8 py-3 rounded-full hover:bg-red-700 transition-all duration-300 shadow-md"
           >
             Read More Reviews
           </a>
