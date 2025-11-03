@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import React, { useState, useEffect, useContext } from 'react';
 import { TbLogin2 } from "react-icons/tb";
 import { IoIosSearch } from "react-icons/io";
-import { FaHeart } from "react-icons/fa";
+import { FaHeart, FaUser } from "react-icons/fa";
 import { navLinks, pages, socialLinks } from '../Data';
 import CartShop from './CartShop';
 import MobileNav from './MobileNav';
@@ -12,6 +12,8 @@ import { UserContext } from '../Context/UserContext';
 import { ProductContext } from '../Context/ProductContext';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CgProfile } from "react-icons/cg";
+import ProductNavSearch from './ProductNavSearch';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -104,7 +106,12 @@ const Header = () => {
           </Link>
 
           {/* User */}
-          {user ? null : (
+          {user ? (
+            <Link href="/Profile" className="text-2xl text-gray-600 hover:text-red-500">
+              <CgProfile />
+            </Link>
+          )
+          : (
             <Link href="/Login" className="text-2xl text-gray-600 hover:text-red-500">
               <TbLogin2 />
             </Link>
@@ -130,48 +137,7 @@ const Header = () => {
       {/* Search Overlay */}
       <AnimatePresence>
         {showSearch && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 flex items-start justify-center z-50 pt-28"
-          >
-            <motion.div
-              initial={{ y: -50 }}
-              animate={{ y: 0 }}
-              exit={{ y: -50 }}
-              className="bg-white w-[90%] md:w-[600px] rounded-lg shadow-lg p-6 relative"
-            >
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                type="text"
-                placeholder="Search products..."
-                className="w-full border px-4 py-3 rounded-lg outline-none text-gray-700"
-              />
-              <div className="mt-4 max-h-[300px] overflow-y-auto">
-                {filteredProducts.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-4">
-                    {filteredProducts.map((p) => (
-                      <Link key={p._id} href={`/Product/${p._id}`} className="flex flex-col items-center border rounded-lg p-3 hover:shadow-md transition">
-                        <Image src={p.Photo[0].url} alt={p.name} width={120} height={120} className="object-cover rounded-md" />
-                        <span className="text-xs mt-2 text-center">{p.name}</span>
-                        <span className="text-red-600 font-semibold">${p.price}</span>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  search && <p className="text-gray-500 text-sm text-center">No products found.</p>
-                )}
-              </div>
-              <button
-                onClick={() => setShowSearch(false)}
-                className="absolute top-3 right-4 text-gray-500 hover:text-black"
-              >
-                ✕
-              </button>
-            </motion.div>
-          </motion.div>
+          <ProductNavSearch setShowSearch={setShowSearch} search={search} setSearch={setSearch} filteredProducts={filteredProducts} />
         )}
       </AnimatePresence>
     </header>

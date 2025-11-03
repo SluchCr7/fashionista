@@ -10,7 +10,9 @@ import Notify from '../Components/Notify';
 const UserContextProvider = ({children}) => {
     const [user, setUser] = useState(null)
     const [users, setUsers] = useState([])
-    const [message , setMessage] = useState("")
+    const [message, setMessage] = useState("")
+    const [isAuthChecked, setIsAuthChecked] = useState(false);
+    const [isLogin, setIsLogin] = useState(false);
     // Register 
     const Register = async(email , name , password) => {
         await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/register`, {email , name, password})
@@ -28,7 +30,9 @@ const UserContextProvider = ({children}) => {
     const Login = async(email , password) => {
         await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`, { email, password }).then((res) => {
                 setUser(res.data)
+                setIsLogin(true)
                 localStorage.setItem('Data', JSON.stringify(res.data))
+                localStorage.setItem('loginState', 'true')
                 setMessage("Enter Your Email And Password")
                 setTimeout(() => {
                     setMessage("")
@@ -50,19 +54,28 @@ const UserContextProvider = ({children}) => {
             .then(willLogout => {    
                 if (willLogout) {
                     setUser({})
+                    setIsLogin(false)
                     localStorage.removeItem('Data')
+                    localStorage.removeItem('loginState')
                     window.location.href = "/Login"
                 }
             })
             .catch(err => toast.error("Logout Failed"))
     }
-    // Get User
     useEffect(() => {
-        const user = localStorage.getItem('Data')
-        if(user){
-            setUser(JSON.parse(user))
+        const storedUser = localStorage.getItem('Data');
+        const loginState = localStorage.getItem('loginState');
+
+        if (storedUser && loginState === 'true') {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            setIsLogin(true);
+        } else {
+            setIsLogin(false);
         }
-    }, []) 
+
+        setIsAuthChecked(true);
+    } , []);
     // Get All Users
     useEffect(() => {
         axios.get('http://localhost:3001/api/auth').then((res) => {
@@ -110,7 +123,7 @@ const UserContextProvider = ({children}) => {
   return (
       <div className="relative">
         <Notify Notify={message}/>
-        <UserContext.Provider value={{user , users , Logout , Login , Register , AddFavourite }}>
+        <UserContext.Provider value={{user , users , Logout , Login , Register , AddFavourite , isLogin , isAuthChecked }}>
             {children}
         </UserContext.Provider>
       </div>

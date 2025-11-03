@@ -7,6 +7,8 @@ export const ProductContext = createContext();
 const ProductContextProvider = ({children}) => {
     const [message, setMessage] = useState('')
     const [products , setProducts] = useState([])
+    const [product, setProduct] = useState({})
+    const [loadingProduct , setLoadingProduct] = useState(false)
     // Add New Product Function
     const AddProduct = async(name , description , price , quantity , category , gender , collections , sizes , colors , material , img) => {
         const formData = new FormData()
@@ -57,10 +59,28 @@ const ProductContextProvider = ({children}) => {
                 console.log(err)
             })
     }
+    const getProductBuID = async (id) => {
+        setLoadingProduct(true)
+        try{
+            await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product/${id}`)
+            .then((res) => {
+                setProduct(res.data)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+        }
+        catch(err){
+            console.log(err)
+        }
+        finally {
+            setLoadingProduct(false)
+        }
+    }
   return (
     <div className="relative">
         <Notify Notify={message}/>
-        <ProductContext.Provider value={{products , AddProduct , deleteProduct}}>
+        <ProductContext.Provider value={{products ,getProductBuID, product , loadingProduct , AddProduct , deleteProduct}}>
             {children}
         </ProductContext.Provider>
     </div>

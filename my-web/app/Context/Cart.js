@@ -13,13 +13,38 @@ const CartContextProvider = ({children}) => {
   const [orders , setOrders] = useState([])
   const [discount , setDiscount] = useState(0)
   const { user } = useContext(UserContext)
+  const addToCart = (product, quantity = 1) => {
+    if (!product || !product._id) return;
+
+    setCart((prevCart) => {
+      const existing = prevCart.find((item) => item._id === product._id);
+
+      let updatedCart;
+      if (existing) {
+        updatedCart = prevCart.map((item) =>
+          item._id === product._id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+        setMessage(`✅ Updated quantity for ${product.name}`);
+      } else {
+        updatedCart = [...prevCart, { ...product, quantity, discount }];
+        setMessage(`🛒 Added ${product.name} to cart`);
+        setNumInCart((prev) => prev + 1);
+      }
+
+      // Save to localStorage
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      setTimeout(() => setMessage(""), 3000);
+      return updatedCart;
+    });
+  };
+
+  // 🧩 Load cart from localStorage on mount
   useEffect(() => {
-    console.log(discount);
-  },[discount])
-    const addToCart = (product , quantity) => {
-        setCart([...cart, { ...product, quantity , discount}])
-        setNumInCart((prev) => prev + 1)
-    }
+    const saved = localStorage.getItem("cart");
+    if (saved) setCart(JSON.parse(saved));
+  }, []);
     const SubmitCart = (Cart) => {
       setFinalCart(Cart)
     }

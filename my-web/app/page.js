@@ -13,15 +13,14 @@ import Sponsers from "./Components/Sponsers";
 import HeroPage from "./Components/HeroPage";
 import { IoIosArrowForward } from "react-icons/io";
 import { CartContext } from "./Context/Cart";
+import { UserContext } from "./Context/UserContext";
 
 export default function Home() {
-  // const lastPage = useRef();
-  // const MoveDown = () => {
-  //   lastPage.current.scrollIntoView({
-  //     behavior: "smooth",
-  //   })
-  // }
-  const {discount}  = useContext(CartContext)
+  const {isLogin , isAuthChecked} = useContext(UserContext)
+  const { discount } = useContext(CartContext)
+  if (!isAuthChecked) {
+    return null;
+  }
   return (
     <div className="flex items-center flex-col relative">
       <div className="relative w-full">

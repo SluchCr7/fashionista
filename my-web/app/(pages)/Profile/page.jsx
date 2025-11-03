@@ -1,11 +1,11 @@
 'use client'
 import { CartContext } from '@/app/Context/Cart'
 import { UserContext } from '@/app/Context/UserContext'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useMemo } from 'react'
 import Image from 'next/image'
-import { MdDelete } from "react-icons/md"
-import { FiMail } from "react-icons/fi"
+import { MdDelete, MdLogout } from "react-icons/md"
 import { FaUserShield } from "react-icons/fa"
+import { motion, AnimatePresence } from 'framer-motion'
 
 const Profile = () => {
   const [myOrders, setMyOrders] = useState([])
@@ -19,78 +19,106 @@ const Profile = () => {
     }
   }, [orders, user])
 
+  const deliveredCount = useMemo(() => myOrders.filter(o => o.status === "Delivered").length, [myOrders])
+  const pendingCount = useMemo(() => myOrders.filter(o => o.status === "Pending").length, [myOrders])
+
   return (
-    <div className="flex flex-col md:flex-row gap-6 px-6 py-8 min-h-screen w-full bg-gray-50">
-      
-      {/* Profile Card */}
-      <div className="w-full md:w-[35%] flex justify-center">
-        <div className="shadow-lg bg-white w-full max-w-md p-6 rounded-2xl flex flex-col gap-5 relative overflow-hidden">
-          
-          {/* Header gradient */}
-          <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-2xl"></div>
-          
-          <div className="flex flex-col md:flex-row gap-4 items-center relative mt-10">
-            <Image 
-              alt="profile_image" 
-              src={user?.profilePhoto?.url || "/default-avatar.png"} 
-              width={90} height={90} 
-              className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md" 
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-14 px-6 md:px-12">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-10"
+      >
+
+        {/* 🌈 Profile Section */}
+        <motion.div
+          whileHover={{ scale: 1.01 }}
+          className="flex-1 lg:max-w-sm bg-white/60 backdrop-blur-lg shadow-xl rounded-2xl border border-gray-100 overflow-hidden"
+        >
+          {/* Header Gradient */}
+          <div className="relative bg-gradient-to-r from-red-600 via-pink-500 to-purple-600 h-36">
+            <div className="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
+          </div>
+
+          {/* Profile Info */}
+          <div className="relative -mt-14 px-6 pb-6 text-center">
+            <Image
+              alt="profile"
+              src={user?.profilePhoto?.url || "/default-avatar.png"}
+              width={100}
+              height={100}
+              className="w-28 h-28 rounded-full mx-auto border-4 border-white shadow-md object-cover"
             />
-            <div className="text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2">
-                <span className="text-lg font-bold text-gray-800">{user?.name}</span>
-                {user?.isAdmin && (
-                  <span className="bg-yellow-400 text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1">
-                    <FaUserShield /> Admin
-                  </span>
-                )}
+            <h2 className="text-2xl font-bold text-gray-800 mt-3">{user?.name}</h2>
+            <p className="text-gray-500 text-sm">{user?.email}</p>
+
+            {user?.isAdmin && (
+              <span className="inline-flex items-center gap-2 text-yellow-700 bg-yellow-100 mt-2 px-3 py-1 rounded-full text-xs font-semibold">
+                <FaUserShield /> Admin
+              </span>
+            )}
+
+            <button
+              onClick={Logout}
+              className="mt-6 flex items-center justify-center gap-2 w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition"
+            >
+              <MdLogout className="text-lg" /> Logout
+            </button>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-3 gap-4 mt-6">
+              <div className="bg-white rounded-xl shadow p-4">
+                <p className="text-xs text-gray-500">Total Orders</p>
+                <p className="text-lg font-bold text-gray-800">{myOrders.length}</p>
               </div>
-              <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-600">
-                <FiMail /> {user?.email}
+              <div className="bg-white rounded-xl shadow p-4">
+                <p className="text-xs text-gray-500">Delivered</p>
+                <p className="text-lg font-bold text-green-600">{deliveredCount}</p>
+              </div>
+              <div className="bg-white rounded-xl shadow p-4">
+                <p className="text-xs text-gray-500">Pending</p>
+                <p className="text-lg font-bold text-yellow-500">{pendingCount}</p>
               </div>
             </div>
           </div>
+        </motion.div>
 
-          <button 
-            onClick={Logout} 
-            className="bg-red-600 text-white w-full py-3 rounded-md font-semibold hover:bg-red-700 transition mt-4"
-          >
-            Logout
-          </button>
-        </div> 
-      </div>
+        {/* 📦 Orders Section */}
+        <div className="flex-1 space-y-6">
+          <div>
+            <h2 className="text-3xl font-extrabold text-gray-800">My Orders</h2>
+            <p className="text-gray-500 text-sm">Track and manage your recent purchases</p>
+          </div>
 
-      {/* Orders Section */}
-      <div className="w-full md:w-[65%] flex flex-col gap-5">
-        <span className="font-bold text-black text-2xl">My Orders</span>
+          <AnimatePresence>
+            {myOrders.length > 0 ? (
+              <motion.div
+                layout
+                className="grid grid-cols-1 gap-6"
+              >
+                {myOrders.map((order, index) => (
+                  <motion.div
+                    key={order._id}
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 flex flex-col md:flex-row justify-between items-center hover:shadow-lg transition-all"
+                  >
+                    <div className="flex-1 text-center md:text-left">
+                      <h3 className="font-semibold text-gray-800">Order #{index + 1}</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {order.Products.length} items | {order.address}
+                      </p>
+                    </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-gray-700 border border-gray-200 shadow-md rounded-lg overflow-hidden">
-            
-            {/* Table Header */}
-            <thead className="bg-gray-100 text-gray-600 text-sm uppercase">
-              <tr>
-                {["Num", "Date", "Address", "Phone", "Items", "Total", "Status", "Delete"].map((heading, index) => (
-                  <th key={index} className="py-3 px-4 text-center">{heading}</th>
-                ))}
-              </tr>
-            </thead>
-
-            {/* Table Body */}
-            <tbody>
-              {myOrders.length > 0 ? (
-                myOrders.map((order, index) => (
-                  <tr key={order._id} className="border-b border-gray-200 hover:bg-gray-50 transition-all">
-                    <td className="p-4 text-center">#{index + 1}</td>
-                    <td className="p-4 text-center">{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td className="p-4 text-center">{order.address}</td>
-                    <td className="p-4 text-center">{order.phoneNumber}</td>
-                    <td className="p-4 text-center">{order.Products.length}</td>
-                    <td className="p-4 text-center font-bold text-green-600">${order.total}</td>
-                    {/* Status */}
-                    <td className="p-4 text-center">
-                      <span className={`
-                        px-2 py-1 rounded-md text-xs font-semibold
+                    <div className="text-center mt-4 md:mt-0">
+                      <p className="text-lg font-bold text-green-600">${order.total}</p>
+                      <span className={`text-xs font-semibold px-3 py-1 rounded-full mt-1 inline-block
                         ${order.status === "Pending" && "bg-yellow-100 text-yellow-700"}
                         ${order.status === "Shipped" && "bg-blue-100 text-blue-700"}
                         ${order.status === "Delivered" && "bg-green-100 text-green-700"}
@@ -98,27 +126,37 @@ const Profile = () => {
                       `}>
                         {order.status || "Pending"}
                       </span>
-                    </td>
-                    {/* Delete */}
-                    <td 
-                      onClick={() => confirm("Are you sure you want to delete this order?") && deleteOrder(order._id)} 
-                      className="p-4 cursor-pointer text-center text-red-600 hover:text-red-800 transition"
+                    </div>
+
+                    <button
+                      onClick={() =>
+                        confirm("Are you sure you want to delete this order?") &&
+                        deleteOrder(order._id)
+                      }
+                      className="text-red-600 hover:text-red-800 p-3 rounded-full transition mt-3 md:mt-0"
+                      title="Delete Order"
                     >
-                      <MdDelete size={20} />
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="8" className="text-center p-6 text-gray-500">
-                    No orders found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>  
+                      <MdDelete size={22} />
+                    </button>
+                  </motion.div>
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center justify-center text-center py-16 text-gray-500"
+              >
+                <Image src="/empty.svg" width={220} height={220} alt="no orders" />
+                <h3 className="mt-4 text-xl font-semibold text-gray-700">No Orders Found</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Once you make a purchase, your orders will appear here.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

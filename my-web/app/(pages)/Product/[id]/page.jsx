@@ -4,24 +4,31 @@ import { ProductContext } from "@/app/Context/ProductContext";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
+import { CartContext } from "@/app/Context/Cart";
+import ProductSkeleton from "@/app/Skeletons/ProductSkeleton";
 
 const Product = ({ params }) => {
   const { id } = params;
-  const [product, setProduct] = useState({});
-  const { products } = useContext(ProductContext);
+  const { products , getProductBuID, product , loadingProduct } = useContext(ProductContext);
+  const {cart , addToCart} = useContext(CartContext)
+  const [adding, setAdding] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
+  const handleAddToCart = () => {
+    setAdding(true);
+    setTimeout(() => {
+      addToCart(product, quantity);
+      setAdding(false);
+    }, 600);
+  };
 
   useEffect(() => {
-    const selectProduct = products.find((prod) => prod._id == id);
-    if (selectProduct) {
-      setProduct(selectProduct);
-    }
-  }, [id, products]);
+    getProductBuID(id);
+  }, [id]);
 
-  if (!product || Object.keys(product).length === 0) {
+  if (loadingProduct) {
     return (
-      <div className="flex items-center justify-center w-full text-3xl font-bold min-h-[60vh]">
-        Loading Product...
-      </div>
+      <ProductSkeleton/>
     );
   }
 
@@ -82,14 +89,50 @@ const Product = ({ params }) => {
             {product.description || "This is a premium product designed with top quality materials."}
           </p>
           {/* CTA */}
-          <div className="flex gap-4">
-            <button className="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 transition">
-              Add to Cart
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            {/* Quantity Selector */}
+            <div className="flex items-center border rounded-xl overflow-hidden">
+              <button
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                className="px-3 py-2 text-xl font-bold text-gray-600 hover:bg-gray-100 transition"
+              >
+                −
+              </button>
+              <span className="px-5 py-2 text-lg font-semibold">{quantity}</span>
+              <button
+                onClick={() => setQuantity((q) => q + 1)}
+                className="px-3 py-2 text-xl font-bold text-gray-600 hover:bg-gray-100 transition"
+              >
+                +
+              </button>
+            </div>
+
+            {/* Add to Cart */}
+            <button
+              onClick={handleAddToCart}
+              disabled={adding}
+              className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition ${
+                adding ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+              }`}
+            >
+              {adding ? (
+                <>
+                  <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
+                  <span>Adding...</span>
+                </>
+              ) : (
+                <>
+                  <span>🛒</span> Add to Cart
+                </>
+              )}
             </button>
+
+            {/* Buy Now */}
             <button className="border border-gray-300 px-6 py-3 rounded-xl font-semibold hover:bg-black hover:text-white transition">
               Buy Now
             </button>
           </div>
+
         </motion.div>
       </div>
 
