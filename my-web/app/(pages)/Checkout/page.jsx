@@ -35,10 +35,12 @@ const CheckoutPage = () => {
   }
 
   useEffect(() => {
-    const ProductsIds = finalCart.map((prod) => prod.id);
+    const ProductsIds = finalCart.map((prod) => prod._id);
     setProductsArrayOrder(ProductsIds);
   }, [finalCart]);
-
+  useEffect(()=>{
+    console.log(ProductsArrOrder)
+  },[ProductsArrOrder])
   return (
     <>
       <Notify Notify={message}/>
@@ -130,7 +132,7 @@ const CheckoutPage = () => {
             <div key={prod.id} className='border-t border-gray-200 pt-4 flex justify-between items-center w-full'>
               <div className='flex gap-3'>
                 <Image 
-                  src={prod?.img} alt='product image' width={500} height={500}
+                  src={prod?.Photo[0].url} alt='product image' width={500} height={500}
                   className='w-[80px] h-[80px] rounded-md object-cover' />
                 <div className='flex flex-col'>
                   <h1 className='text-lg font-bold'>{prod?.name}</h1>
