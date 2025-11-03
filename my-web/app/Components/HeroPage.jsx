@@ -101,7 +101,7 @@ const Hero = () => {
                                 <Link href="/Shop/Women" className="bg-white hover:bg-gray-100 text-gray-900 font-semibold text-lg py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
                                     Shop Women
                                 </Link>
-                                <Link href="/Shop/Kids" className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold text-lg py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
+                                <Link href="/Shop/Kids" className="bg-yellow hover:bg-yellow text-gray-900 font-semibold text-lg py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
                                     Shop Kids
                                 </Link>
                             </div>

@@ -9,8 +9,9 @@ import ProductSkeleton from "@/app/Skeletons/ProductSkeleton";
 
 const Product = ({ params }) => {
   const { id } = params;
-  const { products , getProductBuID, product , loadingProduct } = useContext(ProductContext);
-  const {cart , addToCart} = useContext(CartContext)
+  const [product, setProduct] = useState({});
+  const { products } = useContext(ProductContext);
+  const { cart, addToCart } = useContext(CartContext)
   const [adding, setAdding] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
@@ -22,11 +23,15 @@ const Product = ({ params }) => {
     }, 600);
   };
 
-  useEffect(() => {
-    getProductBuID(id);
-  }, [id]);
 
-  if (loadingProduct) {
+  useEffect(() => {
+    const selectProduct = products.find((prod) => prod._id == id);
+    if (selectProduct) {
+      setProduct(selectProduct);
+    }
+  }, [id, products]);
+
+  if (!product || Object.keys(product).length === 0) {
     return (
       <ProductSkeleton/>
     );
