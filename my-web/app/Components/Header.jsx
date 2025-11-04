@@ -28,9 +28,9 @@ const socialLinks = [
 
 const navLinks = [
   { name: 'Home', link: '/' },
-  { name: 'Shop', link: '/shop' },
-  { name: 'Collections', link: '/collections' },
-  { name: 'Blog', link: '/blog' },
+  { name: 'Shop', link: '/Shop' },
+  { name: 'Collections', link: '/Collections' },
+  { name: 'Blog', link: '/Blog' },
   { name: 'Men', link: '/Men' },
   { name: 'Women', link: '/Women' },
   { name: 'Kids', link: '/Kids' },

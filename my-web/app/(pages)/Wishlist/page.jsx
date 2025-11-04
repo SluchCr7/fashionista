@@ -34,7 +34,7 @@ const Wishlist = () => {
   }, [user?._id, user?.token])
 
   return (
-    <div className="max-w-7xl mx-auto py-16 px-5">
+    <div className="max-w-7xl mx-auto py-16 px-5 w-full">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -60,7 +60,7 @@ const Wishlist = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white rounded-2xl shadow-md overflow-hidden animate-pulse border border-gray-100"
+              className="bg-white rounded-2xl shadow-md overflow-hidden animate-pulse border border-gray-100 w-full"
             >
               <div className="w-full h-64 bg-gray-200 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-[shimmer_1.5s_infinite]" />
@@ -77,7 +77,7 @@ const Wishlist = () => {
         <AnimatePresence>
           <motion.div
             layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
+            className="grid grid-cols-1 w-full sm:grid-cols-2 lg:grid-cols-3 gap-10"
           >
             {myProducts.map((product, index) => (
               <motion.div

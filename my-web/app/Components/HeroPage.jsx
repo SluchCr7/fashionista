@@ -109,16 +109,18 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
                     className="absolute inset-0 w-full h-full flex items-center"
                   >
                     {/* Background image */}
-                    <div className="absolute inset-0 -z-10">
-                      <Image
-                        src={slide.image}
-                        alt={(typeof slide.title === 'string' ? slide.title : 'Hero image')}
-                        fill
-                        sizes="(min-width: 1024px) 900px, 100vw"
-                        className="object-cover object-center"
-                        priority={i === 0}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-b from-black/45 to-black/25 mix-blend-multiply" />
+                    <div className="absolute inset-0 -z-10 h-full w-full">
+                      <div className="relative h-full w-full">
+                        <Image
+                          src={slide.image}
+                          alt={typeof slide.title === 'string' ? slide.title : 'Hero image'}
+                          fill
+                          className="object-cover object-center"
+                          sizes="(min-width: 1024px) 900px, 100vw"
+                          priority={i === 0}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/45 to-black/25 mix-blend-multiply" />
+                      </div>
                     </div>
 
                     {/* Content */}

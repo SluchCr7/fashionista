@@ -48,7 +48,7 @@ const CollectionSection = ({
   return (
     <section className="relative w-full max-w-[1370px] mx-auto px-6 py-20">
       {/* Gradient Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 -z-10"></div>
+      <div className="absolute inset-0 -z-10"></div>
       <div className="pointer-events-none absolute -top-32 left-0 w-96 h-96 bg-red-200/20 blur-3xl rounded-full -z-10"></div>
       <div className="pointer-events-none absolute bottom-0 right-0 w-80 h-80 bg-yellow-200/20 blur-3xl rounded-full -z-10"></div>
 

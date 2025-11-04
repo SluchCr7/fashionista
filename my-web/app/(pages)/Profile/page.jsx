@@ -40,7 +40,7 @@ const Profile = () => {
 
   // 🌈 Skeleton while loading
   const ProfileSkeleton = () => (
-    <div className="animate-pulse flex flex-col lg:flex-row gap-10 max-w-7xl mx-auto">
+    <div className="animate-pulse flex w-full flex-col lg:flex-row gap-10 max-w-7xl mx-auto">
       {/* Left profile skeleton */}
       <div className="flex-1 lg:max-w-sm bg-white/60 backdrop-blur-lg shadow-xl rounded-2xl border border-gray-100 overflow-hidden">
         <div className="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 h-36"></div>
@@ -88,7 +88,7 @@ const Profile = () => {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-14 px-6 md:px-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-14 px-6 md:px-12 w-full">
       {loading ? (
         <ProfileSkeleton />
       ) : (
@@ -96,7 +96,7 @@ const Profile = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-10"
+          className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-10 w-full"
         >
           {/* 🌈 Profile Section */}
           <motion.div
