@@ -185,7 +185,7 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
 
             <div className="h-1/2 min-h-[180px] rounded-xl overflow-hidden relative bg-white shadow-md grid grid-cols-2">
               <div className="relative">
-                <Image src="/Hero/promo2a.jpg" alt="Category" fill className="object-cover object-center" />
+                <Image src="/Hero/promo2.jpg" alt="Category" fill className="object-cover object-center" />
                 <div className="absolute inset-0 bg-black/25" />
                 <div className="absolute z-10 left-4 bottom-4">
                   <p className="text-xs text-white/90">Accessories</p>
@@ -194,7 +194,7 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
               </div>
 
               <div className="relative">
-                <Image src="/Hero/promo2b.jpg" alt="Category" fill className="object-cover object-center" />
+                <Image src="/Hero/promo3.jpg" alt="Category" fill className="object-cover object-center" />
                 <div className="absolute inset-0 bg-black/25" />
                 <div className="absolute z-10 left-4 bottom-4">
                   <p className="text-xs text-white/90">Trending</p>
