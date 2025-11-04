@@ -64,7 +64,7 @@ const Contact = () => {
             <div className="relative z-10">
               <h3 className="text-3xl font-bold mb-5 text-yellow-400">Contact Information</h3>
               <p className="text-gray-300 mb-8 leading-relaxed">
-                Have questions or need assistance? We're here to help — contact us anytime.
+                Have questions or need assistance? We`&apos;`re here to help — contact us anytime.
               </p>
               <ul className="space-y-5">
                 <li className="flex items-center gap-3">
