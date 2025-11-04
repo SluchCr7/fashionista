@@ -3,7 +3,9 @@ import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Loader from './Loader';
+import { UserContext } from '../Context/UserContext';
 const LayoutComponent = ({ children }) => {
+  const {isLogin , isAuthChecked} = useContext(UserContext)
 
   if (!isAuthChecked) {
     return (
