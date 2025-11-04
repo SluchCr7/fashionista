@@ -18,9 +18,6 @@ import { UserContext } from "./Context/UserContext";
 export default function Home() {
   const {isLogin , isAuthChecked} = useContext(UserContext)
   const { discount } = useContext(CartContext)
-  if (!isAuthChecked) {
-    return null;
-  }
   return (
     <div className="flex items-center flex-col relative">
       <div className="relative w-full">

@@ -1,5 +1,6 @@
 import Footer from "./Components/Footer";
 import Header from "./Components/Header";
+import LayoutComponent from "./Components/LayoutComponent";
 import AdContextProvider from "./Context/AdsContext";
 import CartContextProvider from "./Context/Cart";
 import ProductContextProvider from "./Context/ProductContext";
@@ -29,9 +30,9 @@ export default function RootLayout({ children }) {
             <ProductContextProvider>
               <AdContextProvider>
                 <ReviewContextProvider>
-                  <Header />
-                  {children}
-                  <Footer/>
+                  <LayoutComponent>
+                    {children}
+                  </LayoutComponent>
                 </ReviewContextProvider>
               </AdContextProvider>
             </ProductContextProvider>
