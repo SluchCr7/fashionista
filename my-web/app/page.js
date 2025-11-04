@@ -18,7 +18,7 @@ import { UserContext } from "./Context/UserContext";
 export default function Home() {
   const { discount } = useContext(CartContext)
   return (
-    <div className="flex items-center flex-col relative">
+    <div className="flex items-center flex-col relative w-full">
       <div className="relative w-full">
         <HeroPage/>
       </div>

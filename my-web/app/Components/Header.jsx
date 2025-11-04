@@ -16,8 +16,8 @@ import MobileNav from './MobileNav'
 
 // ==== إعداد بيانات ديناميكية لسهولة التخصيص ====
 const topBarLinks = [
-  { name: 'About Us', link: '/about' },
-  { name: 'Help Center', link: '/help' },
+  { name: 'About Us', link: '/About' },
+  { name: 'Help Center', link: '/FAQ' },
   { name: 'Contact', link: '/contact' },
 ]
 const socialLinks = [
@@ -31,7 +31,10 @@ const navLinks = [
   { name: 'Shop', link: '/shop' },
   { name: 'Collections', link: '/collections' },
   { name: 'Blog', link: '/blog' },
-  { name: 'Contact', link: '/contact' },
+  { name: 'Men', link: '/Men' },
+  { name: 'Women', link: '/Women' },
+  { name: 'Kids', link: '/Kids' },
+  { name: 'Shoes', link: '/Shoes' },
 ]
 
 const Header = () => {
@@ -82,7 +85,7 @@ const Header = () => {
               key={i}
               href={s.link}
               target="_blank"
-              className="hover:text-black transition"
+              className="hover:text-[#080606] text-black  transition"
             >
               {s.icon}
             </Link>

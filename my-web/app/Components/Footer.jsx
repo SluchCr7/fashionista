@@ -7,12 +7,12 @@ import { motion } from 'framer-motion'
 
 const Footer = () => {
   return (
-    <footer className="relative bg-[#0f0f0f] text-gray-300 overflow-hidden">
+    <footer className="relative bg-[#0f0f0f] text-gray-300 overflow-hidden w-full">
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"></div>
 
       {/* Container */}
-      <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-16 py-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 z-10">
+      <div className="relative max-w-7xl mx-auto px-6 md:px-10 lg:px-16 py-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 z-10 w-full">
 
         {/* Brand & Newsletter */}
         <div className="flex flex-col gap-5">
