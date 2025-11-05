@@ -342,7 +342,7 @@ const Header = () => {
           {/* Wishlist */}
           <Link
             href="/Wishlist"
-            className="hidden md:flex text-2xl text-gray-600 hover:text-red-500 transition"
+            className="flex text-2xl text-gray-600 hover:text-red-500 transition"
           >
             <CiHeart />
           </Link>
