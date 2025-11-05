@@ -206,10 +206,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { IoIosSearch } from 'react-icons/io'
-import { FaHeart } from 'react-icons/fa'
-import { CgProfile } from 'react-icons/cg'
-import { TbLogin2 } from 'react-icons/tb'
 import { motion, AnimatePresence } from 'framer-motion'
 
 import { UserContext } from '../Context/UserContext'
@@ -217,7 +213,10 @@ import { ProductContext } from '../Context/ProductContext'
 import ProductNavSearch from './ProductNavSearch'
 import CartShop from './CartShop'
 import MobileNav from './MobileNav'
-
+import { CiSearch } from "react-icons/ci"; 
+import { CiHeart } from "react-icons/ci"; 
+import { CiLogin } from "react-icons/ci"; 
+import { CiUser } from "react-icons/ci"; 
 // ==== إعداد بيانات ديناميكية لسهولة التخصيص ====
 const topBarLinks = [
   { name: 'About Us', link: '/About' },
@@ -311,7 +310,7 @@ const Header = () => {
             Fash<span className="text-red-500">ion</span>ista
           </Link>
 
-          <div className="flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map(({ name, link }, i) => {
               const active = pathname === link
               return (
@@ -335,7 +334,7 @@ const Header = () => {
         {/* === RIGHT: ACTION ICONS === */}
         <div className="flex items-center gap-6">
           {/* Search */}
-          <IoIosSearch
+          <CiSearch
             onClick={() => setShowSearch(!showSearch)}
             className="text-2xl text-gray-600 hover:text-black cursor-pointer transition"
           />
@@ -345,7 +344,7 @@ const Header = () => {
             href="/Wishlist"
             className="hidden md:flex text-2xl text-gray-600 hover:text-red-500 transition"
           >
-            <FaHeart />
+            <CiHeart />
           </Link>
 
           {/* User */}
@@ -354,14 +353,14 @@ const Header = () => {
               href="/Profile"
               className="text-2xl text-gray-600 hover:text-red-500 transition"
             >
-              <CgProfile />
+              <CiUser />
             </Link>
           ) : (
             <Link
               href="/Login"
               className="text-2xl text-gray-600 hover:text-red-500 transition"
             >
-              <TbLogin2 />
+              <CiLogin />
             </Link>
           )}
 
