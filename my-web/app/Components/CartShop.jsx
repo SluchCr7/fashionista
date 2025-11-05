@@ -12,9 +12,6 @@ const CartShop = () => {
   const handleCart = () => {
     SubmitCart(cart)
   }
-  useEffect(() => {
-    console.log(cart)
-  }, [cart])
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
 
   return (

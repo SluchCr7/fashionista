@@ -209,27 +209,61 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
       </div>
 
       {/* PRESET: small sticky CTA on mobile */}
-      <div className="lg:hidden fixed left-4 right-4 bottom-6 z-40">
-        <div className="bg-white/95 backdrop-blur rounded-full shadow-lg px-4 py-2 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Image src={slides[index].image} alt="thumb" width={64} height={64} className="rounded-md object-cover" />
-            <div>
-              <p className="text-xs text-gray-500">{slides[index].eyebrow}</p>
-              <p className="text-sm font-semibold">{typeof slides[index].title === 'string' ? slides[index].title : 'Latest'}</p>
+      <div className="lg:hidden fixed left-3 right-3 bottom-4 z-40">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex items-center justify-between gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-white/80 backdrop-blur-md shadow-[0_4px_25px_rgba(0,0,0,0.1)] border border-white/30"
+        >
+          {/* Left: Image + Text */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0">
+              <Image
+                src={slides[index].image}
+                alt="Slide preview"
+                width={64}
+                height={64}
+                className="object-cover w-full h-full"
+              />
+            </div>
+
+            <div className="truncate">
+              <p className="text-[11px] sm:text-xs text-gray-500 leading-tight truncate">
+                {slides[index].eyebrow}
+              </p>
+              <p className="text-sm sm:text-base font-semibold text-gray-900 leading-tight truncate">
+                {typeof slides[index].title === 'string' ? slides[index].title : 'Latest Drop'}
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <button onClick={prev} aria-label="Prev" className="p-2 rounded-full border">
-              <FiChevronLeft />
+
+          {/* Right: Controls */}
+          <div className="flex items-center flex-shrink-0 gap-2 sm:gap-3">
+            <button
+              onClick={prev}
+              aria-label="Previous"
+              className="p-2.5 sm:p-3 rounded-full bg-white border border-gray-200 shadow hover:bg-gray-100 active:scale-95 transition"
+            >
+              <FiChevronLeft className="text-gray-700 text-lg sm:text-xl" />
             </button>
-            <Link href={slides[index].cta?.href || '/'} className="bg-yellow-400 px-4 py-2 rounded-full font-semibold">
-              {slides[index].cta?.text || 'Shop'}
+
+            <Link
+              href={slides[index].cta?.href || '/'}
+              className="bg-yellow-400 hover:bg-yellow-300 active:scale-95 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-semibold text-black shadow transition"
+            >
+              {slides[index].cta?.text || 'Shop Now'}
             </Link>
-            <button onClick={next} aria-label="Next" className="p-2 rounded-full border">
-              <FiChevronRight />
+
+            <button
+              onClick={next}
+              aria-label="Next"
+              className="p-2.5 sm:p-3 rounded-full bg-white border border-gray-200 shadow hover:bg-gray-100 active:scale-95 transition"
+            >
+              <FiChevronRight className="text-gray-700 text-lg sm:text-xl" />
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )
