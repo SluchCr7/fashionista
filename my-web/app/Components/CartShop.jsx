@@ -18,8 +18,8 @@ const CartShop = () => {
     <div>
       <Sheet>
         <SheetTrigger>
-          <div className='relative cursor-pointer'>
-            <CiShoppingCart className="text-2xl" />
+          <div className='relative cursor-pointer pt-1 md:pt-0'>
+            <CiShoppingCart className="text-2xl " />
             {numInCart > 0 && (
               <span className='absolute -top-1 -left-2 text-white w-[16px] h-[16px] text-[10px] flex items-center justify-center rounded-full bg-black'>
                 {numInCart}

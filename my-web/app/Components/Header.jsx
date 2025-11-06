@@ -221,7 +221,8 @@ import { CiUser } from "react-icons/ci";
 const topBarLinks = [
   { name: 'About Us', link: '/About' },
   { name: 'Help Center', link: '/FAQ' },
-  { name: 'Contact', link: '/contact' },
+  { name: 'Contact', link: '/Contact' },
+  { name: 'Shipping Policy', link: '/Shipping' },
 ]
 const socialLinks = [
   { icon: <i className="ri-facebook-fill" />, link: 'https://facebook.com' },
@@ -305,7 +306,7 @@ const Header = () => {
         <div className="flex items-center gap-10">
           <Link
             href="/"
-            className="text-2xl lg:text-3xl font-extrabold tracking-wide text-gray-900 uppercase"
+            className="text-base md:text-3xl font-extrabold tracking-wide text-gray-900 uppercase"
           >
             Fash<span className="text-red-500">ion</span>ista
           </Link>

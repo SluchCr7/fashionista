@@ -209,12 +209,12 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
       </div>
 
       {/* PRESET: small sticky CTA on mobile */}
-      <div className="lg:hidden fixed left-3 right-3 bottom-4 z-40">
+      <div className="lg:hidden fixed left-3 max-w-[80%] mx-auto w-full right-3 bottom-4 z-40">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="flex items-center justify-between gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-white/80 backdrop-blur-md shadow-[0_4px_25px_rgba(0,0,0,0.1)] border border-white/30"
+          className="flex items-center w-full justify-between gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-white/80 backdrop-blur-md shadow-[0_4px_25px_rgba(0,0,0,0.1)] border border-white/30"
         >
           {/* Left: Image + Text */}
           <div className="flex items-center gap-3 min-w-0">

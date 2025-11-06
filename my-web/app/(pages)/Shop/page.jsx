@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { IoMdHeart } from "react-icons/io";
 import { ProductContext } from "@/app/Context/ProductContext";
 import { CartContext } from "@/app/Context/Cart";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const Shop = () => {
   const searchParams = useSearchParams();
@@ -143,33 +143,33 @@ const Shop = () => {
   }, [sortPrice, filteredProducts]);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 px-6 py-10 bg-gray-50 min-h-screen">
+    <div className="flex flex-col lg:flex-row gap-6 px-3 sm:px-6 py-8 sm:py-10 bg-gray-50 min-h-screen">
       {/* Sidebar */}
       <div
-        className={`fixed lg:static z-40 top-0 left-0 h-full w-3/4 lg:w-[22%] bg-white shadow-xl p-6 transition-transform transform ${
+        className={`fixed lg:static z-40 top-0 left-0 h-full w-[85%] sm:w-[60%] md:w-[40%] lg:w-[22%] bg-white shadow-2xl p-5 sm:p-6 transition-transform transform ${
           showFilters
             ? "translate-x-0"
             : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Filters</h2>
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800">Filters</h2>
           <button
             onClick={() => setShowFilters(false)}
-            className="lg:hidden text-gray-600 text-xl"
+            className="lg:hidden text-gray-600 text-2xl"
           >
             ✕
           </button>
         </div>
-        <div className="space-y-6 overflow-y-auto h-[75vh] custom-scrollbar">
+        <div className="space-y-6 overflow-y-auto h-[75vh] pr-2 custom-scrollbar">
           {/* Category */}
           <div>
-            <h3 className="font-semibold mb-2 text-gray-700">Category</h3>
+            <h3 className="font-semibold mb-2 text-gray-700 text-sm sm:text-base">Category</h3>
             <div className="space-y-1">
               {categories.map((c) => (
                 <label
                   key={c}
-                  className="flex items-center gap-2 text-gray-600 cursor-pointer hover:text-black"
+                  className="flex items-center gap-2 text-gray-600 cursor-pointer hover:text-black text-sm sm:text-base"
                 >
                   <input
                     type="radio"
@@ -184,11 +184,11 @@ const Shop = () => {
 
           {/* Gender */}
           <div>
-            <h3 className="font-semibold mb-2 text-gray-700">Gender</h3>
+            <h3 className="font-semibold mb-2 text-gray-700 text-sm sm:text-base">Gender</h3>
             {genders.map((g) => (
               <label
                 key={g}
-                className="flex items-center gap-2 text-gray-600 cursor-pointer hover:text-black"
+                className="flex items-center gap-2 text-gray-600 cursor-pointer hover:text-black text-sm sm:text-base"
               >
                 <input
                   type="radio"
@@ -202,11 +202,11 @@ const Shop = () => {
 
           {/* Material */}
           <div>
-            <h3 className="font-semibold mb-2 text-gray-700">Material</h3>
+            <h3 className="font-semibold mb-2 text-gray-700 text-sm sm:text-base">Material</h3>
             {materials.map((m) => (
               <label
                 key={m}
-                className="flex items-center gap-2 text-gray-600 cursor-pointer hover:text-black"
+                className="flex items-center gap-2 text-gray-600 cursor-pointer hover:text-black text-sm sm:text-base"
               >
                 <input
                   type="checkbox"
@@ -220,13 +220,13 @@ const Shop = () => {
 
           {/* Colors */}
           <div>
-            <h3 className="font-semibold mb-2 text-gray-700">Color</h3>
-            <div className="grid grid-cols-6 gap-2">
+            <h3 className="font-semibold mb-2 text-gray-700 text-sm sm:text-base">Color</h3>
+            <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2">
               {colors.map((c) => (
                 <label
                   key={c}
                   style={{ backgroundColor: c.toLowerCase() }}
-                  className={`w-7 h-7 rounded-full cursor-pointer border ${
+                  className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full cursor-pointer border ${
                     filters.color.includes(c) ? "ring-2 ring-black" : ""
                   }`}
                 >
@@ -243,13 +243,13 @@ const Shop = () => {
 
           {/* Size */}
           <div>
-            <h3 className="font-semibold mb-2 text-gray-700">Size</h3>
+            <h3 className="font-semibold mb-2 text-gray-700 text-sm sm:text-base">Size</h3>
             <div className="flex flex-wrap gap-2">
               {sizes.map((s) => (
                 <button
                   key={s}
                   onClick={() => handleFilterChange("size", s)}
-                  className={`px-3 py-1 border rounded-lg text-sm font-medium transition ${
+                  className={`px-3 py-1 border rounded-lg text-xs sm:text-sm font-medium transition ${
                     filters.size.includes(s)
                       ? "bg-black text-white"
                       : "bg-gray-50 hover:bg-gray-100"
@@ -263,7 +263,7 @@ const Shop = () => {
 
           {/* Price */}
           <div>
-            <h3 className="font-semibold mb-2 text-gray-700">Price Range</h3>
+            <h3 className="font-semibold mb-2 text-gray-700 text-sm sm:text-base">Price Range</h3>
             <input
               type="range"
               min="0"
@@ -274,7 +274,7 @@ const Shop = () => {
               }
               className="w-full accent-black"
             />
-            <div className="flex justify-between text-sm text-gray-500 mt-1">
+            <div className="flex justify-between text-xs sm:text-sm text-gray-500 mt-1">
               <span>${priceRange[0]}</span>
               <span>${priceRange[1]}</span>
             </div>
@@ -282,7 +282,7 @@ const Shop = () => {
 
           <button
             onClick={resetFilters}
-            className="w-full mt-4 py-2 bg-gray-800 hover:bg-black text-white rounded-lg font-semibold transition"
+            className="w-full mt-4 py-2 bg-gray-800 hover:bg-black text-white rounded-lg font-semibold transition text-sm sm:text-base"
           >
             Clear All
           </button>
@@ -292,9 +292,9 @@ const Shop = () => {
       {/* Products */}
       <div className="w-full lg:w-[78%]">
         {/* Top Controls */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
           <button
-            className="lg:hidden px-4 py-2 border rounded-lg"
+            className="lg:hidden px-4 py-2 border rounded-lg text-sm sm:text-base"
             onClick={() => setShowFilters(true)}
           >
             ☰ Filters
@@ -302,7 +302,7 @@ const Shop = () => {
           <select
             value={sortPrice}
             onChange={(e) => setSortPrice(e.target.value)}
-            className="border p-2 rounded-lg bg-white shadow-sm"
+            className="border p-2 rounded-lg bg-white shadow-sm text-sm sm:text-base"
           >
             <option value="default">Default</option>
             <option value="lowToHigh">Price: Low to High</option>
@@ -313,7 +313,7 @@ const Shop = () => {
         {/* Products Grid */}
         <motion.div
           layout
-          className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6"
         >
           {sortedProducts.slice(page * 8, page * 8 + 8).map((prod) => (
             <motion.div
@@ -321,19 +321,16 @@ const Shop = () => {
               whileHover={{ scale: 1.03 }}
               className="relative group bg-white rounded-2xl shadow-sm hover:shadow-lg overflow-hidden transition-all"
             >
-              {/* Wishlist */}
               <button className="absolute top-3 right-3 bg-white p-1.5 rounded-full shadow hover:text-red-500 transition">
-                <IoMdHeart size={22} />
+                <IoMdHeart size={20} />
               </button>
 
-              {/* Discount */}
               {discount && (
                 <span className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded">
                   -{discount}%
                 </span>
               )}
 
-              {/* Image */}
               <Link href={`/Product/${prod._id}`}>
                 <div className="overflow-hidden rounded-t-xl">
                   <Image
@@ -341,29 +338,26 @@ const Shop = () => {
                     alt={prod.name}
                     width={400}
                     height={400}
-                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-44 sm:h-52 md:h-56 object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
               </Link>
 
-              {/* Info */}
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800 truncate">
+              <div className="p-3 sm:p-4 text-center">
+                <h3 className="font-semibold text-gray-800 text-sm sm:text-base truncate">
                   {prod.name}
                 </h3>
                 <div className="flex justify-center items-center gap-2 mt-1">
-                  <span className="text-red-600 font-bold">
+                  <span className="text-red-600 font-bold text-sm sm:text-base">
                     ${prod.price}
                   </span>
                   {discount && (
-                    <span className="line-through text-gray-400 text-sm">
+                    <span className="line-through text-gray-400 text-xs sm:text-sm">
                       ${(prod.price + discount).toFixed(2)}
                     </span>
                   )}
                 </div>
-
-                {/* CTA */}
-                <button className="mt-3 w-full py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-900 transition hidden group-hover:block">
+                <button className="mt-3 w-full py-1.5 sm:py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-900 transition hidden group-hover:block text-xs sm:text-sm">
                   Add to Cart
                 </button>
               </div>
@@ -372,11 +366,11 @@ const Shop = () => {
         </motion.div>
 
         {/* Pagination */}
-        <div className="flex justify-center items-center gap-2 mt-8">
+        <div className="flex justify-center items-center gap-2 mt-8 flex-wrap">
           <button
             disabled={page === 0}
             onClick={() => setPage(page - 1)}
-            className="px-3 py-1 border rounded-lg disabled:opacity-50 hover:bg-black hover:text-white transition"
+            className="px-3 py-1 border rounded-lg disabled:opacity-50 hover:bg-black hover:text-white transition text-sm sm:text-base"
           >
             Prev
           </button>
@@ -384,7 +378,7 @@ const Shop = () => {
             <button
               key={i}
               onClick={() => setPage(i)}
-              className={`px-3 py-1 border rounded-lg transition ${
+              className={`px-3 py-1 border rounded-lg transition text-sm sm:text-base ${
                 page === i ? "bg-black text-white" : "hover:bg-gray-100"
               }`}
             >
@@ -394,7 +388,7 @@ const Shop = () => {
           <button
             disabled={page === Math.ceil(sortedProducts.length / 8) - 1}
             onClick={() => setPage(page + 1)}
-            className="px-3 py-1 border rounded-lg disabled:opacity-50 hover:bg-black hover:text-white transition"
+            className="px-3 py-1 border rounded-lg disabled:opacity-50 hover:bg-black hover:text-white transition text-sm sm:text-base"
           >
             Next
           </button>
