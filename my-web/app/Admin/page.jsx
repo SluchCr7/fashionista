@@ -203,7 +203,7 @@ const AdminPanel = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+      <div className="w-full px-4 md:px-8 py-8">
         {/* layout: sidebar + content */}
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar */}

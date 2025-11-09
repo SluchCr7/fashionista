@@ -3,13 +3,15 @@
 import React, { useState, useMemo, useContext, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { CiStar } from 'react-icons/ci'
-import { FaShoppingCart, FaFilter, FaChevronRight } from 'react-icons/fa'
+import { FaShoppingCart, FaChevronRight } from 'react-icons/fa'
 import { ProductContext } from '@/app/Context/ProductContext'
 import { ReviewContext } from '@/app/Context/ReviewContext'
 
-// === Utility components inside the same file for convenience ===
+/* =========================
+   ⭐ Rating Component
+   ========================= */
 const Rating = ({ rating = 0, size = 18, count = 5 }) => {
   const stars = []
   for (let i = 0; i < count; i++) {
@@ -21,9 +23,12 @@ const Rating = ({ rating = 0, size = 18, count = 5 }) => {
   return <div className="flex items-center gap-1">{stars}</div>
 }
 
+/* =========================
+   ⭐ Skeleton Loader
+   ========================= */
 const SkeletonCard = () => (
   <div className="animate-pulse bg-white rounded-lg shadow-md overflow-hidden">
-    <div className="h-56 bg-gray-200" />
+    <div className="h-48 sm:h-56 md:h-64 bg-gray-200" />
     <div className="p-4">
       <div className="h-4 bg-gray-200 w-3/4 mb-2" />
       <div className="h-4 bg-gray-200 w-1/2 mb-4" />
@@ -32,29 +37,35 @@ const SkeletonCard = () => (
   </div>
 )
 
-// === Main redesigned Shoes page ===
+/* =========================
+   ⭐ MAIN COMPONENT
+   ========================= */
 export default function ShoesRedesign() {
   const { products = [] } = useContext(ProductContext)
   const { Reviews = [] } = useContext(ReviewContext)
 
-  // Local UI state
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState('featured')
   const [gender, setGender] = useState('All')
   const [priceRange, setPriceRange] = useState([0, 1000])
   const [selectedBrands, setSelectedBrands] = useState([])
-  const [view, setView] = useState('grid') // grid | list
+  const [view, setView] = useState('grid')
   const [page, setPage] = useState(1)
   const perPage = 9
   const [loading, setLoading] = useState(false)
 
-  // Derived lists
+  /* =========================
+       BRANDS LIST
+     ========================= */
   const brands = useMemo(() => {
     const b = new Set()
     products.forEach(p => p?.brand && b.add(p.brand))
     return Array.from(b)
   }, [products])
 
+  /* =========================
+       RATING MERGE LOGIC
+     ========================= */
   const productsWithRating = useMemo(() => {
     return products.map(p => {
       const pr = Reviews.filter(r => r?.product?._id === p._id)
@@ -63,265 +74,251 @@ export default function ShoesRedesign() {
     })
   }, [products, Reviews])
 
-  // Filtering
+  /* =========================
+       FILTERING
+     ========================= */
   const filtered = useMemo(() => {
     let list = productsWithRating.filter(p => p?.category === 'Shoes')
+
     if (gender !== 'All') list = list.filter(p => (p.gender || 'All') === gender)
     if (query) list = list.filter(p => (p.name || '').toLowerCase().includes(query.toLowerCase()))
     if (selectedBrands.length) list = list.filter(p => selectedBrands.includes(p.brand))
+
     list = list.filter(p => Number(p.price) >= priceRange[0] && Number(p.price) <= priceRange[1])
 
-    // Sort
+    /* Sorting */
     switch (sort) {
-      case 'price-asc': list = list.sort((a,b) => a.price - b.price); break
-      case 'price-desc': list = list.sort((a,b) => b.price - a.price); break
-      case 'rating': list = list.sort((a,b) => (b.avgRating||0) - (a.avgRating||0)); break
+      case 'price-asc': list.sort((a,b) => a.price - b.price); break
+      case 'price-desc': list.sort((a,b) => b.price - a.price); break
+      case 'rating': list.sort((a,b) => (b.avgRating||0) - (a.avgRating||0)); break
       default: break
     }
 
     return list
   }, [productsWithRating, gender, query, selectedBrands, priceRange, sort])
 
-  // Pagination
+  /* =========================
+       PAGINATION
+     ========================= */
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
-  useEffect(() => {
-    setPage(1)
-  }, [query, gender, selectedBrands, priceRange, sort])
-
+  useEffect(() => setPage(1), [query, gender, selectedBrands, priceRange, sort])
   const paged = filtered.slice((page - 1) * perPage, page * perPage)
 
-  // Handlers
-  const toggleBrand = (b) => setSelectedBrands(prev => prev.includes(b) ? prev.filter(x=>x!==b) : [...prev, b])
+  const toggleBrand = (b) => setSelectedBrands(prev => prev.includes(b) ? prev.filter(x => x !== b) : [...prev, b])
 
-  // Small UX: simulate loading when user changes filters quickly
+  /* Loading UX */
   useEffect(() => {
     setLoading(true)
-    const t = setTimeout(() => setLoading(false), 300)
+    const t = setTimeout(() => setLoading(false), 250)
     return () => clearTimeout(t)
   }, [query, sort, gender, selectedBrands, priceRange, page])
 
   return (
     <div className="w-full flex flex-col items-center bg-gray-50">
 
-      {/* HERO */}
-      <header className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-20">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-8">
-          <div className="flex-1">
-            <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: .6 }} className="text-4xl md:text-5xl font-extrabold leading-tight">
+      {/* HERO SECTION - MOBILE FIRST IMPROVED */}
+      <header className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-16 md:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col lg:flex-row items-center gap-8">
+
+          {/* LEFT TEXT */}
+          <div className="flex-1 text-center lg:text-left">
+            <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: .6 }} className="text-3xl md:text-5xl font-extrabold leading-snug">
               Step into the Future — <span className="text-yellow-400">Premium Shoes</span>
             </motion.h1>
-            <p className="mt-4 max-w-lg text-gray-200">Curated collections from top brands. Engineered comfort, modern design, crafted for everyday performance.</p>
 
-            <div className="mt-6 flex gap-3">
+            <p className="mt-4 text-gray-200 max-w-lg mx-auto lg:mx-0 text-sm sm:text-base">
+              Curated collections from top brands. Engineered comfort, modern design.
+            </p>
+
+            <div className="mt-6 flex flex-col sm:flex-row justify-center lg:justify-start gap-3">
               <Link href="/Shop?category=Shoes" className="inline-flex items-center gap-2 bg-yellow-400 text-black px-6 py-3 rounded-full font-semibold shadow hover:scale-[1.02] transition">
                 Shop Shoes <FaChevronRight />
               </Link>
-
               <Link href="/collections/new" className="inline-flex items-center gap-2 border border-white/20 px-5 py-3 rounded-full text-white/90 hover:bg-white/5 transition">
                 New Arrivals
               </Link>
             </div>
           </div>
 
+          {/* HERO IMAGES */}
           <div className="w-full lg:w-1/2 grid grid-cols-2 gap-4">
-            {/* hero mini cards */}
-            <div className="relative rounded-xl overflow-hidden bg-white/5 p-4">
+            <div className="relative rounded-xl overflow-hidden bg-white/5 p-3">
               <Image src="/Hero/hero_shoe_1.jpg" alt="hero 1" width={600} height={400} className="object-cover rounded-lg" />
             </div>
-            <div className="relative rounded-xl overflow-hidden bg-white/5 p-4">
+
+            <div className="relative rounded-xl overflow-hidden bg-white/5 p-3">
               <Image src="/Hero/hero_shoe_2.jpg" alt="hero 2" width={600} height={400} className="object-cover rounded-lg" />
             </div>
           </div>
         </div>
       </header>
 
-      <main className="w-full max-w-7xl px-6 -mt-12">
+      {/* MAIN CONTENT */}
+      <main className="w-full max-w-7xl px-4 sm:px-6 -mt-10 md:-mt-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-          {/* SIDEBAR FILTERS */}
-          <aside className="col-span-1 bg-white rounded-xl shadow p-5 sticky top-20 h-fit">
+          {/* =========================
+               SIDEBAR FILTERS
+             ========================= */}
+          <aside className="col-span-1 bg-white rounded-xl shadow p-5 sticky top-20 h-fit order-2 lg:order-1">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-lg font-semibold">Filters</h3>
-              <button onClick={() => { setGender('All'); setSelectedBrands([]); setPriceRange([0,1000]); setQuery('') }} className="text-sm text-gray-500">Reset</button>
-            </div>
+            <h2 className="text-lg font-semibold mb-4">Filters</h2>
 
-            <div className="mt-4 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Search</label>
-                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search model, color, code" className="mt-2 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-300" />
-              </div>
+            {/* Search */}
+            <input
+              type="text"
+              placeholder="Search shoes..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg mb-4 focus:ring-2 focus:ring-black/50"
+            />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Gender</label>
-                <div className="mt-2 flex gap-2">
-                  {['All','Women','Men','Unisex'].map(g => (
-                    <button key={g} onClick={() => setGender(g)} className={`px-3 py-2 rounded-md text-sm ${gender===g ? 'bg-yellow-400 text-black' : 'bg-gray-100 text-gray-700'}`}>{g}</button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-700">Brands</label>
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  {brands.map((b) => (
-                    <button key={b} onClick={() => toggle({ b })} className="text-sm text-gray-700 bg-gray-100 px-3 py-2 rounded-md text-left">{b}</button>
-                  ))}
-                </div>
-                {/* Friendly brand checkbox list */}
-                <div className="mt-3 space-y-2 max-h-36 overflow-auto pr-2">
-                  {brands.slice(0, 40).map(b => (
-                    <label key={b} className="flex items-center gap-2 text-sm">
-                      <input type="checkbox" checked={selectedBrands.includes(b)} onChange={() => toggleBrand(b)} className="w-4 h-4" />
-                      <span className="truncate">{b}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Price</label>
-                <div className="mt-2 flex items-center gap-2">
-                  <input type="number" value={priceRange[0]} onChange={(e) => setPriceRange([Number(e.target.value||0), priceRange[1]])} className="w-1/2 px-2 py-1 border rounded" />
-                  <input type="number" value={priceRange[1]} onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value||1000)])} className="w-1/2 px-2 py-1 border rounded" />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Sort</label>
-                <select value={sort} onChange={e => setSort(e.target.value)} className="mt-2 w-full px-3 py-2 border rounded-md">
-                  <option value="featured">Featured</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="rating">Top Rated</option>
-                </select>
-              </div>
-
-              <div className="pt-2 border-t mt-2">
-                <p className="text-sm text-gray-500">Showing <strong>{filtered.length}</strong> results</p>
-              </div>
-            </div>
-
-          </aside>
-
-          {/* PRODUCTS LIST */}
-          <section className="col-span-3">
-            <div className="flex items-center justify-between mb-4 gap-4">
-              <div className="flex items-center gap-3">
-                <button onClick={() => setView('grid')} className={`px-3 py-2 rounded ${view==='grid' ? 'bg-white shadow' : 'bg-gray-100'}`}>Grid</button>
-                <button onClick={() => setView('list')} className={`px-3 py-2 rounded ${view==='list' ? 'bg-white shadow' : 'bg-gray-100'}`}>List</button>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500">Page {page} / {totalPages}</span>
-                <div className="flex gap-2">
-                  <button disabled={page<=1} onClick={() => setPage(p => Math.max(1, p-1))} className="px-3 py-2 rounded bg-white shadow">Prev</button>
-                  <button disabled={page>=totalPages} onClick={() => setPage(p => Math.min(totalPages, p+1))} className="px-3 py-2 rounded bg-white shadow">Next</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Grid / List */}
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Array.from({ length: perPage }).map((_, i) => <SkeletonCard key={i} />)}
-              </div>
-            ) : (
-              <div className={view === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
-                {paged.map(prod => (
-                  <motion.article key={prod._id} whileHover={{ y: -6 }} className="bg-white rounded-xl shadow overflow-hidden flex flex-col">
-
-                    <div className="relative h-64 w-full">
-                      <Image src={prod?.Photo?.[0]?.url || '/placeholder.png'} alt={prod?.name} fill className="object-cover" sizes="(min-width:1024px) 400px, 100vw" />
-
-                      <div className="absolute top-3 right-3 flex flex-col gap-2">
-                        <button className="bg-white/90 p-2 rounded-full shadow text-gray-800 hover:scale-105 transition" aria-label="Add to cart">
-                          <FaShoppingCart />
-                        </button>
-                      </div>
-
-                      <div className="absolute left-3 top-3 bg-black/50 text-white px-3 py-1 rounded">{prod?.tag || 'New'}</div>
-                    </div>
-
-                    <div className="p-4 flex-1 flex flex-col justify-between">
-                      <div>
-                        <h4 className="text-lg font-semibold truncate">{prod?.name}</h4>
-                        <p className="text-sm text-gray-500 mt-1 truncate">{prod?.short || prod?.description?.slice(0, 90)}</p>
-
-                        <div className="mt-3 flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <Rating rating={prod.avgRating} />
-                            <span className="text-sm text-gray-400">({prod.reviewsCount})</span>
-                          </div>
-                          <div className="text-DarkRed text-lg font-bold">${prod.price}</div>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 flex gap-2">
-                        <Link href={`/Product/${prod._id}`} className="flex-1 inline-flex items-center justify-center gap-2 border rounded-full px-4 py-2 hover:bg-gray-50">View</Link>
-                        <button className="bg-yellow-400 text-black px-4 py-2 rounded-full font-semibold">Add</button>
-                      </div>
-                    </div>
-
-                  </motion.article>
-                ))}
-
-                {/* empty state */}
-                {paged.length === 0 && (
-                  <div className="col-span-full bg-white rounded-xl p-8 text-center">
-                    <h3 className="text-xl font-semibold">No products found</h3>
-                    <p className="text-gray-500 mt-2">Try adjusting filters or clear search.</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* pagination small */}
-            <div className="mt-6 flex items-center justify-center gap-3">
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <button key={i} onClick={() => setPage(i+1)} className={`px-3 py-1 rounded ${page===i+1 ? 'bg-yellow-400 text-black' : 'bg-white border'}`}>{i+1}</button>
+            {/* Gender Filter */}
+            <div className="mb-6">
+              <h3 className="font-medium mb-2">Gender</h3>
+              {['All', 'Men', 'Women', 'Unisex'].map((g) => (
+                <label key={g} className="flex items-center gap-2 mb-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={gender === g}
+                    onChange={() => setGender(g)}
+                  />
+                  <span>{g}</span>
+                </label>
               ))}
             </div>
 
+            {/* Brands */}
+            <div className="mb-6">
+              <h3 className="font-medium mb-2">Brands</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {brands.map((b) => (
+                  <button
+                    key={b}
+                    onClick={() => toggleBrand(b)}
+                    className={`px-3 py-2 rounded-lg border text-sm transition ${selectedBrands.includes(b)
+                      ? 'bg-black text-white'
+                      : 'bg-gray-100 hover:bg-gray-200'}`}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Price Range */}
+            <div className="mb-6">
+              <h3 className="font-medium mb-2">Price Range</h3>
+              <input
+                type="range"
+                min="0"
+                max="1000"
+                value={priceRange[1]}
+                onChange={(e) => setPriceRange([0, Number(e.target.value)])}
+                className="w-full"
+              />
+              <p className="text-sm mt-1 text-gray-600">Up to ${priceRange[1]}</p>
+            </div>
+
+            {/* Sort */}
+            <div className="mb-4">
+              <h3 className="font-medium mb-2">Sort by</h3>
+              <select
+                className="w-full px-3 py-2 border rounded-lg"
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+              >
+                <option value="featured">Featured</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="rating">Top Rated</option>
+              </select>
+            </div>
+          </aside>
+
+          {/* =========================
+               PRODUCTS SECTION
+             ========================= */}
+          <section className="col-span-1 lg:col-span-3 order-1 lg:order-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Shoes Collection</h2>
+
+              {/* View Toggle */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setView('grid')}
+                  className={`px-3 py-1 rounded ${view === 'grid' ? 'bg-black text-white' : 'bg-gray-200'}`}
+                >
+                  Grid
+                </button>
+                <button
+                  onClick={() => setView('list')}
+                  className={`px-3 py-1 rounded ${view === 'list' ? 'bg-black text-white' : 'bg-gray-200'}`}
+                >
+                  List
+                </button>
+              </div>
+            </div>
+
+            {/* LOADING */}
+            {loading && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+              </div>
+            )}
+
+            {/* PRODUCT GRID */}
+            {!loading && paged.length > 0 && (
+              <div className={`${view === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
+                : 'flex flex-col gap-4'}`}
+              >
+                {paged.map((p) => (
+                  <Link
+                    href={`/Product/${p._id}`}
+                    key={p._id}
+                    className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden group"
+                  >
+                    <div className="relative h-60 bg-gray-100">
+                      <Image
+                        src={p.image?.url || '/placeholder.jpg'}
+                        alt={p.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition duration-300"
+                      />
+                      <span className="absolute top-3 left-3 bg-black/80 text-white text-xs px-2 py-1 rounded">{p.brand}</span>
+                    </div>
+
+                    <div className="p-4">
+                      <h3 className="font-semibold text-lg mb-1">{p.name}</h3>
+                      <Rating rating={p.avgRating} />
+                      <p className="text-black font-bold mt-2">${p.price}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* EMPTY */}
+            {!loading && paged.length === 0 && (
+              <p className="text-gray-600 text-center py-10">No products match your filters.</p>
+            )}
+
+            {/* PAGINATION */}
+            <div className="flex justify-center gap-2 mt-8">
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setPage(i + 1)}
+                  className={`px-4 py-2 rounded ${page === i + 1 ? 'bg-black text-white' : 'bg-gray-200'}`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
           </section>
         </div>
-
-        {/* Brands carousel */}
-        <div className="mt-12 bg-white rounded-xl p-6 shadow">
-          <h3 className="text-lg font-semibold">Shop by Brand</h3>
-          <div className="mt-4 flex items-center gap-6 overflow-x-auto py-3">
-            {brands.length ? brands.map((b, i) => (
-              <div key={b} className="flex-shrink-0 w-40 h-20 bg-gray-50 rounded-lg flex items-center justify-center border">
-                <span className="font-medium text-gray-700 truncate">{b}</span>
-              </div>
-            )) : (
-              <p className="text-gray-500">No brands yet</p>
-            )}
-          </div>
-        </div>
-
-        {/* CTA large */}
-        <section className="mt-12 rounded-xl overflow-hidden relative bg-gradient-to-r from-yellow-400 to-orange-400">
-          <div className="absolute inset-0 opacity-20 bg-[url('/Hero/cta_bg_overlay.jpg')] bg-cover" />
-          <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-extrabold">Limited Time — Extra 20% Off Select Shoes</h2>
-              <p className="mt-2 text-sm text-gray-800">Use code <strong>STEP20</strong> at checkout. Selected styles only — while stocks last.</p>
-            </div>
-
-            <div className="mt-6 md:mt-0">
-              <Link href="/Shop?category=Shoes" className="px-6 py-3 rounded-full bg-black text-white font-semibold shadow">Shop the Sale</Link>
-            </div>
-          </div>
-        </section>
-
       </main>
-
-      <footer className="w-full mt-12 py-10 text-center text-gray-600">
-        <div className="max-w-7xl mx-auto px-6">© {new Date().getFullYear()} YourStore — Crafted with care</div>
-      </footer>
     </div>
   )
 }
-
-// small helper missing inlined to avoid extra imports
-function toggle({ b }) { /* noop placeholder so file doesn't break inside canvas preview when editing */ }
