@@ -201,10 +201,10 @@ export default function ShoesRedesign() {
 
           <div className="w-full lg:w-1/2 grid grid-cols-2 gap-3">
             <div className="relative rounded-xl overflow-hidden bg-white/5 p-2 sm:p-4">
-              <Image src="/Hero/hero_shoe_1.jpg" alt="hero 1" width={800} height={600} className="object-cover rounded-lg" />
+              <Image src="/Hero/bg_shoes_wom.jpg" alt="hero 1" width={800} height={600} className="object-cover rounded-lg" />
             </div>
             <div className="relative rounded-xl overflow-hidden bg-white/5 p-2 sm:p-4">
-              <Image src="/Hero/hero_shoe_2.jpg" alt="hero 2" width={800} height={600} className="object-cover rounded-lg" />
+              <Image src="/Hero/bg_men.jpg" alt="hero 2" width={800} height={600} className="object-cover rounded-lg" />
             </div>
           </div>
         </div>

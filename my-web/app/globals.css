@@ -54,6 +54,7 @@
   color : rgb(198, 166, 6);
   background : rgb(0 , 0 ,0)
 }
+
 .img_man::before , 
 .img_woman::before,
 .img_spicial::before{
@@ -129,6 +130,31 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .img_man {
+    width: 100%;
+    height: 40%;
+    top: 60%;
+    right: 0;
+    clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 0% 100%);
+  }
+  .img_spicial {
+    width: 100%;
+    height: 40%;
+    top: 30%;
+    left: 0%;
+    clip-path: polygon(100% 0, 100% 100%, 50% 75%, 0% 100%, 0 0%, 50% 25%);
+  }
+
+  .img_woman {
+    width: 100%;
+    height: 40%;
+    top: 0;
+    left: 0;
+    clip-path: polygon(0 0, 100% 0%, 100% 75%, 50% 100%, 0 75%);
+  }
+}
+/* Responsive Design */
+@media (max-width: 480px) {
   .img_man {
     width: 100%;
     height: 40%;
