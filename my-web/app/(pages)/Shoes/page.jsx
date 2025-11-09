@@ -1,204 +1,327 @@
 'use client'
-import React, { useContext } from 'react'
+
+import React, { useState, useMemo, useContext, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { CiStar } from "react-icons/ci"
-import { FaShoppingCart } from "react-icons/fa"
-import { motion } from 'framer-motion'
-import Intro from '@/app/Components/Intro'
+import { motion, AnimatePresence } from 'framer-motion'
+import { CiStar } from 'react-icons/ci'
+import { FaShoppingCart, FaFilter, FaChevronRight } from 'react-icons/fa'
 import { ProductContext } from '@/app/Context/ProductContext'
 import { ReviewContext } from '@/app/Context/ReviewContext'
-import { brands } from '@/app/Data'
 
-const Shoes = () => {
-  const { products } = useContext(ProductContext)
-  const { Reviews } = useContext(ReviewContext)
-
-  // Helper to render stars rating
-  const renderStars = (productId) => {
-    const productReviews = Reviews.filter(r => r?.product?._id === productId)
-    const avgRating = productReviews.length > 0 
-      ? productReviews.reduce((a, r) => a + (r.rating || 4), 0) / productReviews.length 
-      : 0
-    return (
-      <div className="flex items-center gap-1">
-        {[...Array(5)].map((_, i) => (
-          <CiStar key={i} className={i < avgRating ? "text-yellow-400" : "text-gray-300"} />
-        ))}
-        <span className="text-gray-500 text-sm">({productReviews.length} Reviews)</span>
-      </div>
+// === Utility components inside the same file for convenience ===
+const Rating = ({ rating = 0, size = 18, count = 5 }) => {
+  const stars = []
+  for (let i = 0; i < count; i++) {
+    const filled = i < Math.round(rating)
+    stars.push(
+      <CiStar key={i} className={filled ? 'text-yellow-400' : 'text-gray-300'} size={size} />
     )
   }
+  return <div className="flex items-center gap-1">{stars}</div>
+}
+
+const SkeletonCard = () => (
+  <div className="animate-pulse bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="h-56 bg-gray-200" />
+    <div className="p-4">
+      <div className="h-4 bg-gray-200 w-3/4 mb-2" />
+      <div className="h-4 bg-gray-200 w-1/2 mb-4" />
+      <div className="h-8 bg-gray-200 w-full rounded" />
+    </div>
+  </div>
+)
+
+// === Main redesigned Shoes page ===
+export default function ShoesRedesign() {
+  const { products = [] } = useContext(ProductContext)
+  const { Reviews = [] } = useContext(ReviewContext)
+
+  // Local UI state
+  const [query, setQuery] = useState('')
+  const [sort, setSort] = useState('featured')
+  const [gender, setGender] = useState('All')
+  const [priceRange, setPriceRange] = useState([0, 1000])
+  const [selectedBrands, setSelectedBrands] = useState([])
+  const [view, setView] = useState('grid') // grid | list
+  const [page, setPage] = useState(1)
+  const perPage = 9
+  const [loading, setLoading] = useState(false)
+
+  // Derived lists
+  const brands = useMemo(() => {
+    const b = new Set()
+    products.forEach(p => p?.brand && b.add(p.brand))
+    return Array.from(b)
+  }, [products])
+
+  const productsWithRating = useMemo(() => {
+    return products.map(p => {
+      const pr = Reviews.filter(r => r?.product?._id === p._id)
+      const avg = pr.length ? pr.reduce((a, r) => a + (r.rating || 0), 0) / pr.length : 0
+      return { ...p, avgRating: avg, reviewsCount: pr.length }
+    })
+  }, [products, Reviews])
+
+  // Filtering
+  const filtered = useMemo(() => {
+    let list = productsWithRating.filter(p => p?.category === 'Shoes')
+    if (gender !== 'All') list = list.filter(p => (p.gender || 'All') === gender)
+    if (query) list = list.filter(p => (p.name || '').toLowerCase().includes(query.toLowerCase()))
+    if (selectedBrands.length) list = list.filter(p => selectedBrands.includes(p.brand))
+    list = list.filter(p => Number(p.price) >= priceRange[0] && Number(p.price) <= priceRange[1])
+
+    // Sort
+    switch (sort) {
+      case 'price-asc': list = list.sort((a,b) => a.price - b.price); break
+      case 'price-desc': list = list.sort((a,b) => b.price - a.price); break
+      case 'rating': list = list.sort((a,b) => (b.avgRating||0) - (a.avgRating||0)); break
+      default: break
+    }
+
+    return list
+  }, [productsWithRating, gender, query, selectedBrands, priceRange, sort])
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
+  useEffect(() => {
+    setPage(1)
+  }, [query, gender, selectedBrands, priceRange, sort])
+
+  const paged = filtered.slice((page - 1) * perPage, page * perPage)
+
+  // Handlers
+  const toggleBrand = (b) => setSelectedBrands(prev => prev.includes(b) ? prev.filter(x=>x!==b) : [...prev, b])
+
+  // Small UX: simulate loading when user changes filters quickly
+  useEffect(() => {
+    setLoading(true)
+    const t = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(t)
+  }, [query, sort, gender, selectedBrands, priceRange, page])
 
   return (
-    <div className="flex flex-col items-center w-full">
-      
-      {/* Hero Section */}
-      <div 
-        className="relative w-full min-h-[100vh] flex items-center justify-center bg-cover bg-center" 
-        style={{ backgroundImage: "url('/Hero/shoesBg.jpg')" }}
-      >
-        <div className="absolute inset-0 bg-black/50"></div>
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="relative z-10 text-center text-white px-5"
-        >
-          <h1 className="text-5xl font-extrabold">Step into Style</h1>
-          <p className="mt-3 text-lg tracking-widest">Discover the perfect pair for every occasion</p>
-          <div className="flex gap-4 justify-center mt-6">
-            <Link href="/Shop" className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition">
-              Shop Now
-            </Link>
-            <Link href="/Shop?category=Shoes" className="border border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-black transition">
-              Explore Shoes
-            </Link>
-          </div>
-        </motion.div>
-      </div>
+    <div className="w-full flex flex-col items-center bg-gray-50">
 
-      {/* Categories Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full py-10 max-w-7xl px-5">
-        {['Women Shoes', 'Men Shoes'].map((category, index) => (
-          <div key={index} className="relative w-full h-[60vh] rounded-lg overflow-hidden group">
-            <Image 
-              src={`/Hero/${index === 0 ? 'bg_shoes_wom' : 'bg_men'}.jpg`} 
-              fill 
-              className="object-cover transition-transform duration-500 group-hover:scale-110" 
-              alt={category} 
-            />
-            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center gap-4">
-              <h2 className="text-white text-4xl font-bold">{category}</h2>
-              <Link 
-                href={`/Shop?gender=${index === 0 ? "Women" : "Men"}&category=Shoes`} 
-                className="opacity-0 group-hover:opacity-100 bg-red-600 text-white px-4 py-2 rounded-lg transition"
-              >
-                Shop Now
+      {/* HERO */}
+      <header className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-20">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-8">
+          <div className="flex-1">
+            <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: .6 }} className="text-4xl md:text-5xl font-extrabold leading-tight">
+              Step into the Future — <span className="text-yellow-400">Premium Shoes</span>
+            </motion.h1>
+            <p className="mt-4 max-w-lg text-gray-200">Curated collections from top brands. Engineered comfort, modern design, crafted for everyday performance.</p>
+
+            <div className="mt-6 flex gap-3">
+              <Link href="/Shop?category=Shoes" className="inline-flex items-center gap-2 bg-yellow-400 text-black px-6 py-3 rounded-full font-semibold shadow hover:scale-[1.02] transition">
+                Shop Shoes <FaChevronRight />
+              </Link>
+
+              <Link href="/collections/new" className="inline-flex items-center gap-2 border border-white/20 px-5 py-3 rounded-full text-white/90 hover:bg-white/5 transition">
+                New Arrivals
               </Link>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Latest Section */}
-      <div className="w-full max-w-7xl px-5 py-10">
-        <Intro title="The Latest" para="Check out our best selling shoes" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          {products.filter(p => p?.category === "Shoes").slice(0, 3).map((prod) => (
-            <motion.div 
-              whileHover={{ scale: 1.05 }} 
-              key={prod._id} 
-              className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition"
-            >
-              <div className="relative">
-                <Image 
-                  src={prod?.Photo[0]?.url} 
-                  alt={prod?.name} 
-                  width={300} 
-                  height={200} 
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform" 
-                />
-                <Link 
-                  href={`/Product/${prod?._id}`} 
-                  className="absolute bottom-3 right-3 bg-red-600 text-white px-3 py-1 text-sm rounded-md opacity-0 group-hover:opacity-100 transition flex items-center gap-2"
-                >
-                  <FaShoppingCart /> Add to Cart
-                </Link>
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="text-lg font-semibold">{prod?.name}</h3>
-                <p className="text-DarkRed text-lg font-bold">${prod?.price}</p>
-                {renderStars(prod?._id)}
-              </div>
-            </motion.div>
-          ))}
+          <div className="w-full lg:w-1/2 grid grid-cols-2 gap-4">
+            {/* hero mini cards */}
+            <div className="relative rounded-xl overflow-hidden bg-white/5 p-4">
+              <Image src="/Hero/hero_shoe_1.jpg" alt="hero 1" width={600} height={400} className="object-cover rounded-lg" />
+            </div>
+            <div className="relative rounded-xl overflow-hidden bg-white/5 p-4">
+              <Image src="/Hero/hero_shoe_2.jpg" alt="hero 2" width={600} height={400} className="object-cover rounded-lg" />
+            </div>
+          </div>
         </div>
-        <div className="flex justify-center mt-6">
-          <Link href="/Shop?category=Shoes" className="px-6 py-2 border rounded-md text-gray-700 hover:bg-gray-100 transition">
-            View All
-          </Link>
-        </div>
-      </div>
+      </header>
 
-      {/* Best Sellers */}
-      <div className="w-full max-w-7xl px-5 py-10">
-        <Intro title="Best Sellers" para="Check out our most popular shoes" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          {products.filter(p => p?.category === "Shoes").slice(0, 3).map((prod) => (
-            <motion.div 
-              whileHover={{ scale: 1.05 }} 
-              key={prod._id} 
-              className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition"
-            >
-              <div className="relative">
-                <Image 
-                  src={prod?.Photo[0]?.url} 
-                  alt={prod?.name} 
-                  width={300} 
-                  height={200} 
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform" 
-                />
-                <Link 
-                  href={`/Product/${prod?._id}`} 
-                  className="absolute bottom-3 right-3 bg-red-600 text-white px-3 py-1 text-sm rounded-md opacity-0 group-hover:opacity-100 transition flex items-center gap-2"
-                >
-                  <FaShoppingCart /> Add to Cart
-                </Link>
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="text-lg font-semibold">{prod?.name}</h3>
-                <p className="text-DarkRed text-lg font-bold">${prod?.price}</p>
-                {renderStars(prod?._id)}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        <div className="flex justify-center mt-6">
-          <Link href="/Shop?category=Shoes" className="px-6 py-2 border rounded-md text-gray-700 hover:bg-gray-100 transition">
-            View All
-          </Link>
-        </div>
-      </div>
+      <main className="w-full max-w-7xl px-6 -mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-      {/* CTA Section */}
-      <div 
-        className="w-full min-h-[80vh] flex flex-col items-center justify-center bg-cover bg-center relative px-5 md:px-0" 
-        style={{ backgroundImage: "url(/Hero/bg_shoes.jpg)" }}
-      >
-        <div className="absolute inset-0 bg-black/60"></div>
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="relative z-10 text-center text-white max-w-2xl px-5"
-        >
-          <h2 className="text-4xl font-extrabold">New Collections of Shoes</h2>
-          <p className="mt-3 text-lg">Discover the latest trends in footwear and elevate your style with a Big Discount.</p>
-          <Link href="/Shop?category=Shoes" className="mt-5 inline-block bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition">
-            Shop Collection
-          </Link>
-        </motion.div>
-      </div>
+          {/* SIDEBAR FILTERS */}
+          <aside className="col-span-1 bg-white rounded-xl shadow p-5 sticky top-20 h-fit">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-lg font-semibold">Filters</h3>
+              <button onClick={() => { setGender('All'); setSelectedBrands([]); setPriceRange([0,1000]); setQuery('') }} className="text-sm text-gray-500">Reset</button>
+            </div>
 
-      {/* Shop by Brand */}
-      <div className="w-full max-w-7xl px-5 py-10">
-        <Intro title="Shop by Brand" para="Choose your favorite brands" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
-          {brands.map((brand, index) => (
-            <motion.div 
-              whileHover={{ scale: 1.1 }} 
-              key={index} 
-              className="flex flex-col items-center cursor-pointer"
-            >
-              <Image src={brand.image} alt={brand.name} width={120} height={120} className="w-24 h-24 object-contain" />
-              <p className="mt-2 text-lg font-semibold text-gray-700">{brand.name}</p>
-            </motion.div>
-          ))}
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Search</label>
+                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search model, color, code" className="mt-2 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-300" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Gender</label>
+                <div className="mt-2 flex gap-2">
+                  {['All','Women','Men','Unisex'].map(g => (
+                    <button key={g} onClick={() => setGender(g)} className={`px-3 py-2 rounded-md text-sm ${gender===g ? 'bg-yellow-400 text-black' : 'bg-gray-100 text-gray-700'}`}>{g}</button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">Brands</label>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {brands.map((b) => (
+                    <button key={b} onClick={() => toggle({ b })} className="text-sm text-gray-700 bg-gray-100 px-3 py-2 rounded-md text-left">{b}</button>
+                  ))}
+                </div>
+                {/* Friendly brand checkbox list */}
+                <div className="mt-3 space-y-2 max-h-36 overflow-auto pr-2">
+                  {brands.slice(0, 40).map(b => (
+                    <label key={b} className="flex items-center gap-2 text-sm">
+                      <input type="checkbox" checked={selectedBrands.includes(b)} onChange={() => toggleBrand(b)} className="w-4 h-4" />
+                      <span className="truncate">{b}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Price</label>
+                <div className="mt-2 flex items-center gap-2">
+                  <input type="number" value={priceRange[0]} onChange={(e) => setPriceRange([Number(e.target.value||0), priceRange[1]])} className="w-1/2 px-2 py-1 border rounded" />
+                  <input type="number" value={priceRange[1]} onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value||1000)])} className="w-1/2 px-2 py-1 border rounded" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Sort</label>
+                <select value={sort} onChange={e => setSort(e.target.value)} className="mt-2 w-full px-3 py-2 border rounded-md">
+                  <option value="featured">Featured</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="rating">Top Rated</option>
+                </select>
+              </div>
+
+              <div className="pt-2 border-t mt-2">
+                <p className="text-sm text-gray-500">Showing <strong>{filtered.length}</strong> results</p>
+              </div>
+            </div>
+
+          </aside>
+
+          {/* PRODUCTS LIST */}
+          <section className="col-span-3">
+            <div className="flex items-center justify-between mb-4 gap-4">
+              <div className="flex items-center gap-3">
+                <button onClick={() => setView('grid')} className={`px-3 py-2 rounded ${view==='grid' ? 'bg-white shadow' : 'bg-gray-100'}`}>Grid</button>
+                <button onClick={() => setView('list')} className={`px-3 py-2 rounded ${view==='list' ? 'bg-white shadow' : 'bg-gray-100'}`}>List</button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-500">Page {page} / {totalPages}</span>
+                <div className="flex gap-2">
+                  <button disabled={page<=1} onClick={() => setPage(p => Math.max(1, p-1))} className="px-3 py-2 rounded bg-white shadow">Prev</button>
+                  <button disabled={page>=totalPages} onClick={() => setPage(p => Math.min(totalPages, p+1))} className="px-3 py-2 rounded bg-white shadow">Next</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Grid / List */}
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: perPage }).map((_, i) => <SkeletonCard key={i} />)}
+              </div>
+            ) : (
+              <div className={view === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
+                {paged.map(prod => (
+                  <motion.article key={prod._id} whileHover={{ y: -6 }} className="bg-white rounded-xl shadow overflow-hidden flex flex-col">
+
+                    <div className="relative h-64 w-full">
+                      <Image src={prod?.Photo?.[0]?.url || '/placeholder.png'} alt={prod?.name} fill className="object-cover" sizes="(min-width:1024px) 400px, 100vw" />
+
+                      <div className="absolute top-3 right-3 flex flex-col gap-2">
+                        <button className="bg-white/90 p-2 rounded-full shadow text-gray-800 hover:scale-105 transition" aria-label="Add to cart">
+                          <FaShoppingCart />
+                        </button>
+                      </div>
+
+                      <div className="absolute left-3 top-3 bg-black/50 text-white px-3 py-1 rounded">{prod?.tag || 'New'}</div>
+                    </div>
+
+                    <div className="p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <h4 className="text-lg font-semibold truncate">{prod?.name}</h4>
+                        <p className="text-sm text-gray-500 mt-1 truncate">{prod?.short || prod?.description?.slice(0, 90)}</p>
+
+                        <div className="mt-3 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Rating rating={prod.avgRating} />
+                            <span className="text-sm text-gray-400">({prod.reviewsCount})</span>
+                          </div>
+                          <div className="text-DarkRed text-lg font-bold">${prod.price}</div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex gap-2">
+                        <Link href={`/Product/${prod._id}`} className="flex-1 inline-flex items-center justify-center gap-2 border rounded-full px-4 py-2 hover:bg-gray-50">View</Link>
+                        <button className="bg-yellow-400 text-black px-4 py-2 rounded-full font-semibold">Add</button>
+                      </div>
+                    </div>
+
+                  </motion.article>
+                ))}
+
+                {/* empty state */}
+                {paged.length === 0 && (
+                  <div className="col-span-full bg-white rounded-xl p-8 text-center">
+                    <h3 className="text-xl font-semibold">No products found</h3>
+                    <p className="text-gray-500 mt-2">Try adjusting filters or clear search.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* pagination small */}
+            <div className="mt-6 flex items-center justify-center gap-3">
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button key={i} onClick={() => setPage(i+1)} className={`px-3 py-1 rounded ${page===i+1 ? 'bg-yellow-400 text-black' : 'bg-white border'}`}>{i+1}</button>
+              ))}
+            </div>
+
+          </section>
         </div>
-      </div>
+
+        {/* Brands carousel */}
+        <div className="mt-12 bg-white rounded-xl p-6 shadow">
+          <h3 className="text-lg font-semibold">Shop by Brand</h3>
+          <div className="mt-4 flex items-center gap-6 overflow-x-auto py-3">
+            {brands.length ? brands.map((b, i) => (
+              <div key={b} className="flex-shrink-0 w-40 h-20 bg-gray-50 rounded-lg flex items-center justify-center border">
+                <span className="font-medium text-gray-700 truncate">{b}</span>
+              </div>
+            )) : (
+              <p className="text-gray-500">No brands yet</p>
+            )}
+          </div>
+        </div>
+
+        {/* CTA large */}
+        <section className="mt-12 rounded-xl overflow-hidden relative bg-gradient-to-r from-yellow-400 to-orange-400">
+          <div className="absolute inset-0 opacity-20 bg-[url('/Hero/cta_bg_overlay.jpg')] bg-cover" />
+          <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-extrabold">Limited Time — Extra 20% Off Select Shoes</h2>
+              <p className="mt-2 text-sm text-gray-800">Use code <strong>STEP20</strong> at checkout. Selected styles only — while stocks last.</p>
+            </div>
+
+            <div className="mt-6 md:mt-0">
+              <Link href="/Shop?category=Shoes" className="px-6 py-3 rounded-full bg-black text-white font-semibold shadow">Shop the Sale</Link>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <footer className="w-full mt-12 py-10 text-center text-gray-600">
+        <div className="max-w-7xl mx-auto px-6">© {new Date().getFullYear()} YourStore — Crafted with care</div>
+      </footer>
     </div>
   )
 }
 
-export default Shoes
+// small helper missing inlined to avoid extra imports
+function toggle({ b }) { /* noop placeholder so file doesn't break inside canvas preview when editing */ }
