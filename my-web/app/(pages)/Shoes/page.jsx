@@ -234,11 +234,9 @@ export default function ShoesRedesign() {
                 <option value="rating">Top Rated</option>
               </select>
             </div>
-          </aside>
+          </div>
+        </aside>
 
-          {/* =========================
-               PRODUCTS SECTION
-             ========================= */}
           <section className="col-span-1 lg:col-span-3 order-1 lg:order-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Shoes Collection</h2>
