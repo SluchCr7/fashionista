@@ -26,8 +26,8 @@ export default function NotFound() {
         <h2 className="text-3xl md:text-4xl font-bold mt-4">Oops! Page Not Found</h2>
 
         <p className="mt-4 text-gray-300 tracking-wide leading-relaxed">
-          The page you're looking for doesn't exist or has been moved. Double check the URL
-          or return back to the homepage. We're here to guide you.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved. Double check the URL
+          or return back to the homepage. We&apos;re here to guide you.
         </p>
 
         <Link href="/" className="inline-flex items-center gap-2 mt-8 px-6 py-3 rounded-full bg-yellow-400 text-black font-semibold shadow hover:scale-105 transition">
