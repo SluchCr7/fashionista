@@ -120,10 +120,10 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
                   {/* Content */}
                   <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-3xl mx-auto text-center lg:text-left">
                     <p className="text-sm md:text-base text-yellow-300 font-medium tracking-wide mb-3">{slide.eyebrow}</p>
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-white drop-shadow-lg">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-DarkRed drop-shadow-lg">
                       {slide.title}
                     </h2>
-                    <p className="mt-4 text-sm md:text-base text-gray-200 max-w-xl">{slide.description}</p>
+                    <p className="mt-4 text-sm md:text-base text-gray-700 max-w-xl">{slide.description}</p>
 
                     <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:gap-4 justify-center lg:justify-start">
                       <Link href={slide.cta?.href || '/'} className="inline-flex items-center gap-2 bg-yellow-400 text-black font-semibold px-6 py-3 rounded-full text-base uppercase tracking-wide hover:scale-[1.02] transition-shadow shadow-lg">
