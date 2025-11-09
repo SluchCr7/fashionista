@@ -102,12 +102,13 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
                 i === index && (
                   <motion.div
                     key={slide.id}
-                    initial={{ opacity: 0, scale: 1.02 }}
+                    initial={i === 0 ? false : { opacity: 0, scale: 1.02 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.98 }}
                     transition={{ duration: 0.7 }}
                     className="absolute inset-0 w-full h-full flex items-center"
                   >
+
                     {/* Background image */}
                     <div className="absolute inset-0 -z-10 h-full w-full">
                       <div className="relative h-full w-full">
@@ -206,64 +207,6 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
             </div>
           </aside>
         </div>
-      </div>
-
-      {/* PRESET: small sticky CTA on mobile */}
-      <div className="lg:hidden fixed left-3 max-w-[80%] mx-auto w-full right-3 bottom-4 z-40">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="flex items-center w-full justify-between gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-white/80 backdrop-blur-md shadow-[0_4px_25px_rgba(0,0,0,0.1)] border border-white/30"
-        >
-          {/* Left: Image + Text */}
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0">
-              <Image
-                src={slides[index].image}
-                alt="Slide preview"
-                width={64}
-                height={64}
-                className="object-cover w-full h-full"
-              />
-            </div>
-
-            <div className="truncate">
-              <p className="text-[11px] sm:text-xs text-gray-500 leading-tight truncate">
-                {slides[index].eyebrow}
-              </p>
-              <p className="text-sm sm:text-base font-semibold text-gray-900 leading-tight truncate">
-                {typeof slides[index].title === 'string' ? slides[index].title : 'Latest Drop'}
-              </p>
-            </div>
-          </div>
-
-          {/* Right: Controls */}
-          <div className="flex items-center flex-shrink-0 gap-2 sm:gap-3">
-            <button
-              onClick={prev}
-              aria-label="Previous"
-              className="p-2.5 sm:p-3 rounded-full bg-white border border-gray-200 shadow hover:bg-gray-100 active:scale-95 transition"
-            >
-              <FiChevronLeft className="text-gray-700 text-lg sm:text-xl" />
-            </button>
-
-            <Link
-              href={slides[index].cta?.href || '/'}
-              className="bg-yellow-400 hover:bg-yellow-300 active:scale-95 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-semibold text-black shadow transition"
-            >
-              {slides[index].cta?.text || 'Shop Now'}
-            </Link>
-
-            <button
-              onClick={next}
-              aria-label="Next"
-              className="p-2.5 sm:p-3 rounded-full bg-white border border-gray-200 shadow hover:bg-gray-100 active:scale-95 transition"
-            >
-              <FiChevronRight className="text-gray-700 text-lg sm:text-xl" />
-            </button>
-          </div>
-        </motion.div>
       </div>
     </section>
   )

@@ -333,7 +333,7 @@ const Header = () => {
         </div>
 
         {/* === RIGHT: ACTION ICONS === */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 md:gap-6">
           {/* Search */}
           <CiSearch
             onClick={() => setShowSearch(!showSearch)}
