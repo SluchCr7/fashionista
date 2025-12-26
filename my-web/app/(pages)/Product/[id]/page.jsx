@@ -90,7 +90,7 @@ const Product = ({ params }) => {
   }
 
   return (
-    <div className="bg-background min-h-screen pb-20">
+    <div className="bg-background min-h-screen pb-20 pt-10">
       <div className="container mx-auto px-4 md:px-6 py-10">
         {/* Breadcrumb */}
         <nav className="text-sm text-muted-foreground mb-8 flex items-center gap-2">

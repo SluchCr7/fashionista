@@ -1,73 +1,60 @@
 'use client'
-
 import React from "react"
 import { motion } from "framer-motion"
-import Image from "next/image"
 
 const Loader = () => {
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden">
-      
-      {/* === خلفية متحركة ناعمة (Gradient Animated) === */}
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0a0a0a] text-white overflow-hidden">
+
       <motion.div
-        className="absolute inset-0"
-        style={{
-          background: "linear-gradient(135deg, #0f172a, #1e293b, #111827, #0f172a)",
-          backgroundSize: "400% 400%",
-        }}
-        animate={{
-          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-        }}
-        transition={{
-          duration: 14,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="relative z-10 flex flex-col items-center"
+      >
+        {/* Main Brand Text with Split Reveal */}
+        <div className="overflow-hidden mb-6">
+          <motion.h1
+            initial={{ y: 100 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            className="text-5xl md:text-7xl font-light tracking-tighter"
+          >
+            FASHIONISTA
+          </motion.h1>
+        </div>
 
-      {/* طبقة زجاجية شفافة (glass overlay) */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
-
-      {/* === المكون الرئيسي === */}
-      <div className="relative z-10 flex flex-col items-center justify-center gap-10 text-white">
-        
-        {/* الشعار (Logo) */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative flex items-center justify-center"
-        >
-          <motion.div
-            animate={{ scale: [1, 1.1, 1], rotate: [0, 2, -2, 0] }}
-            transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-            className="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-yellow-400/40 via-pink-400/30 to-transparent blur-xl absolute"
-          />
-          <span className="relative text-4xl sm:text-5xl font-extrabold tracking-wide italic drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-            Fash<span className="text-yellow-400">ionista</span>
-          </span>
-        </motion.div>
-
-        {/* سبينر احترافي */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="relative w-14 h-14"
-        >
-          <div className="absolute inset-0 border-4 border-transparent border-t-yellow-400 border-l-yellow-400 rounded-full"></div>
-          <div className="absolute inset-1 border-2 border-white/10 rounded-full"></div>
-        </motion.div>
-
-        {/* نص التحميل */}
+        {/* Subtitle / Tagline */}
         <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="text-sm sm:text-base text-gray-300 tracking-widest uppercase"
+          initial={{ opacity: 0, letterSpacing: "0.2em" }}
+          animate={{ opacity: 0.6, letterSpacing: "0.5em" }}
+          transition={{ delay: 0.8, duration: 1.5, ease: "easeOut" }}
+          className="text-xs md:text-sm uppercase text-white/50 mb-12"
         >
-          Loading your experience...
+          Redefining Style
         </motion.p>
+
+        {/* Elegant Progress Line */}
+        <div className="w-64 h-[2px] bg-white/10 relative overflow-hidden rounded-full">
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: "0%" }}
+            transition={{
+              duration: 2.5,
+              ease: "easeInOut",
+              repeat: Infinity,
+              repeatType: "mirror"
+            }}
+            className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-white to-transparent opacity-80"
+          />
+        </div>
+      </motion.div>
+
+      {/* Background Ambience */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-white/5 blur-[120px] rounded-full" />
       </div>
+
     </div>
   )
 }

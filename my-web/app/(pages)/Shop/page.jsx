@@ -118,7 +118,7 @@ const Shop = () => {
     <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground">
       {/* Sidebar Filter */}
       <aside
-        className={`fixed lg:sticky top-0 z-40 h-screen w-[300px] bg-background border-r border-border p-6 overflow-y-auto transition-transform duration-300 lg:translate-x-0 ${showFilters ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+        className={`fixed lg:sticky top-10 z-40 h-screen w-[300px] bg-background border-r border-border p-6 overflow-y-auto transition-transform duration-300 lg:translate-x-0 ${showFilters ? "translate-x-0 shadow-2xl" : "-translate-x-full"
           }`}
       >
         <div className="flex justify-between items-center mb-8">
@@ -231,7 +231,7 @@ const Shop = () => {
 
       {/* Main Content */}
       <main className="flex-1 p-6 md:p-10">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 py-10">
           <div className="flex items-center gap-4">
             <button onClick={() => setShowFilters(true)} className="lg:hidden flex items-center gap-2 text-sm font-bold uppercase">
               <SlidersHorizontal size={18} /> Filters
