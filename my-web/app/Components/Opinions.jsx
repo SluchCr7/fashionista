@@ -43,7 +43,7 @@ const Opinions = memo(() => {
             >
               <Quote className="w-12 h-12 text-primary mx-auto mb-8 opacity-50" />
               <p className="text-xl md:text-2xl font-serif italic text-foreground/80 leading-relaxed mb-8">
-                "{t.opinion}"
+                {t.opinion}
               </p>
 
               <div className="flex items-center justify-center gap-1 mb-6 text-yellow-500">

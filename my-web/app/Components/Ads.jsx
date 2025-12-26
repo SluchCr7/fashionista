@@ -36,7 +36,7 @@ const Ads = () => {
                 Elevate Your <br /> Everyday Style
               </h2>
               <p className="text-secondary-foreground/80 mb-8 max-w-md text-lg">
-                Discover our curated Women's Collection. Timeless pieces designed for modern elegance and comfort.
+                Discover our curated Women is Collection. Timeless pieces designed for modern elegance and comfort.
               </p>
               <Link
                 href="/Women"
