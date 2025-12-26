@@ -1,11 +1,9 @@
-'use client'
-import React, { useRef, useState, useEffect } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { FaLongArrowAltRight, FaLongArrowAltLeft } from "react-icons/fa"
-import { motion } from 'framer-motion'
-import { CiStar } from "react-icons/ci"
-import Intro from './Intro'
+'use client';
+import React, { useRef, useState, useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowRight, ArrowLeft, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const CollectionSection = ({
   title,
@@ -16,138 +14,132 @@ const CollectionSection = ({
   ctaText = "Shop All Products",
   ctaLink = "/Shop"
 }) => {
-  const scrollRef = useRef(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(false)
+  const scrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   // Scroll Logic
   const scroll = (dir) => {
-    const scrollAmount = dir === "left" ? -400 : 400
-    scrollRef.current?.scrollBy({ left: scrollAmount, behavior: "smooth" })
-  }
+    const scrollAmount = dir === "left" ? -400 : 400;
+    scrollRef.current?.scrollBy({ left: scrollAmount, behavior: "smooth" });
+  };
 
   const handleScrollUpdate = () => {
-    const el = scrollRef.current
+    const el = scrollRef.current;
     if (el) {
-      const left = el.scrollLeft
-      const right = el.scrollWidth > left + el.clientWidth + 10
-      setCanScrollLeft(left > 0)
-      setCanScrollRight(right)
+      const left = el.scrollLeft;
+      const right = el.scrollWidth > left + el.clientWidth + 10;
+      setCanScrollLeft(left > 0);
+      setCanScrollRight(right);
     }
-  }
+  };
 
   useEffect(() => {
-    const el = scrollRef.current
+    const el = scrollRef.current;
     if (el) {
-      el.addEventListener("scroll", handleScrollUpdate)
-      handleScrollUpdate()
-      return () => el.removeEventListener("scroll", handleScrollUpdate)
+      el.addEventListener("scroll", handleScrollUpdate);
+      handleScrollUpdate();
+      return () => el.removeEventListener("scroll", handleScrollUpdate);
     }
-  }, [])
+  }, [products]); // Re-run when products change
+
+  if (!products || products.length === 0) return null;
 
   return (
-    <section className="relative w-full max-w-[1370px] mx-auto px-6 py-20">
-      {/* Gradient Background Elements */}
-      <div className="absolute inset-0 -z-10"></div>
-      <div className="pointer-events-none absolute -top-32 left-0 w-96 h-96 bg-red-200/20 blur-3xl rounded-full -z-10"></div>
-      <div className="pointer-events-none absolute bottom-0 right-0 w-80 h-80 bg-yellow-200/20 blur-3xl rounded-full -z-10"></div>
+    <section className="py-20 bg-background text-foreground">
+      <div className="container mx-auto px-4 md:px-6 relative">
 
-      {/* Intro Section */}
-      <Intro title={title} para={subtitle} />
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold mb-3">{title}</h2>
+            <p className="text-muted-foreground max-w-lg">{subtitle}</p>
+          </div>
 
-      <div className="relative mt-10">
-        {/* Navigation Buttons */}
-        {products.length > 4 && (
-          <>
+          {/* Navigation Buttons */}
+          <div className="flex gap-4 mt-4 md:mt-0">
             <button
               onClick={() => scroll("left")}
               aria-label="Scroll left"
-              className={`absolute top-1/2 -translate-y-1/2 -left-4 z-20 p-4 rounded-full bg-black text-white shadow-lg hover:bg-red-600 transition duration-300 hidden lg:block
-                ${!canScrollLeft && "opacity-30 pointer-events-none"}`}
+              disabled={!canScrollLeft}
+              className="p-3 rounded-full border border-border hover:bg-muted hover:text-foreground transition disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              <FaLongArrowAltLeft className="text-lg" />
+              <ArrowLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => scroll("right")}
               aria-label="Scroll right"
-              className={`absolute top-1/2 -translate-y-1/2 -right-4 z-20 p-4 rounded-full bg-black text-white shadow-lg hover:bg-red-600 transition duration-300 hidden lg:block
-                ${!canScrollRight && "opacity-30 pointer-events-none"}`}
+              disabled={!canScrollRight}
+              className="p-3 rounded-full border border-border hover:bg-muted hover:text-foreground transition disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              <FaLongArrowAltRight className="text-lg" />
+              <ArrowRight className="w-5 h-5" />
             </button>
-          </>
-        )}
+          </div>
+        </div>
 
         {/* Product Cards */}
         <div
           ref={scrollRef}
-          className="flex gap-8 overflow-x-auto scroll-smooth scrollbar-hide py-6"
+          className="flex gap-6 overflow-x-auto scroll-smooth scrollbar-hide py-4 -mx-4 px-4 md:-mx-0 md:px-0"
         >
           {products.map((prod, idx) => {
-            const { avg, count } = showRating ? calculateRating(prod._id) : { avg: null, count: null }
+            const { avg, count } = showRating ? calculateRating(prod._id) : { avg: null, count: null };
 
             return (
               <motion.div
                 key={idx}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                className="min-w-full sm:min-w-[48%] md:min-w-[31%] lg:min-w-[23%] bg-white rounded-2xl shadow-md hover:shadow-2xl transition overflow-hidden"
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: idx * 0.1 }}
+                className="min-w-[280px] md:min-w-[320px] group"
               >
-                <Link href={`/Product/${prod._id}`}>
-                  <div className="relative overflow-hidden h-[420px]">
+                <Link href={`/Product/${prod._id}`} className="block">
+                  <div className="relative overflow-hidden aspect-[3/4] rounded-lg bg-secondary/50 mb-4">
                     <Image
                       src={prod.Photo[0]?.url || '/placeholder.jpg'}
                       alt={prod.name}
-                      width={500}
-                      height={700}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-in-out hover:scale-105"
+                      fill
+                      className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-500">
-                      <span className="bg-white text-black px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-gray-100 transition">
-                        View Product
-                      </span>
-                    </div>
+
+                    {/* Badge if needed (Sale, New) */}
+                    {/* <div className="absolute top-3 left-3 bg-white/90 px-2 py-1 text-xs font-bold uppercase tracking-wider">New</div> */}
+
+                    <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
 
-                  <div className="p-5 text-center">
-                    <h3 className="font-bold text-lg text-gray-900 truncate">{prod.name}</h3>
-                    <p className="text-red-600 font-extrabold text-xl mt-1">${prod.price}</p>
-
-                    {showRating && (
-                      <div className="flex items-center justify-center gap-2 mt-2">
-                        <div className="flex text-yellow-500">
-                          {Array(5)
-                            .fill(0)
-                            .map((_, i) => (
-                              <CiStar
-                                key={i}
-                                className={`text-lg ${i < Math.round(avg) ? 'fill-yellow-500' : 'fill-gray-300'}`}
-                              />
-                            ))}
+                  <div className="space-y-1">
+                    <h3 className="font-medium text-lg leading-tight group-hover:underline decoration-1 underline-offset-4">{prod.name}</h3>
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold text-lg text-foreground">${prod.price}</p>
+                      {showRating && avg > 0 && (
+                        <div className="flex items-center gap-1 text-sm text-yellow-500">
+                          <Star className="w-4 h-4 fill-yellow-500" />
+                          <span>{avg}</span>
+                          <span className="text-muted-foreground text-xs">({count})</span>
                         </div>
-                        <span className="text-gray-800 font-medium text-sm">{avg} / 5</span>
-                        <span className="text-gray-400 text-xs">({count} Reviews)</span>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </Link>
               </motion.div>
-            )
+            );
           })}
         </div>
-      </div>
 
-      {/* CTA */}
-      <div className="mt-14 flex justify-center">
-        <Link
-          href={ctaLink}
-          className="bg-black text-white px-10 py-4 rounded-full font-bold text-lg tracking-wider hover:bg-red-600 transition transform hover:scale-105 shadow-xl"
-        >
-          {ctaText}
-        </Link>
+        {/* CTA */}
+        <div className="mt-12 flex justify-center">
+          <Link
+            href={ctaLink}
+            className="inline-flex items-center bg-primary text-primary-foreground px-8 py-3 rounded-full font-medium transition hover:bg-primary/90"
+          >
+            {ctaText} <ArrowRight className="ml-2 w-4 h-4" />
+          </Link>
+        </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default CollectionSection
+export default CollectionSection;

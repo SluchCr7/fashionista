@@ -1,47 +1,57 @@
-'use client'
-import Image from "next/image";
-import Hero from "./Components/Hero";
-import LatestCollection from "./Components/LatestCollection";
-import BestSeller from "./Components/BestSeller";
-import HomePage from "./Components/HomePage";
-import Opinions from "./Components/Opinions";
-import { useContext, useRef } from "react";
-import Features from "./Components/Features";
-import Categories from "./Components/Categories";
-import Ads from "./Components/Ads";
-import Sponsers from "./Components/Sponsers";
-import HeroPage from "./Components/HeroPage";
-import { IoIosArrowForward } from "react-icons/io";
+'use client';
+import React, { useContext } from "react";
 import { CartContext } from "./Context/Cart";
-import { UserContext } from "./Context/UserContext";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
+import HeroPage from "./Components/HeroPage";
+import Categories from "./Components/Categories";
+import LatestCollection from "./Components/LatestCollection";
+import HomePage from "./Components/HomePage";
+import BestSeller from "./Components/BestSeller";
+import Ads from "./Components/Ads";
+import Features from "./Components/Features";
+import Opinions from "./Components/Opinions";
+import Sponsers from "./Components/Sponsers";
 
 export default function Home() {
-  const { discount } = useContext(CartContext)
+  const { discount } = useContext(CartContext);
+
   return (
-    <div className="flex items-center flex-col relative w-full">
-      <div className="relative w-full">
-        <HeroPage/>
-      </div>
-      <div className="flex flex-col items-center w-full gap-3 py-4">
-        <Categories/>
-        <LatestCollection />
-        <HomePage />
-        {/* <Hero /> */}
-        <BestSeller />
-        {
-          discount > 0 &&
-          <div className="w-full bg-DarkRed p-4 py-24">
-            <div className="max-w-4xl flex mx-auto items-center flex-col md:flex-row justify-between">
-              <span className="text-white text-3xl uppercase font-bold">Grant {discount}% off on all products</span>
-              <button className="bg-transparent border-y-2 border-r border-white text-white pr-9 pl-2 py-2 flex items-center gap-4">Shop Now <IoIosArrowForward /></button>
-            </div>
+    <div className="flex flex-col min-h-screen">
+      <HeroPage />
+
+      <Categories />
+
+      <LatestCollection />
+
+      <HomePage />
+
+      <BestSeller />
+
+      {discount > 0 && (
+        <section className="bg-primary text-primary-foreground py-16">
+          <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-center md:text-left">
+              Get <span className="text-background px-2 bg-foreground/10 rounded">{discount}% OFF</span> on all products!
+            </h2>
+            <Link
+              href="/Shop"
+              className="bg-background text-foreground px-8 py-3 rounded-full font-bold uppercase tracking-wider hover:bg-background/90 transition-colors flex items-center gap-2"
+            >
+              Shop Now <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-        }
-        <Ads/>
-        <Features/>
-        <Opinions />
-        <Sponsers/>
-      </div>
+        </section>
+      )}
+
+      <Ads />
+
+      <Features />
+
+      <Opinions />
+
+      <Sponsers />
     </div>
   );
 }

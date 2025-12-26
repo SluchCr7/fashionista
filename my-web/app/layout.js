@@ -6,38 +6,48 @@ import CartContextProvider from "./Context/Cart";
 import ProductContextProvider from "./Context/ProductContext";
 import ReviewContextProvider, { ReviewContext } from "./Context/ReviewContext";
 import UserContextProvider from "./Context/UserContext";
+import ThemeProvider from "./Context/ThemeContext";
 import "./globals.css";
-import { JetBrains_Mono } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 
-const jetBrainsMono = JetBrains_Mono({
-  subsets: ["latin"]
-  , weight: ["100", "200", "300", "400", "500", "600"]
-  , style: ["normal", "italic"]
-})
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
 export const metadata = {
-  title: `Fashionista`,
-  description: "Fashionista is a fashion website has been created to provide you with the best fashion products that you need.",
+  title: `Fashionista | Premium Fashion`,
+  description: "Discover the latest trends in high-end fashion with Fashionista.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${jetBrainsMono.className} bg-white text-foreground`}
+        className={`${inter.variable} ${playfair.variable} font-sans bg-background text-foreground antialiased`}
       >
-        <UserContextProvider>
-          <CartContextProvider>
-            <ProductContextProvider>
-              <AdContextProvider>
-                <ReviewContextProvider>
-                  <LayoutComponent>
-                    {children}
-                  </LayoutComponent>
-                </ReviewContextProvider>
-              </AdContextProvider>
-            </ProductContextProvider>
-          </CartContextProvider>
-        </UserContextProvider>
+        <ThemeProvider>
+          <UserContextProvider>
+            <CartContextProvider>
+              <ProductContextProvider>
+                <AdContextProvider>
+                  <ReviewContextProvider>
+                    <LayoutComponent>
+                      {children}
+                    </LayoutComponent>
+                  </ReviewContextProvider>
+                </AdContextProvider>
+              </ProductContextProvider>
+            </CartContextProvider>
+          </UserContextProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

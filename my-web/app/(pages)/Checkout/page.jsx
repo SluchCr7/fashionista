@@ -1,9 +1,11 @@
-'use client'
+'use client';
 
-import Image from 'next/image'
-import React, { useContext, useEffect, useState } from 'react'
-import Notify from '../../Components/Notify'
-import { CartContext } from '@/app/Context/Cart'
+import Image from 'next/image';
+import React, { useContext, useEffect, useState } from 'react';
+import { ArrowRight, Lock, MapPin, Truck, CreditCard, ShoppingBag } from 'lucide-react';
+import Notify from '../../Components/Notify';
+import { CartContext } from '@/app/Context/Cart';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CheckoutPage = () => {
   const [checkOutData, setCheckOutData] = useState({
@@ -22,8 +24,10 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
 
   const total = finalCart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const shipping = 10;
+  const grandTotal = total + shipping;
 
-  const handlCheckOut = async () => {
+  const handleCheckOut = async () => {
     if (Object.values(checkOutData).every(val => val !== "")) {
       setLoading(true);
       await submitOrder(ProductsArrOrder, checkOutData.address, checkOutData.phone, total);
@@ -31,7 +35,7 @@ const CheckoutPage = () => {
       setMessage("✅ Order placed successfully!");
       setTimeout(() => setMessage(""), 3000);
     } else {
-      setMessage("⚠️ You must fill all details");
+      setMessage("⚠️ Please fill in all shipping details");
       setTimeout(() => setMessage(""), 3000);
     }
   }
@@ -44,164 +48,134 @@ const CheckoutPage = () => {
   return (
     <>
       <Notify Notify={message} />
-      <div className="min-h-screen bg-gray-50 py-16 px-4 md:px-8 flex justify-center items-start">
-        <div className="flex flex-col md:flex-row gap-10 w-full max-w-6xl">
-
-          {/* Checkout Form */}
-          <div className="flex flex-col gap-8 w-full md:w-1/2 bg-white shadow-lg rounded-2xl p-8 border border-gray-100">
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-wide">
-              Checkout
-            </h1>
-
-            {/* Contact Details */}
-            <section>
-              <h2 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-                Contact Details
-              </h2>
-              <div className="flex flex-col gap-4">
-                <InputField
-                  id="email"
-                  label="Email"
-                  type="email"
-                  value={checkOutData.email}
-                  onChange={(e) => setCheckOutData({ ...checkOutData, email: e.target.value })}
-                />
-                <InputField
-                  id="phone"
-                  label="Phone Number"
-                  type="text"
-                  value={checkOutData.phone}
-                  onChange={(e) => setCheckOutData({ ...checkOutData, phone: e.target.value })}
-                />
-              </div>
-            </section>
-
-            {/* Delivery Details */}
-            <section>
-              <h2 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-                Delivery Details
-              </h2>
-              <div className="flex flex-col gap-4">
-                <InputField
-                  id="name"
-                  label="Full Name"
-                  type="text"
-                  value={checkOutData.name}
-                  onChange={(e) => setCheckOutData({ ...checkOutData, name: e.target.value })}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <InputField
-                    id="address"
-                    label="Address"
-                    type="text"
-                    value={checkOutData.address}
-                    onChange={(e) => setCheckOutData({ ...checkOutData, address: e.target.value })}
-                  />
-                  <InputField
-                    id="city"
-                    label="City"
-                    type="text"
-                    value={checkOutData.city}
-                    onChange={(e) => setCheckOutData({ ...checkOutData, city: e.target.value })}
-                  />
-                  <InputField
-                    id="country"
-                    label="Country"
-                    type="text"
-                    value={checkOutData.country}
-                    onChange={(e) => setCheckOutData({ ...checkOutData, country: e.target.value })}
-                  />
-                  <InputField
-                    id="zip"
-                    label="Zip Code"
-                    type="text"
-                    value={checkOutData.zip}
-                    onChange={(e) => setCheckOutData({ ...checkOutData, zip: e.target.value })}
-                  />
-                </div>
-              </div>
-            </section>
-
-            <div className="flex items-center gap-3 pt-2">
-              <div className="w-4 h-4 rounded-full bg-green-600 shadow-inner"></div>
-              <span className="text-sm font-medium text-gray-700">Cash on Delivery</span>
-            </div>
-
-            <button
-              onClick={handlCheckOut}
-              disabled={loading}
-              className={`mt-4 w-full py-3 rounded-lg text-white font-semibold tracking-wide transition-all duration-300 
-                ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-gray-900 hover:bg-red-700 shadow-md hover:shadow-lg"}`}
-            >
-              {loading ? "Processing..." : "Place Order"}
-            </button>
+      <div className="min-h-screen bg-background py-10 md:py-20 px-4 md:px-8">
+        <div className="container mx-auto max-w-6xl">
+          {/* Header */}
+          <div className="mb-10 text-center md:text-left">
+            <h1 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-4">Checkout</h1>
+            <p className="text-muted-foreground flex items-center justify-center md:justify-start gap-2">
+              <Lock className="w-4 h-4" /> Secure Checkout
+            </p>
           </div>
 
-          {/* Order Summary */}
-          <div className="flex flex-col gap-6 w-full md:w-1/2 bg-white shadow-lg rounded-2xl p-8 border border-gray-100">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-wide">
-              Order Summary
-            </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20">
 
-            {finalCart.length === 0 ? (
-              <p className="text-gray-500 text-center py-10">No items in your cart.</p>
-            ) : (
-              <>
-                <div className="space-y-4">
-                  {finalCart.map((prod) => (
-                    <div key={prod._id} className="flex justify-between items-center border-t border-gray-200 pt-4">
-                      <div className="flex gap-4 items-center">
-                        <Image
-                          src={prod?.Photo[0]?.url}
-                          alt={prod?.name}
-                          width={80}
-                          height={80}
-                          className="rounded-md object-cover w-[80px] h-[80px] hover:scale-105 transition-transform duration-300"
-                        />
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">{prod?.name}</h3>
-                          <p className="text-sm text-gray-600">
-                            Size: <span className="font-semibold text-gray-800">{prod?.size}</span> | 
-                            Color: <span className="font-semibold text-gray-800">{prod?.color}</span>
-                          </p>
+            {/* Form Section */}
+            <div className="lg:col-span-7 space-y-10">
+              {/* Contact */}
+              <section className="space-y-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">1</div>
+                  <h2 className="text-xl font-bold font-serif uppercase tracking-wider">Contact Information</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <InputField id="email" label="Email Address" type="email" value={checkOutData.email} onChange={(e) => setCheckOutData({ ...checkOutData, email: e.target.value })} />
+                  <InputField id="phone" label="Phone Number" type="tel" value={checkOutData.phone} onChange={(e) => setCheckOutData({ ...checkOutData, phone: e.target.value })} />
+                </div>
+              </section>
+
+              {/* Shipping */}
+              <section className="space-y-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">2</div>
+                  <h2 className="text-xl font-bold font-serif uppercase tracking-wider">Shipping Address</h2>
+                </div>
+                <div className="space-y-6">
+                  <InputField id="name" label="Full Name" type="text" value={checkOutData.name} onChange={(e) => setCheckOutData({ ...checkOutData, name: e.target.value })} />
+                  <InputField id="address" label="Address" type="text" value={checkOutData.address} onChange={(e) => setCheckOutData({ ...checkOutData, address: e.target.value })} />
+                  <div className="grid grid-cols-2 gap-6">
+                    <InputField id="city" label="City" type="text" value={checkOutData.city} onChange={(e) => setCheckOutData({ ...checkOutData, city: e.target.value })} />
+                    <InputField id="zip" label="Zip Code" type="text" value={checkOutData.zip} onChange={(e) => setCheckOutData({ ...checkOutData, zip: e.target.value })} />
+                  </div>
+                  <InputField id="country" label="Country" type="text" value={checkOutData.country} onChange={(e) => setCheckOutData({ ...checkOutData, country: e.target.value })} />
+                </div>
+              </section>
+
+              {/* Payment Method (Visual Only for now) */}
+              <section className="space-y-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">3</div>
+                  <h2 className="text-xl font-bold font-serif uppercase tracking-wider">Payment Method</h2>
+                </div>
+                <div className="p-4 border border-border rounded-xl flex items-center gap-4 bg-secondary/20">
+                  <div className="w-12 h-12 bg-green-500/10 text-green-600 rounded-full flex items-center justify-center">
+                    <Truck className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">Cash on Delivery</h3>
+                    <p className="text-sm text-muted-foreground">Pay upon receiving your order.</p>
+                  </div>
+                  <div className="ml-auto w-4 h-4 rounded-full border-2 border-primary bg-primary" />
+                </div>
+              </section>
+
+              <button
+                onClick={handleCheckOut}
+                disabled={loading}
+                className="w-full py-4 bg-primary text-primary-foreground font-bold uppercase tracking-widest rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? "Processing..." : <>Complete Order <ArrowRight size={20} /></>}
+              </button>
+            </div>
+
+            {/* Order Summary */}
+            <div className="lg:col-span-5">
+              <div className="bg-secondary/20 rounded-2xl p-6 md:p-10 sticky top-24 border border-border">
+                <h2 className="text-2xl font-serif font-bold mb-8">Order Summary</h2>
+
+                {finalCart.length === 0 ? (
+                  <div className="text-center py-10">
+                    <ShoppingBag className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">Your cart seems empty.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                      {finalCart.map((prod) => (
+                        <div key={prod._id} className="flex gap-4">
+                          <div className="relative w-16 h-20 bg-background rounded-md overflow-hidden flex-shrink-0 border border-border">
+                            <Image src={prod?.Photo?.[0]?.url || '/placeholder.jpg'} alt={prod.name} fill className="object-cover" />
+                            <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-bl">x{prod.quantity}</span>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-bold text-sm line-clamp-2">{prod.name}</h3>
+                            <p className="text-xs text-muted-foreground mt-1">{prod.size} / {prod.color}</p>
+                          </div>
+                          <div className="font-bold text-sm">
+                            ${(prod.price * prod.quantity).toFixed(2)}
+                          </div>
                         </div>
+                      ))}
+                    </div>
+
+                    <div className="border-t border-border pt-6 space-y-3">
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Subtotal</span>
+                        <span>${total.toFixed(2)}</span>
                       </div>
-                      <div className="text-right text-sm text-gray-700">
-                        <span className="font-semibold">${prod?.price}</span> × {prod?.quantity}
-                        <p className="font-bold text-gray-900">${prod?.price * prod?.quantity}</p>
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Shipping</span>
+                        <span>${shipping.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-xl font-bold text-foreground border-t border-border pt-4">
+                        <span>Total</span>
+                        <span>${grandTotal.toFixed(2)}</span>
                       </div>
                     </div>
-                  ))}
-                </div>
-
-                <div className="border-t pt-4 space-y-2 text-sm text-gray-700">
-                  <div className="flex justify-between">
-                    <span>Subtotal</span>
-                    <span className="font-bold">${total.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Shipping</span>
-                    <span className="font-bold">$10.00</span>
-                  </div>
-                  <div className="flex justify-between text-lg font-extrabold border-t pt-3">
-                    <span>Total</span>
-                    <span>${(total + 10).toFixed(2)}</span>
-                  </div>
-                </div>
-              </>
-            )}
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-/* === حقل إدخال مع تصميم احترافي === */
 const InputField = ({ id, label, type, value, onChange }) => (
-  <div className="flex flex-col gap-1">
-    <label htmlFor={id} className="text-sm font-medium text-gray-700">
+  <div className="flex flex-col gap-2 relative group">
+    <label htmlFor={id} className="text-xs font-bold uppercase tracking-wider text-muted-foreground group-focus-within:text-primary transition-colors">
       {label}
     </label>
     <input
@@ -209,9 +183,10 @@ const InputField = ({ id, label, type, value, onChange }) => (
       type={type}
       value={value}
       onChange={onChange}
-      className="border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-red-600 outline-none transition-all duration-200 focus:border-red-600"
+      className="bg-background border border-border rounded-lg px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground/30"
+      placeholder={`Enter your ${label.toLowerCase()}`}
     />
   </div>
-)
+);
 
-export default CheckoutPage
+export default CheckoutPage;

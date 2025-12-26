@@ -1,97 +1,111 @@
-'use client'
-import Notify from '@/app/Components/Notify'
-import { UserContext } from '@/app/Context/UserContext'
-import Image from 'next/image'
-import Link from 'next/link'
-import React, { useContext, useState } from 'react'
+'use client';
+import Notify from '@/app/Components/Notify';
+import { UserContext } from '@/app/Context/UserContext';
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useContext, useState } from 'react';
+import { ArrowRight, Lock } from 'lucide-react';
 
 const Login = () => {
-  const [email , setEmail] = useState("")
-  const [password, setPass] = useState("")
-  const [message, setMessage] = useState("")
-  const [loading, setLoading] = useState(false)
-  const { Login } = useContext(UserContext)
+  const [email, setEmail] = useState("");
+  const [password, setPass] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { Login } = useContext(UserContext);
 
-  const handleLogin = async () => {
-    if(email === "" || password === ""){
-      setMessage("Enter Your Email And Password")
-      setTimeout(() => setMessage(""), 3000)
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (email === "" || password === "") {
+      setMessage("Please enter email and password");
+      setTimeout(() => setMessage(""), 3000);
     } else {
       try {
-        setLoading(true)
-        await Login(email, password)
+        setLoading(true);
+        await Login(email, password);
       } catch (err) {
-        setMessage("Invalid Email or Password")
-        setTimeout(() => setMessage(""), 3000)
+        setMessage("Invalid credentials");
+        setTimeout(() => setMessage(""), 3000);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
   }
 
   return (
     <>
-      <Notify Notify={message}/>
-      <div className='flex items-center flex-col md:flex-row gap-6 w-full min-h-screen'>
-        
-        {/* Form Section */}
-        <div className='flex items-center flex-col gap-4 px-10 py-5 w-full'>
-          <div className='w-full md:w-[70%] border border-gray-300 shadow-lg p-10 rounded-lg bg-white flex items-center flex-col gap-6'>
-            
-            <span className='text-black font-bold text-3xl'>Sluchwsky</span>
-            <p className='text-sm tracking-[1px] text-gray-600'>Login now and start discovering your dreams</p>
-            
-            <div className='flex flex-col gap-4 w-full'>
-              {/* Email */}
-              <div className='flex flex-col gap-1 w-full'>
-                <label htmlFor="Email" className='text-sm font-medium'>Email</label>
-                <input 
-                  value={email} 
-                  onChange={(e)=> setEmail(e.target.value)} 
-                  id='Email' 
-                  type="email" 
-                  className='p-2 w-full rounded border border-gray-400 bg-transparent text-black focus:outline-none focus:border-black' 
-                />
-              </div>
-              
-              {/* Password */}
-              <div className='flex flex-col gap-1 w-full'>
-                <label htmlFor="Password" className='text-sm font-medium'>Password</label>
-                <input 
-                  value={password} 
-                  onChange={(e)=> setPass(e.target.value)} 
-                  id='Password' 
-                  type="password" 
-                  className='p-2 w-full rounded border border-gray-400 bg-transparent text-black focus:outline-none focus:border-black' 
-                />
-              </div>
-              
-              {/* Button */}
-              <button 
-                onClick={handleLogin} 
-                disabled={loading}
-                className={`p-3 w-full rounded-md text-white uppercase transition 
-                ${loading ? 'bg-gray-600 cursor-not-allowed' : 'bg-black hover:bg-gray-800'}`}
-              >
-                {loading ? "Logging in..." : "Login"}
-              </button>
-              
-              {/* Signup Link */}
-              <span className='text-sm text-gray-700'>
-                Don&apos;t have an Account?{" "}
-                <Link href={"/Register"} className='font-bold text-black hover:underline'>Sign Up</Link>
-              </span>
-            </div>
+      <Notify Notify={message} />
+      <div className="flex min-h-screen bg-background text-foreground">
+
+        {/* Image Side */}
+        <div className="hidden lg:block w-1/2 relative bg-secondary/20">
+          <Image
+            src="/Hero/HeroWomen.jpg" // Using an existing image
+            alt="Login Visual"
+            fill
+            className="object-cover mix-blend-multiply opacity-80"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-20 text-white">
+            <h2 className="text-4xl font-serif font-bold mb-4">Welcome Back</h2>
+            <p className="text-lg opacity-80">Sign in to access your curated fashion feed and exclusive offers.</p>
           </div>
         </div>
 
-        {/* Image Section */}
-        <div className='hidden md:block w-full'>
-          <Image src={"/assets/login.webp"} width={500} height={500} className='w-full h-auto rounded-lg' alt='login_bg'/>
+        {/* Form Side */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16">
+          <div className="w-full max-w-md space-y-10">
+            <div className="text-center">
+              <Link href="/" className="inline-block mb-8">
+                <h1 className="text-3xl font-serif font-bold tracking-tighter uppercase">Fashion<span className="text-primary">ista</span></h1>
+              </Link>
+              <h2 className="text-2xl font-bold mb-2">Login to your account</h2>
+              <p className="text-muted-foreground">Enter your details below to continue.</p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-secondary/30 border border-border rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  placeholder="john@example.com"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Password</label>
+                  <Link href="/Forgot" className="text-xs text-primary hover:underline">Forgot password?</Link>
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPass(e.target.value)}
+                  className="w-full bg-secondary/30 border border-border rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-primary text-primary-foreground py-4 rounded-full font-bold uppercase tracking-widest hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? "Signing In..." : <>Login <ArrowRight size={18} /></>}
+              </button>
+            </form>
+
+            <div className="text-center text-sm text-muted-foreground">
+              Don&apos;t have an account?{" "}
+              <Link href="/Register" className="text-primary font-bold hover:underline">Sign Up</Link>
+            </div>
+          </div>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

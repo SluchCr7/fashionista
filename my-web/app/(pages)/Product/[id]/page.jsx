@@ -1,26 +1,32 @@
 "use client";
-import React, { useContext, useEffect, useState, useMemo } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ProductContext } from "@/app/Context/ProductContext";
 import { UserContext } from "@/app/Context/UserContext";
 import { CartContext } from "@/app/Context/Cart";
-import { motion } from "framer-motion";
+import { useTheme } from "@/app/Context/ThemeContext";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import axios from "axios";
-import { Star, Heart } from "lucide-react";
+import { Star, Heart, ShoppingBag, Minus, Plus, Share2, AlertCircle } from "lucide-react";
 import ProductSkeleton from "@/app/Skeletons/ProductSkeleton";
 
 const Product = ({ params }) => {
   const { id } = params;
   const { products } = useContext(ProductContext);
-  const { cart, addToCart } = useContext(CartContext);
+  const { addToCart } = useContext(CartContext);
   const { user } = useContext(UserContext);
+  const { theme } = useTheme();
+
   const [product, setProduct] = useState({});
+  const [activeImage, setActiveImage] = useState(0);
   const [adding, setAdding] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [message, setMessage] = useState("");
+  const [tabs, setTabs] = useState("description");
 
-  // ✅ تحميل المنتج
+  // Load Product
   useEffect(() => {
     const selected = products.find((p) => p._id === id);
     if (selected) {
@@ -28,7 +34,7 @@ const Product = ({ params }) => {
     }
   }, [id, products]);
 
-  // ✅ فحص هل المنتج في المفضلة أم لا
+  // Check Favorite
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("Data"));
     if (stored && stored.favorites?.includes(id)) {
@@ -36,7 +42,6 @@ const Product = ({ params }) => {
     }
   }, [id]);
 
-  // ✅ إضافة / إزالة من المفضلة
   const toggleFavourite = async () => {
     if (!user) {
       setMessage("Please login first");
@@ -55,7 +60,6 @@ const Product = ({ params }) => {
       setMessage(message);
       setTimeout(() => setMessage(""), 2000);
 
-      // تحديث localStorage
       const stored = JSON.parse(localStorage.getItem("Data"));
       if (stored) {
         if (newStatus && !stored.favorites.includes(id)) {
@@ -71,12 +75,13 @@ const Product = ({ params }) => {
     }
   };
 
-  // ✅ إضافة للسلة
   const handleAddToCart = () => {
     setAdding(true);
     setTimeout(() => {
       addToCart(product, quantity);
       setAdding(false);
+      setMessage("Added to cart!");
+      setTimeout(() => setMessage(""), 2000);
     }, 600);
   };
 
@@ -85,212 +90,224 @@ const Product = ({ params }) => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10">
-      {/* Breadcrumb */}
-      <div className="text-sm text-gray-500 mb-6">
-        Home / {product.category} /{" "}
-        <span className="text-black">{product.name}</span>
-      </div>
+    <div className="bg-background min-h-screen pb-20">
+      <div className="container mx-auto px-4 md:px-6 py-10">
+        {/* Breadcrumb */}
+        <nav className="text-sm text-muted-foreground mb-8 flex items-center gap-2">
+          <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+          <span>/</span>
+          <Link href={`/Shop`} className="hover:text-primary transition-colors">{product.category}</Link>
+          <span>/</span>
+          <span className="text-foreground font-medium truncate max-w-[200px]">{product.name}</span>
+        </nav>
 
-      {/* Alert Message */}
-      {message && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-black text-white text-center py-2 mb-4 rounded-lg"
-        >
-          {message}
-        </motion.div>
-      )}
-
-      {/* Main Content */}
-      <div className="flex flex-col md:flex-row gap-10">
-        {/* Image Gallery */}
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="flex-1"
-        >
-          <div className="relative">
-            <Image
-              src={product?.Photo?.[0]?.url}
-              alt={product.name}
-              width={600}
-              height={600}
-              className="w-full h-auto rounded-2xl object-cover shadow-lg"
-              priority
-            />
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={toggleFavourite}
-              className={`absolute top-4 right-4 p-3 rounded-full shadow-md transition ${
-                isFavorite
-                  ? "bg-red-600 text-white"
-                  : "bg-white hover:bg-gray-100 text-gray-600"
-              }`}
+        {/* Floating Messages */}
+        <AnimatePresence>
+          {message && (
+            <motion.div
+              initial={{ opacity: 0, y: -50, x: "-50%" }}
+              animate={{ opacity: 1, y: 0, x: "-50%" }}
+              exit={{ opacity: 0, y: -20, x: "-50%" }}
+              className="fixed top-24 left-1/2 z-50 bg-foreground text-background px-6 py-3 rounded-full shadow-2xl flex items-center gap-2"
             >
-              <Heart
-                size={22}
-                fill={isFavorite ? "white" : "none"}
-                strokeWidth={1.8}
-              />
-            </motion.button>
-          </div>
+              <AlertCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">{message}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          <div className="flex gap-3 mt-4">
-            {product?.Photo?.slice(0, 4).map((img, idx) => (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20">
+          {/* Left: Gallery */}
+          <div className="space-y-6">
+            <motion.div
+              layoutId={`product-image-${id}`}
+              className="relative aspect-[3/4] md:aspect-square bg-secondary/30 rounded-2xl overflow-hidden"
+            >
               <Image
-                key={idx}
-                src={img.url}
-                alt={`thumb-${idx}`}
-                width={100}
-                height={100}
-                className="w-20 h-20 object-cover rounded-lg cursor-pointer hover:scale-105 transition-transform"
+                src={product?.Photo?.[activeImage]?.url}
+                alt={product.name}
+                fill
+                className="object-cover"
+                priority
               />
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Product Details */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="flex-1 space-y-6"
-        >
-          <h1 className="text-4xl font-extrabold text-gray-900">
-            {product.name}
-          </h1>
-
-          {/* Rating */}
-          <div className="flex items-center gap-1 text-yellow-500">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={18} fill="currentColor" />
-            ))}
-            <span className="text-sm text-gray-500 ml-2">
-              ({product.reviews?.length || 0} Reviews)
-            </span>
-          </div>
-
-          {/* Price */}
-          <p className="text-3xl font-bold text-red-600">${product.price}</p>
-
-          {/* Stock / Brand / Gender */}
-          <div className="space-y-1 text-gray-700">
-            <p>
-              <span className="font-semibold">Brand:</span>{" "}
-              {product.brand || "N/A"}
-            </p>
-            <p>
-              <span className="font-semibold">Gender:</span>{" "}
-              {product.gender || "Unisex"}
-            </p>
-            <p>
-              <span className="font-semibold">Status:</span>{" "}
-              {product.stock > 0 ? (
-                <span className="text-green-600">In Stock</span>
-              ) : (
-                <span className="text-red-500">Out of Stock</span>
-              )}
-            </p>
-          </div>
-
-          {/* Description */}
-          <p className="text-gray-600 leading-relaxed">
-            {product.description ||
-              "This premium product is designed for comfort and durability."}
-          </p>
-
-          {/* Quantity + Add to Cart */}
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex items-center border rounded-xl overflow-hidden">
               <button
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="px-3 py-2 text-xl font-bold text-gray-600 hover:bg-gray-100 transition"
+                onClick={toggleFavourite}
+                className={`absolute top-4 right-4 p-3 rounded-full backdrop-blur-md transition-all duration-300 ${isFavorite
+                    ? "bg-destructive text-destructive-foreground"
+                    : "bg-background/80 text-foreground hover:bg-background"
+                  }`}
               >
-                −
+                <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
               </button>
-              <span className="px-5 py-2 text-lg font-semibold">
-                {quantity}
-              </span>
+            </motion.div>
+
+            <div className="grid grid-cols-4 or grid-cols-5 gap-4">
+              {product?.Photo?.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImage(idx)}
+                  className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${activeImage === idx ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"
+                    }`}
+                >
+                  <Image
+                    src={img.url}
+                    alt={`View ${idx}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Details */}
+          <div className="flex flex-col justify-center">
+            <div className="mb-2">
+              {product.stock > 0 ? (
+                <span className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider bg-green-500/10 text-green-600 rounded-full">
+                  In Stock
+                </span>
+              ) : (
+                <span className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider bg-destructive/10 text-destructive rounded-full">
+                  Out of Stock
+                </span>
+              )}
+            </div>
+
+            <h1 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-4 leading-tight">
+              {product.name}
+            </h1>
+
+            <div className="flex items-center gap-4 mb-6">
+              <span className="text-2xl md:text-3xl font-medium text-destructive">${product.price}</span>
+              <div className="flex items-center gap-1 text-yellow-500">
+                <Star size={18} fill="currentColor" />
+                <span className="text-foreground font-medium text-sm ml-1">4.8</span>
+                <span className="text-muted-foreground text-sm">({product.reviews?.length || 12} reviews)</span>
+              </div>
+            </div>
+
+            <p className="text-muted-foreground leading-relaxed mb-8 text-lg">
+              {product.description || "Experience the perfect blend of style and comfort. Meticulously available in premium materials to ensure durability and elegance for every occasion."}
+            </p>
+
+            {/* Selectors */}
+            <div className="space-y-6 mb-8">
+              {/* Quantity */}
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-bold uppercase tracking-wider text-muted-foreground w-20">Quantity</span>
+                <div className="flex items-center border border-border rounded-full p-1">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+                  >
+                    <Minus size={16} />
+                  </button>
+                  <span className="w-10 text-center font-medium">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-10">
               <button
-                onClick={() => setQuantity((q) => q + 1)}
-                className="px-3 py-2 text-xl font-bold text-gray-600 hover:bg-gray-100 transition"
+                onClick={handleAddToCart}
+                disabled={adding || product.stock <= 0}
+                className="flex-1 bg-primary text-primary-foreground h-14 rounded-full font-bold uppercase tracking-wider hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:-translate-y-1"
               >
-                +
+                {adding ? (
+                  <span className="animate-pulse">Adding...</span>
+                ) : (
+                  <>
+                    <ShoppingBag size={20} /> Add to Cart
+                  </>
+                )}
+              </button>
+              <button className="h-14 w-14 flex items-center justify-center border border-border rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                <Share2 size={20} />
               </button>
             </div>
 
-            <button
-              onClick={handleAddToCart}
-              disabled={adding}
-              className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition ${
-                adding
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-red-600 hover:bg-red-700"
-              }`}
-            >
-              {adding ? (
-                <>
-                  <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
-                  <span>Adding...</span>
-                </>
-              ) : (
-                <>
-                  <span>🛒</span> Add to Cart
-                </>
-              )}
-            </button>
+            {/* Accordion / Tabs */}
+            <div className="border-t border-border pt-8">
+              <div className="flex gap-8 mb-6 border-b border-border">
+                {['description', 'details', 'reviews'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setTabs(tab)}
+                    className={`pb-4 text-sm font-bold uppercase tracking-wider transition-all relative ${tabs === tab ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                  >
+                    {tab}
+                    {tabs === tab && (
+                      <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 w-full h-0.5 bg-primary" />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={tabs}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="text-muted-foreground leading-relaxed min-h-[100px]"
+                >
+                  {tabs === 'description' && (
+                    <p>{product.description || "The quintessential piece for your wardrobe."}</p>
+                  )}
+                  {tabs === 'details' && (
+                    <ul className="list-disc pl-5 space-y-2">
+                      <li>Brand: {product.brand || "Fashionista"}</li>
+                      <li>Category: {product.category}</li>
+                      <li>Gender: {product.gender || "Unisex"}</li>
+                      <li>SKU: {product._id?.substring(0, 8).toUpperCase()}</li>
+                    </ul>
+                  )}
+                  {tabs === 'reviews' && (
+                    <div className="text-sm">
+                      {product.reviews?.length > 0 ? (
+                        "Reviews list would go here."
+                      ) : (
+                        "No reviews yet. Be the first to review!"
+                      )}
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
-        </motion.div>
-      </div>
-
-      {/* Tabs Section */}
-      <div className="mt-12">
-        <div className="border-b flex gap-6 text-gray-600 font-semibold">
-          <button className="pb-2 border-b-2 border-black">Description</button>
-          <button className="pb-2 hover:border-b-2 hover:border-gray-400">
-            Details
-          </button>
-          <button className="pb-2 hover:border-b-2 hover:border-gray-400">
-            Reviews
-          </button>
         </div>
-        <div className="mt-4 text-gray-700 leading-relaxed">
-          <p>{product.description || "No additional details available."}</p>
-        </div>
-      </div>
 
-      {/* Related Products */}
-      <div className="mt-16">
-        <h2 className="text-xl font-bold mb-6">Related Products</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {products
-            .filter(
-              (p) =>
-                p.category === product.category && p._id !== product._id
-            )
-            .slice(0, 5)
-            .map((p) => (
-              <motion.div
-                key={p._id}
-                whileHover={{ scale: 1.05 }}
-                className="cursor-pointer"
-              >
-                <Image
-                  src={p.Photo?.[0]?.url}
-                  alt={p.name}
-                  width={300}
-                  height={300}
-                  className="w-full h-60 object-cover rounded-lg shadow-md"
-                />
-                <div className="mt-2">
-                  <span className="block text-black font-semibold">
-                    {p.name}
-                  </span>
-                  <span className="text-red-600 font-bold">${p.price}</span>
-                </div>
-              </motion.div>
-            ))}
+        {/* Related Products */}
+        <div className="mt-20">
+          <h2 className="text-3xl font-serif font-bold mb-10">You May Also Like</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {products
+              .filter((p) => p.category === product.category && p._id !== product._id)
+              .slice(0, 4)
+              .map((p) => (
+                <Link key={p._id} href={`/Product/${p._id}`} className="group block">
+                  <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-secondary/30 mb-4">
+                    <Image
+                      src={p.Photo?.[0]?.url}
+                      alt={p.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <h3 className="font-serif font-bold text-lg leading-tight group-hover:underline underline-offset-4">{p.name}</h3>
+                  <p className="text-muted-foreground mt-1">${p.price}</p>
+                </Link>
+              ))}
+          </div>
         </div>
       </div>
     </div>

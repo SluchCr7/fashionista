@@ -4,8 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiArrowRight, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
-
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const DEFAULT_SLIDES = [
   {
@@ -14,14 +13,13 @@ const DEFAULT_SLIDES = [
     eyebrow: 'Limited Time',
     title: (
       <>
-        Grab up to <span className="text-yellow-400">50% Off</span>
+        Grab up to <span className="text-destructive">50% Off</span>
         <br /> Selected Styles
       </>
     ),
     description:
       'Signature pieces, reinvented. Fast shipping — find your new favorite look today.',
     cta: { text: 'Shop Now', href: '/shop' },
-    theme: 'light',
   },
   {
     id: 's2',
@@ -29,12 +27,11 @@ const DEFAULT_SLIDES = [
     eyebrow: 'New Arrival',
     title: (
       <>
-        Summer <span className="text-yellow-400">Collection</span> 2025
+        Summer <span className="text-destructive">Collection</span> 2025
       </>
     ),
     description: 'Breezy silhouettes and fresh palettes — built for the season.',
     cta: { text: 'Explore Collection', href: '/collections' },
-    theme: 'dark',
   },
   {
     id: 's3',
@@ -42,12 +39,11 @@ const DEFAULT_SLIDES = [
     eyebrow: 'Exclusive',
     title: (
       <>
-        Limited Edition <span className="text-yellow-400">Pieces</span>
+        Limited Edition <span className="text-destructive">Pieces</span>
       </>
     ),
     description: 'Premium materials. Exceptional details. Once they’re gone — they’re gone.',
-    cta: { text: 'Discover More', href: '/limited' },
-    theme: 'light',
+    cta: { text: 'Discover More', href: '/shop' },
   },
 ]
 
@@ -66,7 +62,6 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
   }, [autoPlay, isPaused, interval, count])
 
   useEffect(() => {
-    // cleanup on unmount
     return () => clearInterval(timer.current)
   }, [])
 
@@ -74,7 +69,6 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
   const next = () => go(index + 1)
   const prev = () => go(index - 1)
 
-  // keyboard accessibility
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'ArrowRight') next()
@@ -87,113 +81,128 @@ export default function Hero({ slides = DEFAULT_SLIDES, autoPlay = true, interva
   return (
     <section
       aria-label="Hero"
-      className="relative w-full overflow-hidden bg-gray-50"
+      className="relative w-full overflow-hidden bg-background py-6"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onFocus={() => setIsPaused(true)}
       onBlur={() => setIsPaused(false)}
     >
-      <div className="max-w-[1400px] mx-auto">
+      <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          {/* Left / Main slider (dominant) */}
-          <div className="col-span-12 lg:col-span-8 relative min-h-[420px] lg:min-h-[640px] rounded-xl overflow-hidden">
-            {slides.map((slide, i) => (
-              i === index && (
-                <div
-                  key={slide.id}
-                  className="absolute inset-0 w-full h-full flex items-center"
-                >
-
-                  {/* Background image */}
-                  <div className="absolute inset-0 -z-10 h-full w-full">
-                    <div className="relative h-[420px] lg:h-[640px] w-full overflow-hidden rounded-xl">
+          {/* Main Slider */}
+          <div className="col-span-12 lg:col-span-8 relative min-h-[420px] lg:min-h-[640px] rounded-2xl overflow-hidden shadow-2xl">
+            <AnimatePresence mode="wait">
+              {slides.map((slide, i) => (
+                i === index && (
+                  <motion.div
+                    key={slide.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.7 }}
+                    className="absolute inset-0 w-full h-full flex items-center justify-center p-8 md:p-16"
+                  >
+                    {/* Background Image */}
+                    <div className="absolute inset-0 -z-10">
                       <Image
                         src={slide.image}
-                        alt={typeof slide.title === 'string' ? slide.title : 'Hero image'}
+                        alt="Hero Image"
                         fill
                         className="object-cover object-center"
+                        priority
                       />
-                      <div className="absolute inset-0 bg-black/25" />
+                      <div className="absolute inset-0 bg-black/40" /> {/* Overlay for readability */}
                     </div>
-                  </div>
 
-                  {/* Content */}
-                  <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-3xl mx-auto text-center lg:text-left">
-                    <p className="text-sm md:text-base text-yellow-300 font-medium tracking-wide mb-3">{slide.eyebrow}</p>
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-DarkRed drop-shadow-lg">
-                      {slide.title}
-                    </h2>
-                    <p className="mt-4 text-sm md:text-base text-gray-700 max-w-xl">{slide.description}</p>
-
-                    <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:gap-4 justify-center lg:justify-start">
-                      <Link href={slide.cta?.href || '/'} className="inline-flex items-center gap-2 bg-yellow-400 text-black font-semibold px-6 py-3 rounded-full text-base uppercase tracking-wide hover:scale-[1.02] transition-shadow shadow-lg">
-                        {slide.cta?.text || 'Shop Now'} <FiArrowRight />
-                      </Link>
-
-                      {slide.cta?.secondary && (
-                        <Link href={slide.cta.secondary.href} className="mt-3 sm:mt-0 inline-flex items-center gap-2 text-white/90 px-4 py-2 rounded-md border border-white/20 hover:bg-white/5 transition">
-                          {slide.cta.secondary.text}
+                    {/* Content */}
+                    <div className="relative z-10 text-center text-white max-w-2xl">
+                      <motion.span
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-widest uppercase bg-white/20 backdrop-blur-sm rounded-full"
+                      >
+                        {slide.eyebrow}
+                      </motion.span>
+                      <motion.h2
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-4xl md:text-6xl font-serif font-bold leading-tight mb-6"
+                      >
+                        {slide.title}
+                      </motion.h2>
+                      <motion.p
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="text-lg md:text-xl text-white/90 mb-8 font-light"
+                      >
+                        {slide.description}
+                      </motion.p>
+                      <motion.div
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        <Link href={slide.cta?.href || '/shop'} className="inline-flex items-center gap-2 bg-white text-black font-medium px-8 py-3 rounded-full hover:bg-white/90 transition-colors">
+                          {slide.cta?.text || 'Shop Now'} <ArrowRight className="w-5 h-5" />
                         </Link>
-                      )}
+                      </motion.div>
                     </div>
-                  </div>
-
-                  {/* Navigation arrows (large screens) */}
-                  <div className="hidden lg:flex absolute right-6 top-1/2 -translate-y-1/2 flex-col gap-3 z-20">
-                    <button aria-label="Previous slide" onClick={prev} className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur text-white shadow">
-                      <FiChevronLeft />
-                    </button>
-                    <button aria-label="Next slide" onClick={next} className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur text-white shadow">
-                      <FiChevronRight />
-                    </button>
-                  </div>
-                </div>
-              )
-            ))}
-
-            {/* Small dots (below) */}
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-6 z-30 flex items-center gap-3">
-              {slides.map((s, i) => (
-                <button
-                  key={s.id}
-                  onClick={() => go(i)}
-                  aria-label={`Go to slide ${i + 1}`}
-                  className={`w-10 h-2 rounded-full transition-all ${i === index ? 'bg-white' : 'bg-white/40 hover:bg-white/70'}`}
-                />
+                  </motion.div>
+                )
               ))}
+            </AnimatePresence>
+
+            {/* Arrows */}
+            <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between z-20 pointer-events-none">
+              <button
+                onClick={prev}
+                className="pointer-events-auto p-2 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm transition-colors"
+                aria-label="Previous Slide"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={next}
+                className="pointer-events-auto p-2 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm transition-colors"
+                aria-label="Next Slide"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
             </div>
           </div>
 
-          {/* Right column - promo cards / categories (secondary) */}
-          <aside className="col-span-12 lg:col-span-4 flex flex-col gap-4">
-            <div className="h-1/2 min-h-[180px] rounded-xl overflow-hidden relative bg-white shadow-md">
-              <Image src="/Hero/promo1.jpg" alt="Promo" fill className="object-cover object-center" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-              <div className="absolute z-10 left-6 bottom-6">
-                <p className="text-sm text-yellow-300 font-medium">New Drop</p>
-                <h3 className="text-lg font-bold text-white">Urban Essentials</h3>
-                <Link href="/collections/urban" className="mt-3 inline-flex items-center gap-2 text-black bg-white px-4 py-2 rounded-full font-semibold">
-                  Shop <FiArrowRight />
+          {/* Side Content */}
+          <aside className="col-span-12 lg:col-span-4 flex flex-col gap-6">
+            {/* Card 1 */}
+            <div className="group relative flex-1 min-h-[250px] rounded-2xl overflow-hidden shadow-lg">
+              <Image src="/Hero/promo1.jpg" alt="Promo" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+              <div className="absolute inset-0 flex flex-col justify-end p-6">
+                <span className="text-white/80 text-xs font-bold uppercase tracking-widest mb-2">New Season</span>
+                <h3 className="text-2xl font-serif font-bold text-white mb-4">Urban Essentials</h3>
+                <Link href="/collections" className="inline-flex items-center text-white font-medium hover:underline">
+                  Shop Collection <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </div>
             </div>
 
-            <div className="h-1/2 min-h-[180px] rounded-xl overflow-hidden relative bg-white shadow-md grid grid-cols-2">
-              <div className="relative">
-                <Image src="/Hero/promo2.jpg" alt="Category" fill className="object-cover object-center" />
-                <div className="absolute inset-0 bg-black/25" />
-                <div className="absolute z-10 left-4 bottom-4">
-                  <p className="text-xs text-white/90">Accessories</p>
-                  <h4 className="text-sm font-semibold text-white">Bags & Wallets</h4>
+            {/* Card 2 Split */}
+            <div className="flex-1 min-h-[250px] grid grid-cols-2 gap-4">
+              <div className="group relative rounded-2xl overflow-hidden shadow-lg">
+                <Image src="/Hero/promo2.jpg" alt="Accessories" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+                <div className="absolute inset-0 flex flex-col justify-end p-4">
+                  <h4 className="text-lg font-serif font-bold text-white">Bags</h4>
                 </div>
               </div>
-
-              <div className="relative">
-                <Image src="/Hero/promo3.jpg" alt="Category" fill className="object-cover object-center" />
-                <div className="absolute inset-0 bg-black/25" />
-                <div className="absolute z-10 left-4 bottom-4">
-                  <p className="text-xs text-white/90">Trending</p>
-                  <h4 className="text-sm font-semibold text-white">Summer Hats</h4>
+              <div className="group relative rounded-2xl overflow-hidden shadow-lg">
+                <Image src="/Hero/promo3.jpg" alt="Summer Hats" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+                <div className="absolute inset-0 flex flex-col justify-end p-4">
+                  <h4 className="text-lg font-serif font-bold text-white">Hats</h4>
                 </div>
               </div>
             </div>
