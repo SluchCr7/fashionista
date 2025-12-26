@@ -175,7 +175,7 @@ const AdminPanel = () => {
         <header className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-2xl font-bold">{tabs.find(t => t.id === activeTab)?.label}</h1>
-            <p className="text-sm text-gray-400">Welcome back, here's what's happening.</p>
+            <p className="text-sm text-gray-400">Welcome back, here is what is happening.</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative hidden md:block">

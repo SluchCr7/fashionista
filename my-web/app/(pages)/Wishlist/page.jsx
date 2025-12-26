@@ -131,7 +131,7 @@ const Wishlist = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Your wishlist is empty</h2>
             <p className="text-gray-500 max-w-md mx-auto mb-8">
-              Looks like you haven't found your favorite picks yet. Explore our featured collections to find something you love.
+              Looks like you have not found your favorite picks yet. Explore our featured collections to find something you love.
             </p>
             <Link
               href="/Shop"
