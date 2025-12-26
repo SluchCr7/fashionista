@@ -38,13 +38,13 @@ const Sponsors = () => {
           {marqueeList.map((logo, index) => (
             <div
               key={index}
-              className="relative w-32 h-16 md:w-40 md:h-20 flex-shrink-0 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+              className="relative w-full grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
             >
               <Image
                 src={logo}
                 alt={`Partner ${index}`}
                 fill
-                className="object-contain"
+                className="object-contain w-full"
               />
             </div>
           ))}

@@ -118,7 +118,7 @@ const Shop = () => {
     <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground">
       {/* Sidebar Filter */}
       <aside
-        className={`fixed lg:sticky top-10 z-40 h-screen w-[300px] bg-background border-r border-border p-6 overflow-y-auto transition-transform duration-300 lg:translate-x-0 ${showFilters ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+        className={`fixed lg:sticky top-10 py-10 z-40 h-screen w-[300px] bg-background border-r border-border p-6 overflow-y-auto transition-transform duration-300 lg:translate-x-0 ${showFilters ? "translate-x-0 shadow-2xl" : "-translate-x-full"
           }`}
       >
         <div className="flex justify-between items-center mb-8">
