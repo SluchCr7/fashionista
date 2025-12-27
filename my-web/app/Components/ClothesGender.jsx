@@ -1,69 +1,85 @@
-'use client'
+'use client';
 import React, { memo, useContext } from 'react';
 import Intro from './Intro';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ProductContext } from '../Context/ProductContext';
 import { motion } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
 
 const ClothesGender = memo(({ gender, title, Para }) => {
   const { products } = useContext(ProductContext);
 
+  const genderProducts = products.filter((prod) => prod.gender === gender);
+
   return (
-    <div className="flex items-center flex-col gap-6 w-full px-6 md:px-12 py-10">
-      <Intro title={title} para={Para} />
+    <section className="w-full px-6 md:px-12 py-16 bg-white">
+      {/* Introduction Header */}
+      <div className="mb-12">
+        <Intro title={title} para={Para} />
+      </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-        {products
-          .filter((prod) => prod.gender === gender)
-          .map((prod, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.03 }}
-              className="group bg-white rounded-xl shadow-md overflow-hidden flex flex-col"
-            >
-              {/* Image */}
-              <div className="relative w-full h-[380px] overflow-hidden">
-                <Image
-                  src={prod?.Photo[0]?.url}
-                  alt={prod?.name}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                  <Link
-                    href={`/Product/${prod?._id}`}
-                    className="bg-white text-black px-4 py-2 rounded-lg font-medium shadow-md hover:bg-black hover:text-white transition"
-                  >
-                    View Details
-                  </Link>
-                </div>
-              </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 w-full">
+        {genderProducts.map((prod, index) => (
+          <motion.div
+            key={prod._id || index}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.05 }}
+            viewport={{ once: true }}
+            className="group cursor-pointer flex flex-col gap-4"
+          >
+            {/* Image Container */}
+            <div className="relative w-full aspect-[3/4] overflow-hidden bg-gray-100 rounded-sm">
+              <Image
+                src={prod?.Photo[0]?.url}
+                alt={prod?.name}
+                fill
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
 
-              {/* Info */}
-              <div className="flex flex-col gap-1 p-4">
-                <span className="text-base font-semibold text-gray-900 truncate">
-                  {prod?.name}
-                </span>
-                <span className="text-lg font-bold text-red-600">
+              {/* Overlay / Quick Action */}
+              <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+              <Link
+                href={`/Product/${prod?._id}`}
+                className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm text-black p-3 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-xl hover:bg-black hover:text-white"
+              >
+                <ArrowUpRight size={20} />
+              </Link>
+            </div>
+
+            {/* Product Info */}
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between items-start">
+                <Link href={`/Product/${prod?._id}`}>
+                  <h3 className="text-base font-medium text-gray-900 leading-tight group-hover:underline decoration-1 underline-offset-4">
+                    {prod?.name}
+                  </h3>
+                </Link>
+                <span className="text-sm font-semibold text-gray-900 ml-4">
                   ${prod?.price}
                 </span>
               </div>
-            </motion.div>
-          ))}
+              <p className="text-sm text-gray-500 capitalize">{prod?.gender}'s Collection</p>
+            </div>
+          </motion.div>
+        ))}
       </div>
 
-      {/* CTA */}
-      <div className="mt-6">
+      {/* CTA Button */}
+      <div className="mt-20 flex justify-center">
         <Link
           href={`/Shop?gender=${gender}`}
-          className="px-6 py-3 bg-black text-white rounded-lg font-semibold shadow-md hover:bg-red-600 transition"
+          className="group relative px-8 py-3 bg-transparent border border-black overflow-hidden rounded-full transition-all hover:bg-black"
         >
-          Shop All {gender === 'men' ? 'Men' : 'Women'}
+          <span className="relative z-10 text-black font-semibold uppercase tracking-widest text-xs group-hover:text-white transition-colors duration-300">
+            View All {gender === 'men' ? 'Men' : 'Women'}
+          </span>
         </Link>
       </div>
-    </div>
+    </section>
   );
 });
 

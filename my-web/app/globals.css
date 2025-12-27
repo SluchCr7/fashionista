@@ -60,3 +60,7 @@
     @apply font-serif tracking-tight;
   }
 }
+
+::-webkit-scrollbar {
+  display: none;
+}

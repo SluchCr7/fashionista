@@ -1,19 +1,69 @@
-'use client'
-import Intro from '@/app/Components/Intro'
-import ClothesGender from '@/app/Components/ClothesGender'
-import { ProductContext } from '@/app/Context/ProductContext'
-import Image from 'next/image'
-import React, { useContext } from 'react'
+'use client';
+import React from 'react';
+import ClothesGender from '@/app/Components/ClothesGender';
+import { motion } from 'framer-motion';
 
 const Men = () => {
   return (
-    <div className='flex items-center flex-col w-full gap-3'>
-        <Image src={'/Hero/bg_man.webp'} width={1000} height={1000} className='w-full h-auto' alt='bg-picture' />
-        <div className='flex items-center flex-col gap-3 w-[100%] md:w-[80%] px-10 py-5'>
-            <ClothesGender gender={"men"} title={"Top Men Clothes"} Para={"Discover New And high Men Wears in Store"} />
-        </div>
-    </div>
-  )
-}
+    <main className="w-full min-h-screen bg-white">
+      {/* Hero Section */}
+      <section className="relative w-full h-[85vh] flex items-center justify-center overflow-hidden">
+        {/* Background Image with Parallax-like fix */}
+        <div
+          className="absolute inset-0 bg-[url('/Hero/bg_man.webp')] bg-cover bg-center bg-no-repeat"
+          style={{ filter: 'brightness(0.85)' }}
+        />
 
-export default Men
+        {/* Content Overlay */}
+        <div className="relative z-10 text-center px-4 flex flex-col items-center gap-6">
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-white text-sm md:text-base font-bold tracking-[0.3em] uppercase"
+          >
+            Spring / Summer 2025
+          </motion.span>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-white text-5xl md:text-8xl font-serif font-medium tracking-tight"
+          >
+            Masculine <br className="md:hidden" /> Elegance
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="text-gray-200 max-w-lg text-lg font-light leading-relaxed"
+          >
+            Discover the new standard of luxury essentials. Crafted for the modern man.
+          </motion.p>
+        </div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        >
+          <span className="text-white/70 text-xs tracking-widest uppercase">Explore</span>
+          <div className="w-[1px] h-12 bg-white/50" />
+        </motion.div>
+      </section>
+
+      {/* Product Section */}
+      <div className="relative z-20 bg-white -mt-4 rounded-t-3xl shadow-2xl pb-20">
+        <ClothesGender
+          gender="men"
+          title="Essential Collection"
+          Para="Timeless pieces designed for versatility and style."
+        />
+      </div>
+    </main>
+  );
+};
+
+export default Men;

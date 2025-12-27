@@ -1,111 +1,155 @@
-'use client'
-import { motion } from "framer-motion"
-import React from "react"
+'use client';
+import { motion } from "framer-motion";
+import React from "react";
+import { Truck, RefreshCw, ShieldCheck, Mail } from "lucide-react";
 
 const ShippingReturns = () => {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
+    <div className="min-h-screen bg-white text-gray-900 font-sans">
       {/* Header Section */}
-      <section className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-20 text-center">
+      <section className="relative py-24 px-6 border-b border-gray-100 overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <motion.span
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-xs font-bold tracking-[0.3em] uppercase text-gray-400 mb-4 block"
+          >
+            Customer Care
+          </motion.span>
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-4xl md:text-5xl font-extrabold text-gray-900"
+            className="text-5xl md:text-7xl font-serif font-medium mb-6"
           >
-            Shipping & Return Policy
+            Shipping & Returns
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-4 text-gray-500 text-lg max-w-2xl mx-auto"
+            className="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed font-light"
           >
-            We aim to provide a seamless shopping experience — here’s everything you need to know about shipping, delivery, and returns.
+            Our commitment to your satisfaction extends beyond the purchase.
+            Experience a seamless delivery and returns process.
           </motion.p>
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-16">
-        {/* Shipping Policy */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-            🚚 Shipping Policy
-          </h2>
-          <p className="text-gray-600 leading-relaxed mb-4">
-            Orders are processed within <span className="font-semibold">1–2 business days</span>. You will receive a confirmation email with tracking information once your order ships.
-          </p>
-          <ul className="list-disc list-inside text-gray-600 space-y-2">
-            <li>Standard delivery takes <b>3–7 business days</b> depending on your location.</li>
-            <li>Express shipping is available at checkout for faster delivery.</li>
-            <li>We currently ship to most regions worldwide. Shipping rates vary by destination.</li>
-            <li>Orders placed on weekends or public holidays will be processed the next business day.</li>
-          </ul>
-          <p className="mt-4 text-gray-600">
-            Once your package has been handed over to the courier, we cannot modify the delivery address.
-          </p>
-        </motion.div>
+      {/* Main Content Grid */}
+      <div className="max-w-6xl mx-auto px-6 py-24">
+        <div className="grid md:grid-cols-2 gap-24 lg:gap-32">
 
-        {/* Return Policy */}
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-            🔁 Return & Exchange Policy
-          </h2>
-          <p className="text-gray-600 leading-relaxed mb-4">
-            We want you to love your purchase! If for any reason you’re not fully satisfied, you can request a return or exchange within <span className="font-semibold">14 days</span> of receiving your order.
-          </p>
-          <ul className="list-disc list-inside text-gray-600 space-y-2">
-            <li>Items must be unworn, unwashed, and in original packaging.</li>
-            <li>Sale items are final and cannot be returned or exchanged.</li>
-            <li>Refunds are processed within 5–7 business days after receiving the returned item.</li>
-            <li>Customers are responsible for return shipping costs unless the item is defective.</li>
-          </ul>
-          <p className="mt-4 text-gray-600">
-            To start a return, contact our support team at{" "}
-            <a
-              href="mailto:support@yourstore.com"
-              className="text-blue-600 hover:underline"
-            >
-              support@yourstore.com
-            </a>.
-          </p>
-        </motion.div>
+          {/* Shipping Policy */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="space-y-8"
+          >
+            <div className="flex items-center gap-4 text-black">
+              <Truck size={28} strokeWidth={1.5} />
+              <h2 className="text-2xl font-serif font-medium uppercase tracking-tight">Delivery Logistics</h2>
+            </div>
+
+            <div className="space-y-6 text-gray-600 leading-relaxed font-light">
+              <p>
+                Each order is handled with the utmost care and precision. We process all shipments within
+                <span className="text-black font-normal"> 24 to 48 business hours</span> of confirmation.
+              </p>
+
+              <ul className="space-y-4">
+                <li className="flex gap-4">
+                  <span className="text-black font-medium">—</span>
+                  <span>Standard delivery: 3–5 business days via premium couriers.</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-black font-medium">—</span>
+                  <span>Express shipping available globally for time-sensitive arrivals.</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-black font-medium">—</span>
+                  <span>Real-time tracking provided upon dispatch.</span>
+                </li>
+              </ul>
+
+              <div className="pt-4 p-6 bg-gray-50 rounded-sm border-l-2 border-black italic text-sm">
+                Note: Address modifications are not possible once the package has entered the courier network.
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Return Policy */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="space-y-8"
+          >
+            <div className="flex items-center gap-4 text-black">
+              <RefreshCw size={28} strokeWidth={1.5} />
+              <h2 className="text-2xl font-serif font-medium uppercase tracking-tight">Return philosophy</h2>
+            </div>
+
+            <div className="space-y-6 text-gray-600 leading-relaxed font-light">
+              <p>
+                If your selection is not perfectly suited to your needs, we offer a refined returns policy within
+                <span className="text-black font-normal"> 14 days</span> of receipt.
+              </p>
+
+              <ul className="space-y-4">
+                <li className="flex gap-4">
+                  <span className="text-black font-medium">—</span>
+                  <span>Items must remain in original pristine condition with all tags attached.</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-black font-medium">—</span>
+                  <span>Complimentary exchanges for size or color variations based on availability.</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-black font-medium">—</span>
+                  <span>Refunds processed back to the original payment method within 7 days.</span>
+                </li>
+              </ul>
+
+              <div className="pt-4 flex items-center gap-3 text-sm font-medium text-black">
+                <ShieldCheck size={18} />
+                <span>Premium Quality Guaranteed</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </div>
 
-      {/* Extra Section */}
+      {/* Contact Section */}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="bg-gray-100 border-t border-gray-200 py-16 px-6 text-center"
+        className="bg-black text-white py-24 px-6 text-center"
       >
-        <h3 className="text-xl md:text-2xl font-semibold text-gray-800 mb-3">
-          Questions or Concerns?
-        </h3>
-        <p className="text-gray-600 max-w-2xl mx-auto mb-6">
-          Our customer care team is here to help. Reach out to us anytime regarding your order or delivery.
-        </p>
-        <a
-          href="/contact"
-          className="inline-block bg-black text-white py-3 px-8 rounded-full font-medium hover:bg-gray-800 transition"
-        >
-          Contact Support
-        </a>
+        <div className="max-w-2xl mx-auto space-y-8">
+          <Mail className="mx-auto mb-4 opacity-50" size={40} strokeWidth={1} />
+          <h3 className="text-3xl md:text-4xl font-serif font-light italic">
+            Further assistance required?
+          </h3>
+          <p className="text-gray-400 font-light leading-relaxed">
+            Our concierge team is available to assist you with any inquiries regarding
+            bespoke shipping arrangements or detailed return queries.
+          </p>
+          <div className="pt-6">
+            <a
+              href="mailto:concierge@yourstore.com"
+              className="inline-block border border-white/30 px-12 py-4 rounded-full font-medium tracking-widest text-xs uppercase hover:bg-white hover:text-black transition-all duration-300"
+            >
+              Contact Concierge
+            </a>
+          </div>
+        </div>
       </motion.div>
     </div>
   )
 }
 
-export default ShippingReturns
+export default ShippingReturns;

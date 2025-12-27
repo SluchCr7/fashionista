@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Companies } from '../Data';
 
 const Sponsors = () => {
-  // Triple the list to ensure smooth seamless looping
+  // تكرار القائمة لعمل loop ناعم
   const marqueeList = [...Companies, ...Companies, ...Companies];
 
   return (
@@ -21,30 +21,39 @@ const Sponsors = () => {
         </motion.p>
       </div>
 
-      <div className="relative w-full flex overflow-hidden mask-gradient-x">
-        {/* Gradient Masks for fading edges */}
+      <div className="relative w-full overflow-hidden">
+        {/* تدرج ناعم على الأطراف */}
         <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
         <motion.div
-          className="flex items-center gap-16 md:gap-24 flex-nowrap"
-          animate={{ x: ["0%", "-50%"] }}
+          className="flex items-center flex-nowrap"
+          animate={{ x: ['0%', '-50%'] }}
           transition={{
             duration: 40,
             repeat: Infinity,
-            ease: "linear",
+            ease: 'linear',
           }}
         >
           {marqueeList.map((logo, index) => (
             <div
               key={index}
-              className="relative w-full grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-pointer"
+              className="
+                relative 
+                min-w-[300px] md:min-w-[400px] lg:min-w-[500px]
+                h-32 md:h-40
+                flex items-center justify-center
+                grayscale opacity-80
+                hover:grayscale-0 hover:opacity-100
+                transition-all duration-500
+              "
             >
               <Image
                 src={logo}
                 alt={`Partner ${index}`}
                 fill
-                className="object-contain w-full"
+                className="object-contain"
+                sizes="(max-width: 768px) 300px, (max-width: 1200px) 400px, 500px"
               />
             </div>
           ))}
