@@ -62,7 +62,7 @@ const ClothesGender = memo(({ gender, title, Para }) => {
                   ${prod?.price}
                 </span>
               </div>
-              <p className="text-sm text-gray-500 capitalize">{prod?.gender}'s Collection</p>
+              <p className="text-sm text-gray-500 capitalize">{prod?.gender} is Collection</p>
             </div>
           </motion.div>
         ))}
