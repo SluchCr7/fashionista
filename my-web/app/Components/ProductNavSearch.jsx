@@ -1,95 +1,85 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { FiSearch, FiX } from "react-icons/fi";
+import { Search, X, Package } from "lucide-react";
 
 const ProductNavSearch = ({ setShowSearch, search, setSearch, filteredProducts }) => {
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-start justify-center z-[100] pt-24 px-4 sm:px-0"
-      >
-        <motion.div
-          initial={{ y: -40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -40, opacity: 0 }}
-          transition={{ type: "spring", damping: 20, stiffness: 200 }}
-          className="relative bg-white/95 w-full sm:w-[600px] rounded-2xl shadow-2xl border border-gray-200 p-6"
-        >
-          {/* Header */}
-          <div className="flex items-center gap-3 border-b border-gray-200 pb-3">
-            <FiSearch className="text-gray-400 text-xl" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              type="text"
-              placeholder="Search for products..."
-              className="flex-1 bg-transparent outline-none text-gray-800 placeholder-gray-400 text-sm sm:text-base"
-              autoFocus
-            />
-            <button
-              onClick={() => setShowSearch(false)}
-              className="p-2 hover:bg-gray-100 rounded-full transition"
-              title="Close search"
-            >
-              <FiX className="text-gray-500 text-lg" />
-            </button>
-          </div>
+    <div className="w-full max-w-4xl mx-auto">
+      {/* Search Input */}
+      <div className="relative mb-8">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-6 h-6" />
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          type="text"
+          placeholder="Search for products, collections, brands..."
+          className="w-full bg-secondary/30 border border-border rounded-full py-4 pl-14 pr-12 text-lg outline-none focus:ring-2 focus:ring-primary/20 transition-all font-serif"
+          autoFocus
+        />
+        {search && (
+          <button
+            onClick={() => setSearch('')}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full text-muted-foreground"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+      </div>
 
-          {/* Results */}
-          <div className="mt-5 max-h-[360px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-            {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {/* Results */}
+      <div className="min-h-[100px]">
+        {search ? (
+          filteredProducts.length > 0 ? (
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4">
+                Search Results ({filteredProducts.length})
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 {filteredProducts.map((p) => (
                   <Link
                     key={p._id}
                     href={`/Product/${p._id}`}
                     onClick={() => setShowSearch(false)}
-                    className="group flex flex-col items-center border border-gray-100 rounded-xl p-3 hover:shadow-lg transition-all bg-white hover:bg-gray-50"
+                    className="group flex gap-4 md:flex-col md:gap-2 p-3 rounded-xl hover:bg-muted/50 transition-colors"
                   >
-                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 overflow-hidden rounded-lg">
+                    <div className="relative w-16 h-16 md:w-full md:aspect-[3/4] overflow-hidden rounded-lg bg-secondary">
                       <Image
                         src={p.Photo[0].url}
                         alt={p.name}
                         fill
-                        sizes="100px"
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 64px, 200px"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
-                    <span className="text-[13px] mt-2 text-gray-800 text-center line-clamp-2">
-                      {p.name}
-                    </span>
-                    <span className="text-sm text-red-600 font-semibold mt-1">
-                      ${p.price}
-                    </span>
+                    <div className="flex flex-col justify-center md:items-start">
+                      <h4 className="font-serif font-bold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-2 md:line-clamp-1">
+                        {p.name}
+                      </h4>
+                      <span className="text-sm font-medium text-muted-foreground mt-1">
+                        ${p.price}
+                      </span>
+                    </div>
                   </Link>
                 ))}
               </div>
-            ) : search ? (
-              <div className="flex flex-col items-center justify-center py-12 text-gray-500 text-sm">
-                <Image
-                  src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
-                  alt="No results"
-                  width={60}
-                  height={60}
-                  className="opacity-70 mb-3"
-                />
-                <p>No products found for “{search}”</p>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-8 h-8 text-muted-foreground/50" />
               </div>
-            ) : (
-              <div className="text-gray-400 text-sm text-center py-10">
-                Start typing to search for products 🔍
-              </div>
-            )}
+              <p className="text-muted-foreground font-medium">No products found for "{search}"</p>
+            </div>
+          )
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-sm text-muted-foreground uppercase tracking-wider">Start typing to discover</p>
           </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        )}
+      </div>
+    </div>
   );
 };
 

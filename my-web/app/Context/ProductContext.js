@@ -1,90 +1,141 @@
-'use client'
-import React, { useEffect, useState } from 'react'
-import { createContext } from 'react'
-import Notify from '../Components/Notify';
+'use client';
+import React, { useEffect, useState, createContext, useCallback, useMemo } from 'react';
 import axios from 'axios';
+import { toast } from '@/lib/toast';
+
 export const ProductContext = createContext();
-const ProductContextProvider = ({children}) => {
-    const [message, setMessage] = useState('')
-    const [products , setProducts] = useState([])
-    const [product, setProduct] = useState({})
-    const [loadingProduct , setLoadingProduct] = useState(false)
-    // Add New Product Function
-    const AddProduct = async(name , description , price , quantity , category , gender , collections , sizes , colors , material , img) => {
-        const formData = new FormData()
-        formData.append('image', img)
-        formData.append('name', name)
-        formData.append('description', description)
-        formData.append('price', price)
-        formData.append('quantity', quantity)
-        formData.append('category', category)
-        formData.append('gender', gender)   
-        formData.append('collections', collections) 
-        sizes.forEach((size) => {
-            formData.append('sizes', size)
-        })
-        colors.forEach((color) => {
-            formData.append('colors', color)
-        })   
-        formData.append('material', material)   
-        await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product` , formData)
-            .then(res => {
-                setMessage("Product Add Successfully")
-                setTimeout(()=> setMessage('') , 3000)
-                window.location.reload()
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-    }
-    // Get All Products
+
+const ProductContextProvider = ({ children }) => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [product, setProduct] = useState({});
+    const [loadingProduct, setLoadingProduct] = useState(false);
+
+    // Fetch All Products
+    const fetchProducts = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product`);
+            setProducts(res.data);
+        } catch (err) {
+            console.error('Error fetching products:', err);
+            toast.error("Failed to load products. Please refresh.");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
-        axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product`)
-        .then((res) => {
-            setProducts(res.data)
-        })
-            .catch((err) => {
-            console.log(err)
-        })
-    }, [])
+        fetchProducts();
+    }, [fetchProducts]);
+
+    // Add New Product
+    const AddProduct = useCallback(async (formData) => {
+        const toastId = toast.loading("Adding product...");
+        try {
+            await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product`, formData);
+
+            toast.update(toastId, {
+                render: "✅ Product added successfully!",
+                type: "success",
+                isLoading: false,
+                autoClose: 3000
+            });
+
+            await fetchProducts(); // Refresh list
+            return true;
+        } catch (err) {
+            console.error("Add product error:", err);
+            toast.update(toastId, {
+                render: err.response?.data?.message || "Failed to add product",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000
+            });
+            return false;
+        }
+    }, [fetchProducts]);
+
     // Delete Product
-    const deleteProduct = async(prodId) => {
-        await axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product/${prodId}`)
-            .then((res) => {
-                setMessage("Product Delete Successfully")
-                setTimeout(()=> setMessage('') , 3000)
-                window.location.reload()
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-    }
-    const getProductBuID = async (id) => {
-        setLoadingProduct(true)
-        try{
-            await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product/${id}`)
-            .then((res) => {
-                setProduct(res.data)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
+    const deleteProduct = useCallback(async (prodId) => {
+        // Confirmation is usually handled in UI, but if confirmed:
+        const toastId = toast.loading("Deleting product...");
+        try {
+            await axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product/${prodId}`);
+
+            toast.update(toastId, {
+                render: "🗑️ Product deleted successfully",
+                type: "success",
+                isLoading: false,
+                autoClose: 3000
+            });
+
+            setProducts(prev => prev.filter(p => p._id !== prodId));
+        } catch (err) {
+            console.error("Delete product error:", err);
+            toast.update(toastId, {
+                render: "Failed to delete product",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000
+            });
         }
-        catch(err){
-            console.log(err)
+    }, []);
+
+    // Get Single Product
+    const getProductBuID = useCallback(async (id) => {
+        setLoadingProduct(true);
+        try {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product/${id}`);
+            setProduct(res.data);
+        } catch (err) {
+            console.error("Get product error:", err);
+            toast.error("Failed to load product details");
+        } finally {
+            setLoadingProduct(false);
         }
-        finally {
-            setLoadingProduct(false)
-        }
-    }
-  return (
-    <div className="relative">
-        <Notify Notify={message}/>
-        <ProductContext.Provider value={{products ,getProductBuID, product , loadingProduct , AddProduct , deleteProduct}}>
+    }, []);
+
+    // Derived State (Memoized for performance)
+    const featuredProducts = useMemo(() => {
+        return products.filter(p => p.isFeatured || p.collections === 'Special').slice(0, 4);
+    }, [products]);
+
+    const newArrivals = useMemo(() => {
+        // Assuming products are sorted by date or taking the last ones
+        return [...products].reverse().slice(0, 8);
+    }, [products]);
+
+    const bestSellers = useMemo(() => {
+        // Logic for best sellers (mocked if no specific field exists yet)
+        return products.slice(0, 4);
+    }, [products]);
+
+    const getProductsByCategory = useCallback((category) => {
+        return products.filter(p => p.category === category);
+    }, [products]);
+
+    const value = {
+        products,
+        loading,
+        product,
+        loadingProduct,
+        AddProduct, // Now accepts formData directly for better flexibility
+        deleteProduct,
+        getProductBuID,
+        fetchProducts,
+        // Computed collections
+        featuredProducts,
+        newArrivals,
+        bestSellers,
+        getProductsByCategory
+    };
+
+    return (
+        <ProductContext.Provider value={value}>
             {children}
         </ProductContext.Provider>
-    </div>
-  )
-}
+    );
+};
 
-export default ProductContextProvider
+export default ProductContextProvider;

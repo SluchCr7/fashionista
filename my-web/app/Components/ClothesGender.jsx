@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ProductContext } from '../Context/ProductContext';
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
+import ProductCard from './ProductCard';
 
 const ClothesGender = memo(({ gender, title, Para }) => {
   const { products } = useContext(ProductContext);
@@ -28,42 +29,8 @@ const ClothesGender = memo(({ gender, title, Para }) => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.05 }}
             viewport={{ once: true }}
-            className="group cursor-pointer flex flex-col gap-4"
           >
-            {/* Image Container */}
-            <div className="relative w-full aspect-[3/4] overflow-hidden bg-gray-100 rounded-sm">
-              <Image
-                src={prod?.Photo[0]?.url}
-                alt={prod?.name}
-                fill
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              />
-
-              {/* Overlay / Quick Action */}
-              <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-              <Link
-                href={`/Product/${prod?._id}`}
-                className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm text-black p-3 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-xl hover:bg-black hover:text-white"
-              >
-                <ArrowUpRight size={20} />
-              </Link>
-            </div>
-
-            {/* Product Info */}
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between items-start">
-                <Link href={`/Product/${prod?._id}`}>
-                  <h3 className="text-base font-medium text-gray-900 leading-tight group-hover:underline decoration-1 underline-offset-4">
-                    {prod?.name}
-                  </h3>
-                </Link>
-                <span className="text-sm font-semibold text-gray-900 ml-4">
-                  ${prod?.price}
-                </span>
-              </div>
-              <p className="text-sm text-gray-500 capitalize">{prod?.gender} is Collection</p>
-            </div>
+            <ProductCard product={prod} />
           </motion.div>
         ))}
       </div>

@@ -1,152 +1,200 @@
-'use client'
+'use client';
+import React, { useEffect, useState, createContext, useCallback } from 'react';
 import axios from 'axios';
-import React, { useEffect, useState, createContext } from 'react';
-import swal from 'sweetalert';
-import Notify from '../Components/Notify';
+import { useRouter } from 'next/navigation';
+import { toast } from '@/lib/toast';
 
 export const UserContext = createContext();
 
 const UserContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
-  const [message, setMessage] = useState('');
   const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // ✅ Register
-  const Register = async (email, name, password) => {
-    try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/register`, {
-        email,
-        name,
-        password,
-      });
-      swal('Good job!', res.data.message, 'success');
-      setTimeout(() => (window.location.href = '/Login'), 2000);
-    } catch (err) {
-      swal('Oops!', err?.response?.data?.message || 'Registration Failed', 'error');
+  const router = useRouter();
+
+  // Initialize auth state
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const storedUser = localStorage.getItem('Data');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        localStorage.removeItem('Data');
+      } finally {
+        setIsAuthChecked(true);
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Sync user state with localStorage whenever it changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('Data', JSON.stringify(user));
+    } else if (isAuthChecked) {
+      // Only remove if we've finished checking auth and user is null
+      // preventing accidental logout on initial load
+      localStorage.removeItem('Data');
     }
-  };
+  }, [user, isAuthChecked]);
 
-  // ✅ Login
-  const Login = async (email, password) => {
+  // Login
+  const Login = useCallback(async (email, password) => {
+    const toastId = toast.loading('Logging in...');
     try {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`, {
         email,
         password,
       });
-      setUser(res.data);
-      setIsLogin(true);
-      localStorage.setItem('Data', JSON.stringify(res.data));
-      localStorage.setItem('loginState', 'true');
-      swal('Welcome back!', 'Login successful', 'success');
-      setTimeout(() => (window.location.href = '/'), 1500);
+
+      const userData = res.data;
+      setUser(userData);
+
+      toast.update(toastId, {
+        render: `Welcome back, ${userData.name || 'User'}!`,
+        type: 'success',
+        isLoading: false,
+        autoClose: 2000
+      });
+
+      router.push('/');
+      return true;
     } catch (err) {
-      swal('Oops!', err?.response?.data?.message || 'Login Failed', 'error');
+      console.error('Login error:', err);
+      toast.update(toastId, {
+        render: err?.response?.data?.message || 'Invalid credentials',
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+      return false;
     }
-  };
+  }, [router]);
 
-  // ✅ Logout
-  const Logout = () => {
-    swal({
-      title: 'Are you sure?',
-      text: 'You are about to log out!',
-      icon: 'warning',
-      buttons: true,
-      dangerMode: true,
-    }).then((willLogout) => {
-      if (willLogout) {
-        setUser(null);
-        setIsLogin(false);
-        localStorage.removeItem('Data');
-        localStorage.removeItem('loginState');
-        window.location.href = '/Login';
-      }
-    });
-  };
+  // Register
+  const Register = useCallback(async (name, email, password) => {
+    const toastId = toast.loading('Creating account...');
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/register`, {
+        name,
+        email,
+        password,
+      });
 
-  // ✅ تحقق من حالة المستخدم عند التحميل
-  useEffect(() => {
-    const storedUser = localStorage.getItem('Data');
-    const loginState = localStorage.getItem('loginState');
+      toast.update(toastId, {
+        render: '🎉 Account created! Please login.',
+        type: 'success',
+        isLoading: false,
+        autoClose: 2000
+      });
 
-    if (storedUser && loginState === 'true') {
-      setUser(JSON.parse(storedUser));
-      setIsLogin(true);
-    } else {
-      setIsLogin(false);
+      router.push('/Login');
+      return true;
+    } catch (err) {
+      console.error('Registration error:', err);
+      toast.update(toastId, {
+        render: err?.response?.data?.message || 'Registration failed',
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+      return false;
     }
-    setIsAuthChecked(true);
-  }, []);
+  }, [router]);
 
-  // ✅ جلب جميع المستخدمين
-  useEffect(() => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth`)
-      .then((res) => setUsers(res.data))
-      .catch((err) => console.log(err));
-  }, []);
+  // Logout
+  const Logout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem('Data');
+    toast.info('Logged out successfully');
+    router.push('/Login');
+  }, [router]);
 
-  // ✅ إضافة / إزالة منتج من المفضلة
-    const AddFavourite = async (prodId) => {
+  // Add/Remove Favorite
+  const AddFavourite = useCallback(async (prodId) => {
     if (!user) {
-        setMessage('Please login first');
-        setTimeout(() => setMessage(''), 3000);
-        return;
+      toast.warning('Please login to manage your wishlist');
+      router.push('/Login');
+      return null;
     }
 
     try {
-        const res = await axios.post(
+      const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/favorite/${prodId}`,
         {},
         { headers: { Authorization: `Bearer ${user.token}` } }
-        );
+      );
 
-        const { message, isFavorite } = res.data;
-        setMessage(message);
-        setTimeout(() => setMessage(''), 2500);
+      const { message, isFavorite } = res.data;
 
-        // تحديث بيانات المستخدم في LocalStorage
-        const storedData = JSON.parse(localStorage.getItem('Data'));
-        if (storedData) {
+      if (isFavorite) {
+        toast.success('❤️ Added to wishlist');
+      } else {
+        toast.info('💔 Removed from wishlist');
+      }
+
+      // Update local user state specifically for favorites
+      setUser(prevUser => {
+        if (!prevUser) return null;
+
+        const currentFavorites = prevUser.favorites || [];
+        let newFavorites;
+
         if (isFavorite) {
-            if (!storedData.favorites.includes(prodId)) {
-            storedData.favorites.push(prodId);
-            }
+          newFavorites = [...new Set([...currentFavorites, prodId])];
         } else {
-            storedData.favorites = storedData.favorites.filter((id) => id !== prodId);
-        }
-        localStorage.setItem('Data', JSON.stringify(storedData));
+          newFavorites = currentFavorites.filter(id => id !== prodId);
         }
 
-        // إرجاع الحالة الجديدة لتحديث الـ UI
-        return isFavorite;
+        return { ...prevUser, favorites: newFavorites };
+      });
+
+      return isFavorite;
     } catch (err) {
-        console.error(err);
-        setMessage('Something went wrong');
-        setTimeout(() => setMessage(''), 3000);
+      console.error('Favorite error:', err);
+      toast.error('Failed to update wishlist');
+      return null;
     }
+  }, [user, router]);
+
+  // Fetch all users (Admin purpose usually, but keeping it as it was in original)
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth`);
+        setUsers(res.data);
+      } catch (err) {
+        console.error('Fetch users error:', err);
+      }
     };
 
+    // Only fetch if needed (maybe add admin check later)
+    fetchUsers();
+  }, []);
+
+  const value = {
+    user,
+    users,
+    loading,
+    isAuthChecked,
+    Login,
+    Register,
+    Logout,
+    AddFavourite,
+    isAuthenticated: !!user
+  };
 
   return (
-    <div className="relative">
-      <Notify Notify={message} />
-      <UserContext.Provider
-        value={{
-          user,
-          users,
-          Logout,
-          Login,
-          Register,
-          AddFavourite,
-          isLogin,
-          isAuthChecked,
-        }}
-      >
-        {children}
-      </UserContext.Provider>
-    </div>
+    <UserContext.Provider value={value}>
+      {children}
+    </UserContext.Provider>
   );
 };
 

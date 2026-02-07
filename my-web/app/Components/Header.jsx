@@ -2,22 +2,16 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Heart, User, ShoppingBag, Menu, Sun, Moon, X } from 'lucide-react';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
+import { Search, Heart, User, Menu, Sun, Moon, X, ShoppingBag } from 'lucide-react';
 
 import { UserContext } from '../Context/UserContext';
 import { ProductContext } from '../Context/ProductContext';
 import { useTheme } from '../Context/ThemeContext';
+import { CartContext } from '../Context/Cart';
+
 import ProductNavSearch from './ProductNavSearch';
 import CartShop from './CartShop';
-import MobileNav from './MobileNav';
-
-const topBarLinks = [
-  { name: 'About Us', link: '/About' },
-  { name: 'Help Center', link: '/FAQ' },
-  { name: 'Contact', link: '/Contact' },
-  { name: 'Shipping Policy', link: '/Shipping' },
-];
 
 const navLinks = [
   { name: 'Home', link: '/' },
@@ -33,26 +27,34 @@ const Header = () => {
   const [search, setSearch] = useState('');
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
 
+  const { scrollY } = useScroll();
   const pathname = usePathname();
   const { user } = useContext(UserContext);
-  const { products, cart } = useContext(ProductContext);
+  const { products } = useContext(ProductContext);
   const { theme, setTheme } = useTheme();
 
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Smart Header Hide/Show on Scroll
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious();
+    if (latest > previous && latest > 150) {
+      setHidden(true);
+    } else {
+      setHidden(false);
+    }
+    setIsScrolled(latest > 20);
+  });
 
+  // Search Logic
   useEffect(() => {
-    if (!search.trim()) setFilteredProducts([]);
-    else {
-      setFilteredProducts(
-        products.filter((p) =>
-          p.name.toLowerCase().includes(search.toLowerCase())
-        )
+    if (!search.trim()) {
+      setFilteredProducts([]);
+    } else {
+      const results = products.filter((p) =>
+        p.name.toLowerCase().includes(search.toLowerCase())
       );
+      setFilteredProducts(results.slice(0, 5)); // Limit to 5 results for dropdown
     }
   }, [search, products]);
 
@@ -62,17 +64,25 @@ const Header = () => {
 
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 font-sans ${isScrolled
-            ? 'bg-background/80 backdrop-blur-md shadow-sm py-3'
-            : 'bg-transparent py-5'
+      <motion.header
+        variants={{
+          visible: { y: 0 },
+          hidden: { y: -100 },
+        }}
+        animate={hidden ? "hidden" : "visible"}
+        transition={{ duration: 0.35, ease: "easeInOut" }}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b ${isScrolled
+            ? 'bg-background/80 backdrop-blur-xl border-border/40 shadow-sm py-3'
+            : 'bg-transparent border-transparent py-5'
           }`}
       >
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
+
           {/* Logo */}
-          <Link href="/" className="group">
-            <h1 className="text-2xl md:text-3xl font-serif font-bold tracking-tighter text-foreground">
-              FASHION<span className="text-destructive">ISTA</span>
+          <Link href="/" className="group relative z-50">
+            <h1 className={`text-2xl md:text-3xl font-serif font-bold tracking-tighter ${!isScrolled && pathname === '/' && !mobileMenuOpen ? 'text-white md:text-foreground' : 'text-foreground'
+              }`}>
+              FASHION<span className="text-primary italic">ISTA</span>
             </h1>
           </Link>
 
@@ -84,14 +94,14 @@ const Header = () => {
                 <Link
                   key={link.name}
                   href={link.link}
-                  className={`relative text-sm font-medium uppercase tracking-wider transition-colors hover:text-primary ${isActive ? 'text-primary' : 'text-muted-foreground'
+                  className={`relative text-sm font-medium uppercase tracking-widest transition-colors hover:text-primary ${isActive ? 'text-primary' : 'text-muted-foreground'
                     }`}
                 >
                   {link.name}
                   {isActive && (
                     <motion.span
                       layoutId="underline"
-                      className="absolute -bottom-1 left-0 w-full h-[1.5px] bg-primary"
+                      className="absolute -bottom-1 left-0 w-full h-[2px] bg-primary"
                     />
                   )}
                 </Link>
@@ -100,57 +110,75 @@ const Header = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-4 md:gap-6">
+          <div className="flex items-center gap-2 md:gap-4">
+
+            {/* Search Toggle */}
             <button
               onClick={() => setShowSearch(!showSearch)}
-              className="text-foreground hover:text-primary transition-colors"
+              className="p-2 text-foreground hover:text-primary transition-colors rounded-full hover:bg-muted/50"
               aria-label="Search"
             >
-              <Search className="w-5 h-5 md:w-6 md:h-6" />
+              <Search className="w-5 h-5" />
             </button>
 
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="hidden md:block text-foreground hover:text-primary transition-colors"
+              className="hidden md:block p-2 text-foreground hover:text-primary transition-colors rounded-full hover:bg-muted/50"
               aria-label="Toggle Theme"
             >
-              {theme === 'dark' ? (
-                <Sun className="w-5 h-5 md:w-6 md:h-6" />
-              ) : (
-                <Moon className="w-5 h-5 md:w-6 md:h-6" />
-              )}
+              <AnimatePresence mode='wait'>
+                {theme === 'dark' ? (
+                  <motion.div
+                    key="sun"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                  >
+                    <Sun className="w-5 h-5" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="moon"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                  >
+                    <Moon className="w-5 h-5" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </button>
 
+            {/* Wishlist */}
             <Link
               href="/Wishlist"
-              className="hidden md:block text-foreground hover:text-destructive transition-colors"
+              className="hidden md:block p-2 text-foreground hover:text-destructive transition-colors rounded-full hover:bg-muted/50"
               aria-label="Wishlist"
             >
-              <Heart className="w-5 h-5 md:w-6 md:h-6" />
+              <Heart className="w-5 h-5" />
             </Link>
 
+            {/* Account */}
             <Link
               href={user ? '/Profile' : '/Login'}
-              className="hidden md:block text-foreground hover:text-primary transition-colors"
+              className="hidden md:block p-2 text-foreground hover:text-primary transition-colors rounded-full hover:bg-muted/50"
               aria-label="Account"
             >
-              <User className="w-5 h-5 md:w-6 md:h-6" />
+              <User className="w-5 h-5" />
             </Link>
 
+            {/* Cart */}
             <div className="relative">
               <CartShop />
-              {cart?.length > 0 && (
-                <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-                  {cart.length}
-                </span>
-              )}
             </div>
 
+            {/* Mobile Menu Toggle */}
             <button
-              className="md:hidden text-foreground"
+              className="md:hidden p-2 text-foreground z-50"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              <Menu className="w-6 h-6" />
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
@@ -159,13 +187,13 @@ const Header = () => {
         <AnimatePresence>
           {showSearch && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 w-full bg-background border-b border-border shadow-lg p-4"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="border-t border-border bg-background/95 backdrop-blur-xl"
             >
-              <div className="container mx-auto max-w-2xl relative">
+              <div className="container mx-auto px-4 py-8 relative">
                 <ProductNavSearch
                   setShowSearch={setShowSearch}
                   search={search}
@@ -174,7 +202,7 @@ const Header = () => {
                 />
                 <button
                   onClick={() => setShowSearch(false)}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute top-4 right-4 p-2 hover:bg-muted rounded-full"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -182,46 +210,49 @@ const Header = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </header>
+      </motion.header>
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-0 z-[60] bg-background flex flex-col p-6 md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-background/98 backdrop-blur-xl md:hidden flex flex-col pt-24 px-6"
           >
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-serif font-bold">Menu</h2>
-              <button onClick={() => setMobileMenuOpen(false)}>
-                <X className="w-8 h-8" />
-              </button>
-            </div>
-            <nav className="flex flex-col gap-6 text-lg font-medium">
-              {navLinks.map(link => (
-                <Link
+            <nav className="flex flex-col gap-6">
+              {navLinks.map((link, i) => (
+                <motion.div
                   key={link.name}
-                  href={link.link}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-foreground hover:text-primary"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: i * 0.1 }}
                 >
-                  {link.name}
-                </Link>
+                  <Link
+                    href={link.link}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-3xl font-serif font-bold text-foreground hover:text-primary"
+                  >
+                    {link.name}
+                  </Link>
+                </motion.div>
               ))}
-              <div className="h-px bg-border my-2" />
-              <Link href="/Wishlist" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
-                <Heart className="w-5 h-5" /> Wishlist
-              </Link>
-              <Link href={user ? '/Profile' : '/Login'} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
-                <User className="w-5 h-5" /> {user ? 'Profile' : 'Login'}
-              </Link>
-              <button onClick={toggleTheme} className="flex items-center gap-3 text-left">
-                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-              </button>
+
+              <div className="h-px bg-border my-4" />
+
+              <div className="flex flex-col gap-4 text-lg font-medium">
+                <Link href="/Wishlist" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
+                  <Heart className="w-5 h-5" /> Wishlist
+                </Link>
+                <Link href={user ? '/Profile' : '/Login'} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
+                  <User className="w-5 h-5" /> {user ? 'Profile' : 'Login'}
+                </Link>
+                <button onClick={toggleTheme} className="flex items-center gap-3 text-left">
+                  {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                </button>
+              </div>
             </nav>
           </motion.div>
         )}

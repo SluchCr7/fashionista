@@ -1,79 +1,75 @@
 'use client';
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { memo } from 'react';
 import Image from 'next/image';
-import { Quote, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Quote, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { testimonials } from '../Data';
 
 const Opinions = memo(() => {
-  const [index, setIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const count = testimonials?.length || 0;
-
-  const safeIndex = (i) => (count ? (i + count) % count : 0);
-  const next = useCallback(() => setIndex((i) => safeIndex(i + 1)), [count]);
-  const prev = useCallback(() => setIndex((i) => safeIndex(i - 1)), [count]);
-
-  useEffect(() => {
-    if (isPaused || !count) return;
-    const id = setInterval(next, 6000);
-    return () => clearInterval(id);
-  }, [isPaused, count, next]);
-
-  if (!count) return null;
-  const t = testimonials[index];
-  const rating = typeof t.rating === 'number' ? t.rating : 5;
+  // Triple the list to ensure smooth infinite scroll without gaps on large screens
+  const marqueeList = [...testimonials, ...testimonials, ...testimonials];
 
   return (
-    <section className="py-24 bg-background overflow-hidden relative">
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <h2 className="text-3xl md:text-5xl font-serif font-bold text-center mb-16">
-          What Our Clients Say
-        </h2>
+    <section className="py-24 bg-background overflow-hidden relative border-t border-secondary/20">
+      <div className="container mx-auto px-4 md:px-6 mb-16 text-center">
+        <motion.span
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          className="text-primary font-bold tracking-widest uppercase text-xs mb-3 block"
+        >
+          Testimonials
+        </motion.span>
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-3xl md:text-5xl font-serif font-bold text-foreground"
+        >
+          Voices of Fashionista
+        </motion.h2>
+      </div>
 
-        <div className="max-w-4xl mx-auto relative" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.5 }}
-              className="bg-secondary/20 border border-border rounded-3xl p-10 md:p-14 text-center shadow-sm"
+      {/* Marquee Container */}
+      <div className="relative w-full overflow-hidden mask-linear-gradient" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
+        <motion.div
+          className="flex gap-6 md:gap-8 w-max px-4"
+          animate={{ x: "-33.33%" }}
+          transition={{ duration: 40, ease: "linear", repeat: Infinity }}
+        >
+          {marqueeList.map((t, index) => (
+            <div
+              key={`${t.name}-${index}`}
+              className="w-[300px] md:w-[400px] bg-secondary/10 backdrop-blur-sm border border-border/50 rounded-2xl p-8 flex flex-col justify-between hover:bg-secondary/20 transition-colors duration-300 group"
             >
-              <Quote className="w-12 h-12 text-primary mx-auto mb-8 opacity-50" />
-              <p className="text-xl md:text-2xl font-serif italic text-foreground/80 leading-relaxed mb-8">
-                {t.opinion}
-              </p>
-
-              <div className="flex items-center justify-center gap-1 mb-6 text-yellow-500">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} className={i < Math.round(rating) ? "fill-current" : "text-muted/30"}>★</span>
-                ))}
-              </div>
-
-              <div className="flex flex-col items-center">
-                <div className="relative w-16 h-16 rounded-full overflow-hidden mb-3 border-2 border-primary">
-                  <Image src={t.img} alt={t.name} fill className="object-cover" />
+              <div>
+                <div className="flex gap-1 mb-4 text-yellow-500">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={14} fill={i < (t.rating || 5) ? "currentColor" : "none"} className={i < (t.rating || 5) ? "" : "text-muted-foreground/20"} />
+                  ))}
                 </div>
-                <h4 className="font-bold text-lg">{t.name}</h4>
-                <span className="text-sm text-primary font-medium tracking-wider uppercase">{t.job}</span>
+                <Quote className="w-8 h-8 text-primary/20 mb-4 group-hover:text-primary/40 transition-colors" />
+                <p className="text-foreground/80 font-serif italic leading-relaxed text-lg mb-6 line-clamp-4">
+                  "{t.opinion}"
+                </p>
               </div>
-            </motion.div>
-          </AnimatePresence>
 
-          {/* Controls */}
-          <div className="absolute top-1/2 -translate-y-1/2 left-0 -ml-4 md:-ml-12 z-20">
-            <button onClick={prev} className="p-3 rounded-full bg-background border border-border shadow-md hover:bg-muted transition-colors">
-              <ChevronLeft size={24} />
-            </button>
-          </div>
-          <div className="absolute top-1/2 -translate-y-1/2 right-0 -mr-4 md:-mr-12 z-20">
-            <button onClick={next} className="p-3 rounded-full bg-background border border-border shadow-md hover:bg-muted transition-colors">
-              <ChevronRight size={24} />
-            </button>
-          </div>
-        </div>
+              <div className="flex items-center gap-4 mt-auto">
+                <div className="relative w-12 h-12 rounded-full overflow-hidden border border-border">
+                  <Image
+                    src={t.img}
+                    alt={t.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm text-foreground">{t.name}</h4>
+                  <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{t.job || "Verified Customer"}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

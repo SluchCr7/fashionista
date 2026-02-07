@@ -7,6 +7,7 @@ import { Heart, SlidersHorizontal, ChevronDown, ChevronUp, Check, X, Grid, List 
 import { ProductContext } from "@/app/Context/ProductContext";
 import { CartContext } from "@/app/Context/Cart";
 import { motion, AnimatePresence } from "framer-motion";
+import ProductCard from "@/app/Components/ProductCard";
 
 const Shop = () => {
   const searchParams = useSearchParams();
@@ -54,6 +55,7 @@ const Shop = () => {
       params.minPrice ? parseFloat(params.minPrice) : 0,
       params.maxPrice ? parseFloat(params.maxPrice) : 200,
     ]);
+    if (params.sort) setSortPrice(params.sort);
   }, [searchParams]);
 
   const updateUrlParams = (newFilters) => {
@@ -263,37 +265,10 @@ const Shop = () => {
           </div>
         ) : (
           <>
-            <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
+            <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
               {paginatedProducts.map((prod) => (
-                <motion.div key={prod._id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group relative">
-                  <Link href={`/Product/${prod._id}`} className="block overflow-hidden rounded-lg bg-secondary/20 aspect-[3/4]">
-                    <Image
-                      src={prod.Photo?.[0]?.url || '/placeholder.jpg'}
-                      alt={prod.name}
-                      fill
-                      className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-                    />
-                    {discount > 0 && (
-                      <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm">
-                        -{discount}%
-                      </div>
-                    )}
-                  </Link>
-
-                  <div className="mt-4 space-y-1">
-                    <h3 className="font-serif font-bold text-lg leading-tight group-hover:underline decoration-1 underline-offset-4 truncate">{prod.name}</h3>
-                    <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground text-sm font-medium">
-                        ${prod.price} {discount > 0 && <span className="line-through opacity-50 ml-1">${(prod.price * (1 + discount / 100)).toFixed(2)}</span>}
-                      </p>
-                      <button
-                        onClick={() => addToCart(prod, 1)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-primary font-medium text-xs uppercase tracking-wider flex items-center gap-1"
-                      >
-                        Add <Plus size={14} />
-                      </button>
-                    </div>
-                  </div>
+                <motion.div key={prod._id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <ProductCard product={prod} />
                 </motion.div>
               ))}
             </motion.div>

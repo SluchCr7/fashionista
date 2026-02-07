@@ -1,111 +1,271 @@
-'use client'
+'use client';
 import axios from 'axios';
-import React, { useEffect, useState , useContext} from 'react'
-import { createContext } from 'react'
-import Notify from '../Components/Notify';
+import React, { useEffect, useState, useContext, useCallback, useMemo } from 'react';
+import { createContext } from 'react';
 import { UserContext } from './UserContext';
+import { toast, ecommerceToasts } from '@/lib/toast';
+
 export const CartContext = createContext();
-const CartContextProvider = ({children}) => {
-  const [cart, setCart] = useState([])
-  const [numInCart, setNumInCart] = useState(0)
-  const [finalCart, setFinalCart] = useState([])
-  const [message, setMessage] = useState('')
-  const [orders , setOrders] = useState([])
-  const [discount , setDiscount] = useState(0)
-  const { user } = useContext(UserContext)
-  const addToCart = (product, quantity = 1) => {
-    if (!product || !product._id) return;
+
+const CartContextProvider = ({ children }) => {
+  const [cart, setCart] = useState([]);
+  const [numInCart, setNumInCart] = useState(0);
+  const [finalCart, setFinalCart] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [discount, setDiscount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useContext(UserContext);
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('cart');
+    if (saved) {
+      try {
+        const parsedCart = JSON.parse(saved);
+        setCart(parsedCart);
+        setNumInCart(parsedCart.length);
+      } catch (error) {
+        console.error('Error loading cart:', error);
+        localStorage.removeItem('cart');
+      }
+    }
+  }, []);
+
+  // Sync cart count with cart length
+  useEffect(() => {
+    setNumInCart(cart.length);
+  }, [cart]);
+
+  // Add to cart with optimized state updates
+  const addToCart = useCallback((product, quantity = 1) => {
+    if (!product || !product._id) {
+      toast.error('Invalid product');
+      return;
+    }
 
     setCart((prevCart) => {
       const existing = prevCart.find((item) => item._id === product._id);
-
       let updatedCart;
+
       if (existing) {
         updatedCart = prevCart.map((item) =>
           item._id === product._id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
-        setMessage(`✅ Updated quantity for ${product.name}`);
+        ecommerceToasts.updatedQuantity(product.name);
       } else {
         updatedCart = [...prevCart, { ...product, quantity, discount }];
-        setMessage(`🛒 Added ${product.name} to cart`);
-        setNumInCart((prev) => prev + 1);
+        ecommerceToasts.addedToCart(product.name);
       }
 
       // Save to localStorage
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
-      setTimeout(() => setMessage(""), 3000);
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
       return updatedCart;
     });
+  }, [discount]);
+
+  // Remove from cart
+  const removeFromCart = useCallback((productId, productName) => {
+    setCart((prevCart) => {
+      const updatedCart = prevCart.filter((item) => item._id !== productId);
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+      ecommerceToasts.removedFromCart(productName);
+      return updatedCart;
+    });
+  }, []);
+
+  // Update quantity
+  const updateQuantity = useCallback((productId, newQuantity, productName) => {
+    if (newQuantity < 1) {
+      removeFromCart(productId, productName);
+      return;
+    }
+
+    setCart((prevCart) => {
+      const updatedCart = prevCart.map((item) =>
+        item._id === productId ? { ...item, quantity: newQuantity } : item
+      );
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+      ecommerceToasts.updatedQuantity(productName);
+      return updatedCart;
+    });
+  }, [removeFromCart]);
+
+  // Clear cart
+  const clearCart = useCallback(() => {
+    setCart([]);
+    setNumInCart(0);
+    localStorage.removeItem('cart');
+    toast.info('Cart cleared');
+  }, []);
+
+  // Submit cart
+  const SubmitCart = useCallback((Cart) => {
+    setFinalCart(Cart);
+  }, []);
+
+  // Submit order with better error handling
+  const submitOrder = useCallback(async (Products, address, phoneNumber, total) => {
+    if (!user || !user.token) {
+      toast.error('Please login to place an order');
+      return;
+    }
+
+    setIsLoading(true);
+    const toastId = toast.loading('Placing your order...');
+
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/order`,
+        { Products, address, phoneNumber, total },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      // Clear cart on success
+      setFinalCart([]);
+      setCart([]);
+      setNumInCart(0);
+      localStorage.removeItem('cart');
+
+      toast.update(toastId, {
+        render: '🎉 Order placed successfully!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000,
+      });
+
+      // Redirect to orders page
+      setTimeout(() => {
+        window.location.href = '/Order';
+      }, 1000);
+    } catch (error) {
+      console.error('Order submission error:', error);
+      toast.update(toastId, {
+        render: error.response?.data?.message || 'Failed to place order. Please try again.',
+        type: 'error',
+        isLoading: false,
+        autoClose: 4000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
+
+  // Fetch orders
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order`);
+        setOrders(res.data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  // Delete order
+  const deleteOrder = useCallback(async (id) => {
+    const toastId = toast.loading('Cancelling order...');
+
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order/${id}`);
+
+      toast.update(toastId, {
+        render: 'Order cancelled successfully',
+        type: 'success',
+        isLoading: false,
+        autoClose: 2000,
+      });
+
+      // Refresh orders
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast.update(toastId, {
+        render: 'Failed to cancel order',
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000,
+      });
+    }
+  }, []);
+
+  // Fetch discount
+  useEffect(() => {
+    const fetchDiscount = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/discount`);
+        const latestDiscount = res.data[res.data.length - 1]?.discount || 0;
+        setDiscount(latestDiscount);
+      } catch (error) {
+        console.error('Error fetching discount:', error);
+      }
+    };
+
+    fetchDiscount();
+  }, []);
+
+  // Add discount
+  const AddDiscount = useCallback(async (discountValue) => {
+    try {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/discount`, {
+        discount: discountValue,
+      });
+      toast.success(res.data.message || 'Discount updated successfully');
+      setDiscount(discountValue);
+    } catch (error) {
+      console.error('Error adding discount:', error);
+      toast.error('Failed to update discount');
+    }
+  }, []);
+
+  // Calculate cart total
+  const cartTotal = useMemo(() => {
+    return cart.reduce((total, item) => {
+      const price = item.price || 0;
+      const quantity = item.quantity || 1;
+      const itemDiscount = discount || 0;
+      const discountedPrice = price - (price * itemDiscount) / 100;
+      return total + discountedPrice * quantity;
+    }, 0);
+  }, [cart, discount]);
+
+  // Calculate cart item count
+  const cartItemCount = useMemo(() => {
+    return cart.reduce((count, item) => count + (item.quantity || 1), 0);
+  }, [cart]);
+
+  const value = {
+    cart,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    numInCart,
+    finalCart,
+    SubmitCart,
+    submitOrder,
+    orders,
+    deleteOrder,
+    discount,
+    AddDiscount,
+    cartTotal,
+    cartItemCount,
+    isLoading,
   };
 
-  // 🧩 Load cart from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("cart");
-    if (saved) setCart(JSON.parse(saved));
-  }, []);
-    const SubmitCart = (Cart) => {
-      setFinalCart(Cart)
-    }
-    const submitOrder = async (Products , address , phoneNumber , total) => {
-      await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order`, { Products, address, phoneNumber, total },
-        {
-            headers:
-                { Authorization: `Bearer ${user.token}` }
-        }
-      )
-        .then(res => {
-          setFinalCart([])
-          setCart([])
-          setNumInCart(0)
-          localStorage.removeItem("cart")
-          setMessage("Order Submitted Successfully")
-          setTimeout(() => setMessage(""), 3000)
-          window.location.href = "/Order"
-        })
-        .catch(err => console.log(err))
-    }
-    useEffect(() => {
-      axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order`)
-        .then(res => {
-          setOrders(res.data)
-        })
-        .catch(err => console.log(err))
-    },[])
-    const deleteOrder = async(id) => {
-      await axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order/${id}` , {} , 
-      )
-        .then(res => {
-            setMessage("Order Delete Successfully")
-            setTimeout(()=> setMessage('') , 3000)
-            window.location.reload()
-        })
-        .catch(err => console.log(err))
-    }
-    useEffect(() => {
-      axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/discount`)
-        .then((res) => {
-          setDiscount(res.data[res.data.length - 1]?.discount)
-        })
-        .catch(err => console.log(err))
-    },[])
-  const AddDiscount = (discount) => {
-    axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/discount`, { discount })
-        .then((res) => {
-          setMessage(res.data.message)
-          setTimeout(() => setMessage(''), 3000)
-        })
-        .catch(err => console.log(err))
-    }
   return (
-    <div className="relative">
-        <Notify Notify={message}/>
-        <CartContext.Provider value={{cart , addToCart , numInCart , finalCart , SubmitCart, submitOrder , orders , deleteOrder , discount , AddDiscount}}>
-            {children}
-        </CartContext.Provider>
-      </div>
-  )
-}
+    <CartContext.Provider value={value}>
+      {children}
+    </CartContext.Provider>
+  );
+};
 
-export default CartContextProvider
+export default CartContextProvider;

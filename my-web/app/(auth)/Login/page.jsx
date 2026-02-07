@@ -1,110 +1,125 @@
 'use client';
-import Notify from '@/app/Components/Notify';
 import { UserContext } from '@/app/Context/UserContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useContext, useState } from 'react';
-import { ArrowRight, Lock } from 'lucide-react';
+import { ArrowRight, Lock, Mail, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { toast } from '@/lib/toast';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPass] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { Login } = useContext(UserContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (email === "" || password === "") {
-      setMessage("Please enter email and password");
-      setTimeout(() => setMessage(""), 3000);
-    } else {
-      try {
-        setLoading(true);
-        await Login(email, password);
-      } catch (err) {
-        setMessage("Invalid credentials");
-        setTimeout(() => setMessage(""), 3000);
-      } finally {
-        setLoading(false);
-      }
+    if (!email || !password) {
+      toast.error("Please enter your credentials");
+      return;
     }
+
+    setLoading(true);
+    // UserContext's Login function handles success/error toasts
+    await Login(email, password);
+    setLoading(false);
   }
 
   return (
-    <>
-      <Notify Notify={message} />
-      <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen bg-background text-foreground overflow-hidden">
 
-        {/* Image Side */}
-        <div className="hidden lg:block w-1/2 relative bg-secondary/20">
-          <Image
-            src="/Hero/HeroWomen.jpg" // Using an existing image
-            alt="Login Visual"
-            fill
-            className="object-cover mix-blend-multiply opacity-80"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-20 text-white">
-            <h2 className="text-4xl font-serif font-bold mb-4">Welcome Back</h2>
-            <p className="text-lg opacity-80">Sign in to access your curated fashion feed and exclusive offers.</p>
-          </div>
+      {/* Visual Side */}
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
+        className="hidden lg:block w-1/2 relative bg-secondary/10"
+      >
+        <Image
+          src="/Hero/HeroWomen.jpg"
+          alt="Login Visual"
+          fill
+          className="object-cover mix-blend-multiply opacity-90"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-16 text-white">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+          >
+            <h2 className="text-5xl font-serif font-bold mb-6 leading-tight">Welcome Back,<br />Trendsetter.</h2>
+            <p className="text-xl font-light opacity-90 max-w-md">Your personalized collection awaits. Continue your style journey with us.</p>
+          </motion.div>
         </div>
+      </motion.div>
 
-        {/* Form Side */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16">
-          <div className="w-full max-w-md space-y-10">
-            <div className="text-center">
-              <Link href="/" className="inline-block mb-8">
-                <h1 className="text-3xl font-serif font-bold tracking-tighter uppercase">Fashion<span className="text-primary">ista</span></h1>
-              </Link>
-              <h2 className="text-2xl font-bold mb-2">Login to your account</h2>
-              <p className="text-muted-foreground">Enter your details below to continue.</p>
-            </div>
+      {/* Form Side */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-12 relative">
+        <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
 
-            <form onSubmit={handleLogin} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Email</label>
+        <div className="w-full max-w-md space-y-8 relative z-10">
+          <div className="text-center md:text-left">
+            <Link href="/" className="inline-block mb-10 group">
+              <h1 className="text-3xl font-serif font-bold tracking-tighter uppercase group-hover:text-primary transition-colors">Fashion<span className="text-primary group-hover:text-foreground">ista</span></h1>
+            </Link>
+            <h2 className="text-3xl font-bold mb-3 text-foreground">Sign In</h2>
+            <p className="text-muted-foreground text-lg">Enter your details to access your account.</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2 group">
+              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary transition-colors">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5 group-focus-within:text-primary transition-colors" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-secondary/30 border border-border rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                  placeholder="john@example.com"
+                  className="w-full bg-secondary/30 border border-border rounded-xl pl-12 pr-4 py-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-sm"
+                  placeholder="name@example.com"
                 />
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Password</label>
-                  <Link href="/Forgot" className="text-xs text-primary hover:underline">Forgot password?</Link>
-                </div>
+            <div className="space-y-2 group">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary transition-colors">Password</label>
+                <Link href="/Forgot" className="text-xs font-semibold text-primary hover:underline underline-offset-4">Forgot Password?</Link>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5 group-focus-within:text-primary transition-colors" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPass(e.target.value)}
-                  className="w-full bg-secondary/30 border border-border rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  className="w-full bg-secondary/30 border border-border rounded-xl pl-12 pr-4 py-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-sm"
                   placeholder="••••••••"
                 />
               </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-primary text-primary-foreground py-4 rounded-full font-bold uppercase tracking-widest hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? "Signing In..." : <>Login <ArrowRight size={18} /></>}
-              </button>
-            </form>
-
-            <div className="text-center text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <Link href="/Register" className="text-primary font-bold hover:underline">Sign Up</Link>
             </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-foreground text-background py-4 rounded-full font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none mt-4"
+            >
+              {loading ? <Loader2 className="animate-spin w-5 h-5" /> : <>Login <ArrowRight size={18} /></>}
+            </button>
+          </form>
+
+          <div className="text-center pt-4">
+            <p className="text-muted-foreground">
+              Don't have an account?{" "}
+              <Link href="/Register" className="text-primary font-bold hover:underline underline-offset-4 decoration-2">
+                Create Account
+              </Link>
+            </p>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
