@@ -53,7 +53,7 @@ const OrderPage = () => {
           <div className="text-center py-20 bg-secondary/20 rounded-3xl border border-dashed border-border">
             <ShoppingBag className="w-16 h-16 mx-auto mb-6 text-muted-foreground/30" />
             <h2 className="text-2xl font-serif font-bold mb-2">No orders found</h2>
-            <p className="text-muted-foreground mb-8 text-sm">You haven't placed any orders yet.</p>
+            <p className="text-muted-foreground mb-8 text-sm">You haven&apos;t placed any orders yet.</p>
             <button
               onClick={() => window.location.href = '/Shop'}
               className="bg-primary text-primary-foreground px-8 py-3 rounded-full font-bold uppercase tracking-widest hover:scale-105 transition-all text-sm"

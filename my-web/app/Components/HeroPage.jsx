@@ -44,20 +44,20 @@ const HeroPage = () => {
     },
   ];
 
-  const nextSlide = () => {
+  const nextSlide = React.useCallback(() => {
     setDirection(1);
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
+  }, [slides.length]);
 
-  const prevSlide = () => {
+  const prevSlide = React.useCallback(() => {
     setDirection(-1);
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  }, [slides.length]);
 
   useEffect(() => {
     const timer = setInterval(nextSlide, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [nextSlide]);
 
   const slideVariants = {
     enter: (direction) => ({
@@ -243,8 +243,8 @@ const HeroPage = () => {
               setCurrentSlide(index);
             }}
             className={`transition-all duration-300 rounded-full ${index === currentSlide
-                ? 'w-12 h-3 bg-white'
-                : 'w-3 h-3 bg-white/40 hover:bg-white/60'
+              ? 'w-12 h-3 bg-white'
+              : 'w-3 h-3 bg-white/40 hover:bg-white/60'
               }`}
             aria-label={`Go to slide ${index + 1}`}
           />

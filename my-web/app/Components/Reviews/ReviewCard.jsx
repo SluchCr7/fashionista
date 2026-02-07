@@ -156,7 +156,7 @@ const ReviewCard = ({ review }) => {
                 <>
                     <StarRating rating={review.rating} readonly size={16} className="mb-3" />
                     <p className="text-sm text-foreground/80 leading-relaxed italic">
-                        "{review.comment}"
+                        &quot;{review.comment}&quot;
                     </p>
                 </>
             )}
