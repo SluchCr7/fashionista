@@ -96,7 +96,7 @@ const CartShop = () => {
                     <div className="space-y-2">
                       <p className="text-xl font-medium font-serif">Your bag is empty</p>
                       <p className="text-muted-foreground text-sm max-w-[200px] mx-auto">
-                        Looks like you haven't added any items yet.
+                        Looks like you have not added any items yet.
                       </p>
                     </div>
                     <button

@@ -248,7 +248,7 @@ const Profile = () => {
                 </div>
                 <h3 className="text-2xl font-serif font-bold">No orders yet</h3>
                 <p className="text-muted-foreground mt-2 max-w-sm mx-auto mb-8">
-                  You haven't placed any orders yet. Discover our latest collections today.
+                  You have not placed any orders yet. Discover our latest collections today.
                 </p>
                 <Link
                   href="/Shop"

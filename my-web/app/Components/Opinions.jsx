@@ -49,7 +49,7 @@ const Opinions = memo(() => {
                 </div>
                 <Quote className="w-8 h-8 text-primary/20 mb-4 group-hover:text-primary/40 transition-colors" />
                 <p className="text-foreground/80 font-serif italic leading-relaxed text-lg mb-6 line-clamp-4">
-                  "{t.opinion}"
+                  {t.opinion}
                 </p>
               </div>
 

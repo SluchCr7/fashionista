@@ -70,7 +70,7 @@ const ProductNavSearch = ({ setShowSearch, search, setSearch, filteredProducts }
               <div className="w-16 h-16 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="w-8 h-8 text-muted-foreground/50" />
               </div>
-              <p className="text-muted-foreground font-medium">No products found for "{search}"</p>
+              <p className="text-muted-foreground font-medium">No products found for {search}</p>
             </div>
           )
         ) : (
