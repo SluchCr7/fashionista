@@ -108,7 +108,7 @@ const ProductCard = ({ product, showRating = false }) => {
                 {/* Wishlist Button */}
                 <button
                     onClick={handleWishlist}
-                    className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full text-foreground hover:text-destructive transition-all hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 duration-300 z-10"
+                    className="absolute top-3 right-3 p-2 bg-background/80 backdrop-blur-md rounded-full text-foreground hover:text-destructive transition-all hover:bg-background shadow-sm opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 duration-300 z-10 border border-border/20"
                 >
                     <Heart
                         className={`w-4 h-4 ${user?.favorites?.includes(product._id) ? 'fill-destructive text-destructive' : ''}`}
@@ -120,7 +120,7 @@ const ProductCard = ({ product, showRating = false }) => {
                     <button
                         onClick={handleAddToCart}
                         disabled={isAdding}
-                        className="w-full bg-white/90 backdrop-blur-md text-foreground hover:bg-primary hover:text-primary-foreground py-3 text-xs font-bold uppercase tracking-widest shadow-lg transition-all flex items-center justify-center gap-2 rounded-sm"
+                        className="w-full bg-background/90 backdrop-blur-xl text-foreground hover:bg-primary hover:text-primary-foreground py-3 text-[10px] font-bold uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-2 rounded-lg border border-border/40"
                     >
                         {isAdding ? (
                             <span className="animate-pulse">Processing...</span>

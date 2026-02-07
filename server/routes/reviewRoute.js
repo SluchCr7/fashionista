@@ -1,14 +1,23 @@
-const { AddNewReview, getAllReviews, getReview, deleteReview } = require('../Controllers/ReviewController')
-const express = require('express')
-const route = express.Router()
-const {verifyToken , verifyAdmain} = require("../Middelware/verifyToken")
+const express = require('express');
+const router = express.Router();
+const {
+    addReview,
+    getProductReviews,
+    updateReview,
+    deleteReview,
+    getAllReviews,
+    getReview
+} = require('../Controllers/ReviewController');
+const { verifyToken, verifyAdmain } = require("../Middelware/verifyToken");
 
-route.route('/')
-    .get(getAllReviews)
-    .post(verifyToken , AddNewReview)
+// Public Routes
+router.get('/product/:productId', getProductReviews); // Get reviews for a specific product
+router.get('/:id', getReview); // Get single review
+router.get('/', getAllReviews); // Get all reviews (mostly for admin/debug)
 
-route.route('/:id') 
-    .get(getReview)
-    .delete(deleteReview)
+// Protected Routes
+router.post('/', verifyToken, addReview); // Add review
+router.put('/:id', verifyToken, updateReview); // Update review (owner only)
+router.delete('/:id', verifyToken, deleteReview); // Delete review (owner or admin)
 
-module.exports = route
+module.exports = router;

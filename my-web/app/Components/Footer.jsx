@@ -28,7 +28,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-foreground text-background pt-24 pb-12 relative overflow-hidden">
+    <footer className="bg-[#0f1115] text-white/90 pt-24 pb-12 relative overflow-hidden">
       {/* Background Texture */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.2),transparent_70%)]" />

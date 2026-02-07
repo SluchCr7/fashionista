@@ -10,6 +10,7 @@ import { Star, Heart, ShoppingBag, Minus, Plus, Share2, ChevronDown, Check, Info
 import ProductSkeleton from "@/app/Skeletons/ProductSkeleton";
 import { toast } from "@/lib/toast";
 import ProductCard from "@/app/Components/ProductCard";
+import ReviewsSection from "@/app/Components/Reviews/ReviewsSection";
 
 const Product = ({ params }) => {
   const { id } = params;
@@ -94,8 +95,8 @@ const Product = ({ params }) => {
                     key={idx}
                     onClick={() => setActiveImage(idx)}
                     className={`relative flex-shrink-0 w-20 h-20 lg:w-24 lg:h-24 rounded-lg overflow-hidden border transition-all duration-300 ${activeImage === idx
-                        ? "border-primary ring-1 ring-primary/50 opacity-100 scale-95"
-                        : "border-transparent opacity-70 hover:opacity-100 hover:border-border"
+                      ? "border-primary ring-1 ring-primary/50 opacity-100 scale-95"
+                      : "border-transparent opacity-70 hover:opacity-100 hover:border-border"
                       }`}
                   >
                     <Image src={img.url} alt={`View ${idx}`} fill className="object-cover" />
@@ -160,10 +161,10 @@ const Product = ({ params }) => {
                 <span className="text-3xl font-medium">${product.price}</span>
               </div>
               <div className="flex items-center gap-1.5 bg-secondary/30 px-3 py-1.5 rounded-full">
-                <Star size={16} fill="currentColor" className="text-yellow-500" />
-                <span className="font-bold text-sm">4.8</span>
+                <Star size={16} fill="currentColor" className="text-yellow-400" />
+                <span className="font-bold text-sm">{(product.averageRating || 0).toFixed(1)}</span>
                 <span className="text-xs text-muted-foreground underline decoration-muted-foreground/50 underline-offset-2">
-                  {product.reviews?.length || 12} Reviews
+                  {product.reviewsCount || 0} Reviews
                 </span>
               </div>
             </div>
@@ -310,6 +311,9 @@ const Product = ({ params }) => {
               ))}
           </div>
         </div>
+
+        {/* 3. REVIEWS & RATINGS SECTION */}
+        <ReviewsSection product={product} />
       </div>
     </div>
   );

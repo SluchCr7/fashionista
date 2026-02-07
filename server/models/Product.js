@@ -4,62 +4,77 @@ const joi = require("joi");
 const ProductSchema = new mongoose.Schema({
     name: {
         type: String,
-        required : true
+        required: true
     },
     price: {
         type: Number,
-        required : true
+        required: true
     },
-    description : {
+    description: {
         type: String,
-        default : "Product Description"
+        default: "Product Description"
     },
     quantity: {
         type: Number,
-        required : true
+        required: true
     },
-    Photo : {
-        type : Array,
-        required : true
+    Photo: {
+        type: Array,
+        required: true
     },
     model: {
         type: String,
-        default : "Sluch"
+        default: "Sluch"
     },
     material: {
         type: String,
-        default : "Leather"
+        default: "Leather"
     },
     sizes: {
         type: Array,
-        required : true
+        required: true
     },
-    colors : {
+    colors: {
         type: Array,
-        required : true
+        required: true
     },
     gender: {
         type: String,
-        required : true
+        required: true
     },
     collections: {
         type: String,
         // required : true
     },
     category: {
-        type: String,   
-        required : true
+        type: String,
+        required: true
     },
     rating: {
-        type: Number, 
-        default : 0
+        type: Number,
+        default: 0
     },
-}, { timestamps : true })
+    averageRating: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5
+    },
+    reviewsCount: {
+        type: Number,
+        default: 0
+    },
+    ratingBreakdown: {
+        type: Map,
+        of: Number,
+        default: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+    }
+}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } })
 
 ProductSchema.virtual("reviews", {
-  ref: "Review",      
-  localField: "_id",        
-  foreignField: "product",  
+    ref: "Review",
+    localField: "_id",
+    foreignField: "product",
 });
 
 const Product = mongoose.model("Product", ProductSchema)
@@ -71,11 +86,14 @@ const ProductValidate = (obj) => {
         description: joi.string(),
         quantity: joi.number().required(),
         material: joi.string(),
-        sizes : joi.array().required(),
+        sizes: joi.array().required(),
         colors: joi.array().required(),
         collections: joi.string(),
-        gender : joi.string().required(),
+        gender: joi.string().required(),
         // rating : joi.number(),
+        averageRating: joi.number(),
+        reviewsCount: joi.number(),
+        ratingBreakdown: joi.object(),
         model: joi.string(),
         category: joi.string(),
     })
@@ -87,7 +105,7 @@ const UpdateProductValidate = (obj) => {
         name: joi.string(),
         price: joi.number(),
         description: joi.string(),
-        quantity : joi.number(),
+        quantity: joi.number(),
         // rating : joi.number(),
         model: joi.string(),
         category: joi.string(),
@@ -95,4 +113,4 @@ const UpdateProductValidate = (obj) => {
     return schema.validate(obj);
 }
 
-module.exports = {Product, ProductValidate, UpdateProductValidate}
+module.exports = { Product, ProductValidate, UpdateProductValidate }

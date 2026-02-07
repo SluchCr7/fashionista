@@ -4,132 +4,138 @@
 
 @layer base {
   :root {
-    /* Premium Fashion Color Palette */
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    /* Premium Fashion Palette - Light Mode */
+    --background: 40 10% 98%;
+    /* Soft Pearl Off-white */
+    --foreground: 220 20% 12%;
+    /* Deep Charcoal */
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 220 20% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    
-    /* Sophisticated Black for Primary Actions */
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    
-    /* Warm Neutral Secondary */
-    --secondary: 40 10% 96%;
-    --secondary-foreground: 240 5.9% 10%;
-    
-    /* Muted Backgrounds */
-    --muted: 40 10% 95%;
-    --muted-foreground: 240 3.8% 46.1%;
-    
-    /* Accent - Elegant Gold */
-    --accent: 38 92% 50%;
-    --accent-foreground: 240 5.9% 10%;
-    
-    /* Destructive - Refined Red */
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    
-    /* Success - Elegant Green */
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 98%;
-    
-    /* Warning - Sophisticated Amber */
-    --warning: 38 92% 50%;
-    --warning-foreground: 240 5.9% 10%;
-    
-    /* Info - Premium Blue */
-    --info: 221 83% 53%;
-    --info-foreground: 0 0% 98%;
-    
-    /* Borders & Inputs */
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
-    
+    --popover-foreground: 220 20% 12%;
+
+    /* Sophisticated Navy/Black */
+    --primary: 220 25% 10%;
+    --primary-foreground: 40 10% 98%;
+
+    /* Elegant Champagne Secondary */
+    --secondary: 40 15% 94%;
+    --secondary-foreground: 220 25% 10%;
+
+    /* Muted Tones */
+    --muted: 40 10% 92%;
+    --muted-foreground: 220 10% 45%;
+
+    /* Refined Antique Gold */
+    --accent: 38 45% 55%;
+    --accent-foreground: 220 25% 10%;
+
+    /* Refined Meaningful Colors */
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 145 50% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 35 90% 50%;
+    --warning-foreground: 220 25% 10%;
+
+    --info: 210 80% 50%;
+    --info-foreground: 0 0% 100%;
+
+    /* Interactive Elements */
+    --border: 220 15% 88%;
+    --input: 220 15% 92%;
+    --ring: 220 25% 10%;
+    --radius: 0.75rem;
+
     /* Premium Gradients */
-    --gradient-primary: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-    --gradient-accent: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-    --gradient-hero: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
+    --gradient-primary: linear-gradient(135deg, #12141d 0%, #2a2e3a 100%);
+    --gradient-accent: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+    --gradient-hero: linear-gradient(135deg, rgba(18, 20, 29, 0.8) 0%, rgba(18, 20, 29, 0.4) 100%);
   }
 
   .dark {
-    /* Dark Mode - Premium Fashion */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 5.9% 10%;
-    --popover-foreground: 0 0% 98%;
-    
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    
-    --accent: 38 92% 50%;
-    --accent-foreground: 240 5.9% 10%;
-    
+    /* Premium Fashion Palette - Dark Mode (Sleek Obsidian) */
+    --background: 220 25% 7%;
+    /* Deep Obsidian */
+    --foreground: 210 20% 94%;
+    /* Soft Cloud White */
+    --card: 220 25% 9%;
+    --card-foreground: 210 20% 94%;
+    --popover: 220 25% 10%;
+    --popover-foreground: 210 20% 94%;
+
+    --primary: 210 20% 98%;
+    --primary-foreground: 220 25% 10%;
+
+    --secondary: 220 15% 14%;
+    --secondary-foreground: 210 20% 94%;
+
+    --muted: 220 15% 12%;
+    --muted-foreground: 210 10% 65%;
+
+    --accent: 38 55% 65%;
+    /* Radiant Gold */
+    --accent-foreground: 220 25% 10%;
+
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 98%;
-    
-    --warning: 38 92% 50%;
-    --warning-foreground: 240 5.9% 10%;
-    
-    --info: 221 83% 53%;
-    --info-foreground: 0 0% 98%;
-    
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    
-    --gradient-primary: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-    --gradient-accent: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-    --gradient-hero: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 100%);
+    --destructive-foreground: 210 20% 94%;
+
+    --success: 145 45% 35%;
+    --success-foreground: 210 20% 94%;
+
+    --warning: 38 55% 65%;
+    --warning-foreground: 220 25% 10%;
+
+    --info: 210 80% 50%;
+    --info-foreground: 210 20% 94%;
+
+    --border: 220 15% 15%;
+    --input: 220 15% 18%;
+    --ring: 210 20% 94%;
+
+    --gradient-primary: linear-gradient(135deg, #0a0a0b 0%, #15171e 100%);
+    --gradient-accent: linear-gradient(135deg, #c5a059 0%, #e0c58e 100%);
+    --gradient-hero: linear-gradient(135deg, rgba(10, 10, 11, 0.9) 0%, rgba(10, 10, 11, 0.5) 100%);
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease;
   }
-  
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
     text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-serif tracking-tight;
     font-weight: 600;
     line-height: 1.2;
   }
-  
+
   h1 {
     @apply text-4xl md:text-5xl lg:text-6xl;
   }
-  
+
   h2 {
     @apply text-3xl md:text-4xl lg:text-5xl;
   }
-  
+
   h3 {
     @apply text-2xl md:text-3xl lg:text-4xl;
   }
-  
+
   p {
     @apply leading-7;
   }
@@ -159,55 +165,54 @@
   .transition-smooth {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .transition-smooth-slow {
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .hover-lift {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
-  
+
   .hover-lift:hover {
     transform: translateY(-4px);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
   }
-  
+
   .glass-effect {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
-  
+
   .dark .glass-effect {
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
+
   .gradient-text {
     background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   .shimmer {
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.2) 20%,
-      rgba(255, 255, 255, 0.5) 60%,
-      rgba(255, 255, 255, 0)
-    );
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.2) 20%,
+        rgba(255, 255, 255, 0.5) 60%,
+        rgba(255, 255, 255, 0));
     animation: shimmer 2s infinite;
     background-size: 200% 100%;
   }
-  
+
   @keyframes shimmer {
     0% {
       background-position: -200% 0;
     }
+
     100% {
       background-position: 200% 0;
     }

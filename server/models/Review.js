@@ -10,7 +10,7 @@ const reviewSchema = new mongoose.Schema({
     product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
-        required : true
+        required: true
     },
     rating: {
         type: Number,
@@ -20,9 +20,12 @@ const reviewSchema = new mongoose.Schema({
     },
     comment: {
         type: String,
-        // required: true,
+        required: false, // Make comment optional explicit
     },
 }, { timestamps: true });
+
+// Prevent user from reviewing the same product twice
+reviewSchema.index({ product: 1, user: 1 }, { unique: true });
 
 const Review = mongoose.model("Review", reviewSchema);
 
@@ -34,6 +37,6 @@ const ReviewValidate = (obj) => {
         comment: joi.string().allow(''),  // Allow empty comment
     });
     return schema.validate(obj);
-};  
+};
 
 module.exports = { Review, ReviewValidate };

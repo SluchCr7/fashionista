@@ -105,42 +105,62 @@ const CartContextProvider = ({ children }) => {
     setFinalCart(Cart);
   }, []);
 
-  // Submit order with better error handling
-  const submitOrder = useCallback(async (Products, address, phoneNumber, total) => {
+  // Submit order with new structured data
+  const submitOrder = useCallback(async (shippingDetails, subtotal, shippingFee, total) => {
     if (!user || !user.token) {
       toast.error('Please login to place an order');
       return;
     }
 
+    if (cart.length === 0) {
+      toast.error('Your cart is empty');
+      return;
+    }
+
     setIsLoading(true);
-    const toastId = toast.loading('Placing your order...');
+    const toastId = toast.loading('Processing your order...');
 
     try {
-      await axios.post(
+      // Format items for the new Order Model
+      const items = cart.map(item => ({
+        product: item._id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        size: item.size || 'M',
+        color: item.color || 'Standard',
+        image: item.image?.[0] || item.Photo?.[0]?.url || ''
+      }));
+
+      const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/order`,
-        { Products, address, phoneNumber, total },
+        {
+          items,
+          shippingDetails,
+          paymentMethod: 'COD', // Default for now
+          subtotal,
+          shippingFee,
+          total
+        },
         {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
 
       // Clear cart on success
-      setFinalCart([]);
       setCart([]);
       setNumInCart(0);
       localStorage.removeItem('cart');
 
       toast.update(toastId, {
-        render: '🎉 Order placed successfully!',
+        render: '🎉 Your order has been placed successfully!',
         type: 'success',
         isLoading: false,
         autoClose: 3000,
       });
 
-      // Redirect to orders page
-      setTimeout(() => {
-        window.location.href = '/Order';
-      }, 1000);
+      // Return orderId for potential redirection to a success page
+      return res.data.orderId;
     } catch (error) {
       console.error('Order submission error:', error);
       toast.update(toastId, {
@@ -149,10 +169,11 @@ const CartContextProvider = ({ children }) => {
         isLoading: false,
         autoClose: 4000,
       });
+      return null;
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, cart]);
 
   // Fetch orders
   useEffect(() => {

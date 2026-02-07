@@ -108,46 +108,50 @@ const HomePage = () => {
                     src={category.image}
                     alt={category.title}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
                   />
 
-                  {/* Gradient Overlay */}
-                  <div className={`absolute inset-0 bg-gradient-to-t ${category.gradient} opacity-60 group-hover:opacity-70 transition-opacity duration-500`} />
+                  {/* Gradient Overlay - Professional & Theme-Aware */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-700" />
 
-                  {/* Shine Effect */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  {/* Subtle Color Accent Overlay */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} mix-blend-multiply transition-opacity duration-700`} />
+
+                  {/* High-End Shine Effect */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   </div>
 
                   {/* Content */}
-                  <div className="absolute inset-0 flex flex-col justify-between p-6 md:p-8">
+                  <div className="absolute inset-0 flex flex-col justify-between p-6 md:p-10">
                     {/* Badge */}
                     <div className="flex justify-between items-start">
-                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-semibold uppercase tracking-wider">
-                        {category.badge === "Exclusive" && <Sparkles className="w-3 h-3" />}
-                        {category.badge === "Trending" && <TrendingUp className="w-3 h-3" />}
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/40 backdrop-blur-md border border-white/20 text-foreground text-[10px] font-bold uppercase tracking-widest shadow-lg">
+                        {category.badge === "Exclusive" && <Sparkles size={12} className="text-accent" />}
+                        {category.badge === "Trending" && <TrendingUp size={12} className="text-accent" />}
                         {category.badge}
                       </span>
                     </div>
 
                     {/* Title & CTA */}
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-white/90 text-sm font-medium mb-1">
+                    <div className="space-y-5">
+                      <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <p className="text-foreground/70 text-xs font-bold uppercase tracking-widest mb-2">
                           {category.subtitle}
                         </p>
-                        <h3 className={`text-white font-serif font-bold leading-tight ${category.featured ? 'text-4xl md:text-5xl' : 'text-3xl md:text-4xl'
+                        <h3 className={`text-foreground font-serif font-bold leading-tight ${category.featured ? 'text-4xl md:text-5xl' : 'text-3xl md:text-4xl'
                           }`}>
                           {category.title}
                         </h3>
                       </div>
 
-                      {/* CTA Button */}
-                      <div className="flex items-center gap-2 text-white">
-                        <span className="font-semibold text-sm md:text-base uppercase tracking-wider">
+                      {/* CTA */}
+                      <div className="flex items-center gap-3 text-foreground/80 transform translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+                        <span className="font-bold text-xs uppercase tracking-[0.2em]">
                           {category.featured ? 'Explore Collection' : 'Shop Now'}
                         </span>
-                        <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-2" />
+                        <div className="w-8 h-px bg-foreground/50 transition-all group-hover:w-12" />
+                        <ArrowRight size={18} className="transition-transform group-hover:translate-x-2" />
                       </div>
                     </div>
                   </div>

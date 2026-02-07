@@ -1,13 +1,17 @@
-const { deleteOrder, GetAllOrder, GetOrder, newOrder } = require('../Controllers/OrderController')
+const { deleteOrder, GetAllOrder, GetOrder, newOrder, updateOrderStatus } = require('../controllers/OrderController')
 const express = require('express')
 const route = express.Router()
-const { verifyToken, verifyAdmain } = require("../Middelware/verifyToken")
+const { verifyToken, verifyAdmain, verifyTokenAndAdmin } = require("../Middelware/verifyToken")
 
 route.route('/')
-    .get(GetAllOrder)
-    .post(verifyToken , newOrder)
+    .get(verifyToken, GetAllOrder)
+    .post(verifyToken, newOrder)
+
 route.route('/:id')
-    .get(GetOrder)
-    .delete(deleteOrder)
+    .get(verifyToken, GetOrder)
+    .delete(verifyTokenAndAdmin, deleteOrder)
+
+route.route('/:id/status')
+    .patch(verifyTokenAndAdmin, updateOrderStatus)
 
 module.exports = route

@@ -11,6 +11,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import LayoutComponent from "./LayoutComponent";
 
+import FeatureContextProvider from "../Context/FeatureContext";
+
 export default function Providers({ children }) {
     return (
         <ThemeProvider>
@@ -18,11 +20,13 @@ export default function Providers({ children }) {
                 <CartContextProvider>
                     <ProductContextProvider>
                         <AdContextProvider>
-                            <ReviewContextProvider>
-                                <LayoutComponent>
-                                    {children}
-                                </LayoutComponent>
-                            </ReviewContextProvider>
+                            <FeatureContextProvider>
+                                <ReviewContextProvider>
+                                    <LayoutComponent>
+                                        {children}
+                                    </LayoutComponent>
+                                </ReviewContextProvider>
+                            </FeatureContextProvider>
                         </AdContextProvider>
                     </ProductContextProvider>
                 </CartContextProvider>

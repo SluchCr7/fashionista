@@ -36,7 +36,7 @@
 
 'use client'
 import React from 'react';
-import "react-responsive-carousel/lib/styles/carousel.min.css"; 
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -62,25 +62,25 @@ const Hero = () => {
 
     return (
         <div className="w-full min-h-[100vh]">
-            <Carousel 
-                showThumbs={false} 
-                autoPlay 
-                infiniteLoop 
-                showStatus={false} 
-                interval={5000} 
+            <Carousel
+                showThumbs={false}
+                autoPlay
+                infiniteLoop
+                showStatus={false}
+                interval={5000}
                 transitionTime={1000}
             >
                 {slides.map((slide, index) => (
-                    <div 
+                    <div
                         key={index}
                         style={{ backgroundImage: `url(${slide.image})` }}
                         className="w-full min-h-[100vh] flex items-center justify-center bg-cover bg-center relative"
                     >
                         {/* Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
-                        
+
                         {/* Content */}
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, y: 40 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 1, delay: 0.3 }}
@@ -94,14 +94,14 @@ const Hero = () => {
                             </p>
 
                             {/* CTA Buttons */}
-                            <div className="flex flex-wrap justify-center gap-4 mt-8">
-                                <Link href="/Shop/Men" className="bg-red-600 hover:bg-red-700 text-white font-semibold text-lg py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
+                            <div className="flex flex-wrap justify-center gap-4 mt-10">
+                                <Link href="/Shop/Men" className="bg-primary text-primary-foreground font-bold text-sm uppercase tracking-widest py-4 px-10 rounded-full shadow-2xl hover:scale-105 transition-all duration-300 border border-white/10">
                                     Shop Men
                                 </Link>
-                                <Link href="/Shop/Women" className="bg-white hover:bg-gray-100 text-gray-900 font-semibold text-lg py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
+                                <Link href="/Shop/Women" className="bg-background/20 backdrop-blur-md text-white border border-white/30 font-bold text-sm uppercase tracking-widest py-4 px-10 rounded-full shadow-2xl hover:bg-white hover:text-black transition-all duration-300">
                                     Shop Women
                                 </Link>
-                                <Link href="/Shop/Kids" className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold text-lg py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
+                                <Link href="/Shop/Kids" className="bg-accent text-accent-foreground font-bold text-sm uppercase tracking-widest py-4 px-10 rounded-full shadow-2xl hover:scale-105 transition-all duration-300">
                                     Shop Kids
                                 </Link>
                             </div>
