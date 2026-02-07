@@ -244,7 +244,7 @@ export default function ShoesPage() {
                   <ShoppingBag size={48} className="text-muted-foreground/50" />
                 </div>
                 <h3 className="text-2xl font-serif font-bold mb-2 text-foreground">No matches found</h3>
-                <p className="text-muted-foreground mb-8 max-w-sm">We couldn't find any products matching your current filters.</p>
+                <p className="text-muted-foreground mb-8 max-w-sm">We could not find any products matching your current filters.</p>
                 <button
                   onClick={resetFilters}
                   className="px-8 py-3 bg-foreground text-background rounded-full text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-opacity shadow-lg"
