@@ -17,9 +17,11 @@ import CartShop from './CartShop';
 const navLinks = [
   { name: 'Home', link: '/' },
   { name: 'Shop', link: '/Shop' },
-  { name: 'Collections', link: '/Collections' },
   { name: 'Men', link: '/Men' },
   { name: 'Women', link: '/Women' },
+  { name: 'Kids', link: '/Kids' },
+  { name: 'Shoes', link: '/Shoes' },
+  { name: 'Accessories', link: '/Accessories' },
 ];
 
 const Header = () => {

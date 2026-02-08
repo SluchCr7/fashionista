@@ -42,7 +42,7 @@ const LatestCollection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Link href="/Collections" className="group flex items-center gap-2 text-foreground font-semibold uppercase tracking-widest text-sm hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-1">
+            <Link href="/Shop" className="group flex items-center gap-2 text-foreground font-semibold uppercase tracking-widest text-sm hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-1">
               Explore All <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </motion.div>
@@ -96,7 +96,7 @@ const LatestCollection = () => {
 
           {/* CTA Card in Grid */}
           <div className="hidden lg:flex flex-col justify-center items-center bg-secondary/10 rounded-2xl p-8 text-center border border-dashed border-border group hover:border-primary/50 transition-colors cursor-pointer">
-            <Link href="/Collections" className="block w-full">
+            <Link href="/Shop" className="block w-full">
               <h3 className="text-2xl font-serif font-bold mb-4 group-hover:text-primary transition-colors">Discover More</h3>
               <p className="text-muted-foreground mb-6 text-sm">Browse our full catalog of over 500+ premium items.</p>
               <div className="w-12 h-12 rounded-full bg-white border border-border flex items-center justify-center mx-auto shadow-sm group-hover:scale-110 transition-transform">

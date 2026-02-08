@@ -88,8 +88,8 @@ const Kids = () => {
               <span className="text-pink-500 font-bold tracking-widest uppercase text-sm">Best Sellers</span>
               <h2 className="text-4xl font-bold text-gray-900 mt-2">Trending for Kids</h2>
             </div>
-            <Link href="/Shop?category=Kids" className="text-gray-500 hover:text-pink-600 font-semibold underline decoration-pink-300 underline-offset-4 transition-colors">
-              View All Products
+            <Link href="/Shop?gender=Kids" className="text-gray-500 hover:text-pink-600 font-semibold underline decoration-pink-300 underline-offset-4 transition-colors">
+              View All Kids&apos;
             </Link>
           </div>
 

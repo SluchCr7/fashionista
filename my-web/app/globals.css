@@ -232,3 +232,22 @@
 :focus-visible {
   @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
 }
+/* React Toastify Custom Integration */
+.Toastify__toast {
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.Toastify__toast-body {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.Toastify__toast-container {
+  width: auto !important;
+}
+
+.Toastify__progress-bar {
+  display: none !important;
+}

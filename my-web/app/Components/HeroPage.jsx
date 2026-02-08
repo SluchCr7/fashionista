@@ -17,7 +17,7 @@ const HeroPage = () => {
       subtitle: "Redefined",
       description: "Discover our exclusive collection of premium designer pieces",
       cta: "Explore Collection",
-      link: "/Collections",
+      link: "/Shop",
       accent: "from-amber-400 to-yellow-600",
     },
     {
@@ -39,7 +39,7 @@ const HeroPage = () => {
       subtitle: "For You",
       description: "Curated pieces that never go out of style",
       cta: "View Collection",
-      link: "/Collections",
+      link: "/Shop",
       accent: "from-blue-400 to-indigo-600",
     },
   ];

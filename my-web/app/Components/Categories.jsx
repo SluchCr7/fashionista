@@ -27,7 +27,7 @@ const Categories = () => {
       id: 3,
       img: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?q=80&w=1974&auto=format&fit=crop",
       title: "Accessories",
-      link: "/Shop?category=Accessories",
+      link: "/Accessories",
       desc: "The perfect finishing touch",
       size: "normal"
     }
