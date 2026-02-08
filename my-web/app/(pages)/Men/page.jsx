@@ -86,10 +86,10 @@ const Men = () => {
           <div className="flex flex-col md:flex-row justify-between items-end mb-12">
             <div className="mb-6 md:mb-0">
               <span className="text-blue-600 font-bold tracking-widest uppercase text-sm">Top Rated</span>
-              <h2 className="text-4xl font-bold text-gray-900 mt-2">Men's Essentials</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mt-2">Men&apos;s Essentials</h2>
             </div>
             <Link href="/Shop?gender=Men" className="text-gray-500 hover:text-blue-600 font-semibold underline decoration-blue-300 underline-offset-4 transition-colors">
-              View All Men's
+              View All Men&apos;s
             </Link>
           </div>
 
