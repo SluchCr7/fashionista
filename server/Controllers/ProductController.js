@@ -64,7 +64,12 @@ const getAllProduct = asyncHandler(async (req, res) => {
     } = req.query;
 
     const filters = {};
-    if (category) filters.category = category;
+    if (category) {
+        filters.category = category;
+    } else {
+        // Exclude Shoes by default to prioritize clothes in the main shop and homepage
+        filters.category = { $ne: 'Shoes' };
+    }
     if (gender) filters.gender = { $regex: new RegExp(`^${gender}$`, 'i') }; // Case-insensitive gender
     if (material) filters.material = material;
     if (colors) filters.colors = { $in: colors.split(',') };

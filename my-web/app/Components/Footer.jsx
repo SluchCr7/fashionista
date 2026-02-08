@@ -28,10 +28,10 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#0f1115] text-white/90 pt-24 pb-12 relative overflow-hidden">
+    <footer className="bg-background border-t border-border text-foreground pt-24 pb-12 relative overflow-hidden transition-colors duration-300">
       {/* Background Texture */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.2),transparent_70%)]" />
+      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.07] pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,var(--foreground),transparent_70%)]" />
       </div>
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
@@ -43,7 +43,7 @@ const Footer = () => {
                 FASHION<span className="text-muted-foreground italic">ISTA</span>
               </h2>
             </Link>
-            <p className="text-muted/80 leading-relaxed max-w-sm">
+            <p className="text-muted-foreground leading-relaxed max-w-sm">
               Curating the finest in luxury fashion since 2025. We believe in style that speaks, quality that lasts, and a sustainable future for fashion.
             </p>
 
@@ -54,10 +54,10 @@ const Footer = () => {
                 <input
                   type="email"
                   placeholder="Your email address"
-                  className="w-full bg-background/5 border-b border-background/20 py-3 pr-12 text-sm text-background placeholder-background/40 outline-none focus:border-background/60 transition-colors"
+                  className="w-full bg-secondary/50 border-b border-border py-3 pr-12 text-sm text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-primary transition-colors"
                 />
                 <button
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-background/60 group-hover:text-background transition-colors p-2"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground group-hover:text-primary transition-colors p-2"
                   aria-label="Subscribe"
                 >
                   <Send className="w-4 h-4" />
@@ -76,7 +76,7 @@ const Footer = () => {
                     <li key={link.name}>
                       <Link
                         href={link.link}
-                        className="text-muted/60 hover:text-white transition-colors text-sm hover:translate-x-1 inline-block duration-200"
+                        className="text-muted-foreground hover:text-primary transition-colors text-sm hover:translate-x-1 inline-block duration-200"
                       >
                         {link.name}
                       </Link>
@@ -89,8 +89,8 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs text-muted/40">
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-xs text-muted-foreground/60">
             &copy; {new Date().getFullYear()} Fashionista. All rights reserved.
           </p>
 
@@ -100,16 +100,16 @@ const Footer = () => {
               <Link
                 key={i}
                 href="#"
-                className="text-muted/60 hover:text-white transition-colors hover:scale-110 transform duration-200"
+                className="text-muted-foreground hover:text-primary transition-colors hover:scale-110 transform duration-200"
               >
                 <Icon className="w-5 h-5" />
               </Link>
             ))}
           </div>
 
-          <div className="flex gap-6 text-xs text-muted/40">
-            <Link href="/Privacy" className="hover:text-muted/80 transition-colors">Privacy Policy</Link>
-            <Link href="/Terms" className="hover:text-muted/80 transition-colors">Terms of Service</Link>
+          <div className="flex gap-6 text-xs text-muted-foreground/60">
+            <Link href="/Privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+            <Link href="/Terms" className="hover:text-primary transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

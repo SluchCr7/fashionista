@@ -8,10 +8,33 @@ import { Star, ShoppingBag, Filter, X, Heart, ChevronDown } from 'lucide-react';
 import { ProductContext } from '@/app/Context/ProductContext';
 import { ReviewContext } from '@/app/Context/ReviewContext';
 import ProductCard from '@/app/Components/ProductCard';
+import api from '@/lib/api';
 
 export default function ShoesPage() {
-  const { products = [] } = useContext(ProductContext);
+  const { products: contextProducts = [], fetchProducts } = useContext(ProductContext);
   const { Reviews = [] } = useContext(ReviewContext);
+  const [shoesProducts, setShoesProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 1. Fetch Shoes specifically on page load
+  useEffect(() => {
+    const getShoes = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get('/api/product?category=Shoes&limit=100');
+        if (res.success) {
+          setShoesProducts(res.data.products);
+        }
+      } catch (err) {
+        console.error("Failed to fetch shoes", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getShoes();
+  }, []);
+
+  const products = shoesProducts;
 
   // Filter State
   const [filterState, setFilterState] = useState({
@@ -42,7 +65,7 @@ export default function ShoesPage() {
     });
 
     // 2. Filter & Sort
-    let result = withRatings.filter(p => p?.category === 'Shoes');
+    let result = withRatings;
 
     if (filterState.gender !== 'All') result = result.filter(p => (p.gender || 'All') === filterState.gender);
     if (filterState.query) result = result.filter(p => (p.name || '').toLowerCase().includes(filterState.query.toLowerCase()));

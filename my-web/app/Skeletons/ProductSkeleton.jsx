@@ -1,7 +1,7 @@
 import React from 'react'
 
 const ProductSkeleton = () => (
-  <div className="max-w-7xl mx-auto px-6 py-12 animate-pulse">
+  <div className="max-w-7xl mx-auto w-full px-6 py-12 animate-pulse">
     {/* Breadcrumb */}
     <div className="h-4 w-48 bg-gray-300/40 rounded mb-6" />
 
