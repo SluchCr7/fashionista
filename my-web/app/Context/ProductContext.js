@@ -24,9 +24,21 @@ const ProductProvider = ({ children }) => {
         setLoading(true);
         try {
             const activeFilters = { ...filters, ...customFilters };
-            const queryParams = new URLSearchParams(
-                Object.entries(activeFilters).filter(([_, v]) => v)
-            ).toString();
+
+            // Clean up filters to avoid sending empty values
+            const cleanFilters = {};
+            Object.keys(activeFilters).forEach(key => {
+                const val = activeFilters[key];
+                if (val !== undefined && val !== null && val !== '') {
+                    if (Array.isArray(val)) {
+                        if (val.length > 0) cleanFilters[key] = val.join(',');
+                    } else {
+                        cleanFilters[key] = val;
+                    }
+                }
+            });
+
+            const queryParams = new URLSearchParams(cleanFilters).toString();
 
             const res = await api.get(`/api/product?${queryParams}`);
             if (res.success) {

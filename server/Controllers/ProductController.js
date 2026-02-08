@@ -57,12 +57,19 @@ const getAllProduct = asyncHandler(async (req, res) => {
         gender,
         minPrice,
         maxPrice,
+        material,
+        colors,
+        sizes,
         search
     } = req.query;
 
     const filters = {};
     if (category) filters.category = category;
-    if (gender) filters.gender = gender;
+    if (gender) filters.gender = { $regex: new RegExp(`^${gender}$`, 'i') }; // Case-insensitive gender
+    if (material) filters.material = material;
+    if (colors) filters.colors = { $in: colors.split(',') };
+    if (sizes) filters.sizes = { $in: sizes.split(',') };
+
     if (minPrice || maxPrice) {
         filters.price = {};
         if (minPrice) filters.price.$gte = Number(minPrice);

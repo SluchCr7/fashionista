@@ -5,29 +5,27 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Heart, SlidersHorizontal, ChevronDown, ChevronUp, Check, X, Grid, List } from "lucide-react";
 import { ProductContext } from "@/app/Context/ProductContext";
-import { CartContext } from "@/app/Context/CartContext";
-
+import { CartContext } from "@/app/Context/Cart";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/app/Components/ProductCard";
 
 const Shop = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { products } = useContext(ProductContext);
+  const { products, pagination, fetchProducts, loading } = useContext(ProductContext);
   const { discount, addToCart } = useContext(CartContext);
 
   const [filters, setFilters] = useState({
     category: "",
     gender: "",
     material: [],
-    color: [],
-    size: [],
+    colors: [],
+    sizes: [],
     minPrice: 0,
     maxPrice: 200,
   });
   const [priceRange, setPriceRange] = useState([0, 200]);
   const [sortPrice, setSortPrice] = useState("default");
-  const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [activeAccordion, setActiveAccordion] = useState({
     category: true, gender: true, material: false, color: true, size: false, price: true
@@ -35,83 +33,73 @@ const Shop = () => {
 
   const ITEMS_PER_PAGE = 12;
 
-  const categories = [...new Set(products.map((p) => p.category))];
-  const genders = [...new Set(products.map((p) => p.gender.toLowerCase()))];
-  const materials = [...new Set(products.map((p) => p.material))];
-  const colors = ["black", "white", "blue", "red", "green", "brown", "purple", "gray", "bg-yellow-400", "pink", "beige"]; // Simplification
-  const sizes = [...new Set(products.flatMap((p) => p.sizes).filter(Boolean))];
+  // Derive filter options from ALL products (ideally these come from a separate API)
+  const categories = useMemo(() => [...new Set(products.map((p) => p.category))], [products]);
+  const genders = useMemo(() => [...new Set(products.map((p) => p.gender.toLowerCase()))], [products]);
+  const materials = useMemo(() => [...new Set(products.map((p) => p.material))], [products]);
+  const colorsList = ["black", "white", "blue", "red", "green", "brown", "purple", "gray", "yellow", "pink", "beige"];
+  const sizesList = ["S", "M", "L", "XL", "XXL", "38", "39", "40", "41", "42", "43", "44", "45"];
 
   useEffect(() => {
     const params = Object.fromEntries([...searchParams]);
-    setFilters({
+    const updatedFilters = {
       category: params.category || "",
       gender: params.gender || "",
-      material: params.material ? params.material.split(",") : [],
-      color: params.color ? params.color.split(",") : [],
-      size: params.size ? params.size.split(",") : [],
+      material: params.material || "",
+      colors: params.colors ? params.colors.split(",") : [],
+      sizes: params.sizes ? params.sizes.split(",") : [],
       minPrice: params.minPrice ? parseFloat(params.minPrice) : 0,
       maxPrice: params.maxPrice ? parseFloat(params.maxPrice) : 200,
-    });
+      page: params.page ? parseInt(params.page) : 1,
+      sort: params.sort || "-createdAt"
+    };
+
+    setFilters(updatedFilters);
     setPriceRange([
-      params.minPrice ? parseFloat(params.minPrice) : 0,
-      params.maxPrice ? parseFloat(params.maxPrice) : 200,
+      updatedFilters.minPrice,
+      updatedFilters.maxPrice,
     ]);
     if (params.sort) setSortPrice(params.sort);
-  }, [searchParams]);
+
+    // Call fetchProducts with the URL params
+    fetchProducts(updatedFilters);
+  }, [searchParams, fetchProducts]);
 
   const updateUrlParams = (newFilters) => {
     const params = new URLSearchParams();
     Object.keys(newFilters).forEach((key) => {
-      if (Array.isArray(newFilters[key]) && newFilters[key].length > 0) {
-        params.append(key, newFilters[key].join(","));
-      } else if (newFilters[key] && !Array.isArray(newFilters[key])) {
-        params.append(key, newFilters[key]);
+      const val = newFilters[key];
+      if (Array.isArray(val) && val.length > 0) {
+        params.append(key, val.join(","));
+      } else if (val && !Array.isArray(val)) {
+        params.append(key, val);
       }
     });
     router.push(`?${params.toString()}`);
   };
 
   const handleFilterChange = (type, value) => {
-    setFilters((prev) => {
-      const newFilters = { ...prev };
-      if (type === "material" || type === "color" || type === "size") {
-        newFilters[type] = newFilters[type].includes(value)
-          ? newFilters[type].filter((item) => item !== value)
-          : [...newFilters[type], value];
-      } else {
-        newFilters[type] = newFilters[type] === value ? "" : value;
-      }
-      setPage(0);
-      updateUrlParams(newFilters);
-      return newFilters;
-    });
+    const newFilters = { ...filters, page: 1 }; // Reset to page 1 on filter change
+    if (type === "colors" || type === "sizes") {
+      newFilters[type] = filters[type].includes(value)
+        ? filters[type].filter((item) => item !== value)
+        : [...filters[type], value];
+    } else {
+      newFilters[type] = filters[type] === value ? "" : value;
+    }
+    updateUrlParams(newFilters);
+  };
+
+  const handlePageChange = (newPage) => {
+    updateUrlParams({ ...filters, page: newPage });
   };
 
   const resetFilters = () => {
-    setFilters({ category: "", gender: "", material: [], color: [], size: [], minPrice: 0, maxPrice: 200 });
-    setPriceRange([0, 200]);
     router.push("?");
   };
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      const matchesCategory = !filters.category || p.category === filters.category;
-      const matchesGender = !filters.gender || p.gender === filters.gender;
-      const matchesMaterial = filters.material.length === 0 || filters.material.includes(p.material);
-      const matchesColor = filters.color.length === 0 || p.colors?.some((c) => filters.color.includes(c));
-      const matchesSize = filters.size.length === 0 || p.sizes?.some((s) => filters.size.includes(s));
-      const matchesPrice = p.price >= filters.minPrice && p.price <= filters.maxPrice;
-      return matchesCategory && matchesGender && matchesMaterial && matchesColor && matchesSize && matchesPrice;
-    });
-  }, [filters, products]);
-
-  const sortedProducts = useMemo(() => {
-    if (sortPrice === "lowToHigh") return [...filteredProducts].sort((a, b) => a.price - b.price);
-    if (sortPrice === "highToLow") return [...filteredProducts].sort((a, b) => b.price - a.price);
-    return filteredProducts;
-  }, [sortPrice, filteredProducts]);
-
-  const paginatedProducts = sortedProducts.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+  // We rely on backend for filtering and sorting now
+  const displayProducts = products;
 
   const toggleAccordion = (section) => {
     setActiveAccordion(prev => ({ ...prev, [section]: !prev[section] }));
@@ -136,8 +124,8 @@ const Shop = () => {
           {[
             { label: "Category", key: "category", type: "radio", options: categories },
             { label: "Gender", key: "gender", type: "radio", options: genders },
-            { label: "Size", key: "size", type: "button", options: sizes },
-            { label: "Color", key: "color", type: "color", options: colors },
+            { label: "Size", key: "sizes", type: "button", options: sizesList },
+            { label: "Color", key: "colors", type: "color", options: colorsList },
             { label: "Material", key: "material", type: "checkbox", options: materials },
           ].map((section) => (
             <div key={section.key} className="border-b border-border pb-4">
@@ -177,7 +165,7 @@ const Shop = () => {
                           <button
                             key={opt}
                             onClick={() => handleFilterChange(section.key, opt)}
-                            className={`px-3 py-1 text-xs uppercase border rounded-md transition-all ${filters.size.includes(opt) ? 'bg-primary text-primary-foreground border-primary' : 'bg-transparent border-input hover:border-primary'}`}
+                            className={`px-3 py-1 text-xs uppercase border rounded-md transition-all ${filters.sizes.includes(opt) ? 'bg-primary text-primary-foreground border-primary' : 'bg-transparent border-input hover:border-primary'}`}
                           >
                             {opt}
                           </button>
@@ -190,11 +178,11 @@ const Shop = () => {
                           <button
                             key={opt}
                             onClick={() => handleFilterChange(section.key, opt)}
-                            className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${filters.color.includes(opt) ? 'ring-2 ring-primary ring-offset-2' : 'border-input'}`}
-                            style={{ backgroundColor: opt === "bg-yellow-400" ? "#FACC15" : opt }}
+                            className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${filters.colors.includes(opt) ? 'ring-2 ring-primary ring-offset-2' : 'border-input'}`}
+                            style={{ backgroundColor: opt === "yellow" ? "#FACC15" : opt }}
                             title={opt}
                           >
-                            {filters.color.includes(opt) && <Check size={12} className={opt === 'white' || opt === 'beige' ? 'text-black' : 'text-white'} />}
+                            {filters.colors.includes(opt) && <Check size={12} className={opt === 'white' || opt === 'beige' ? 'text-black' : 'text-white'} />}
                           </button>
                         ))}
                       </div>
@@ -239,26 +227,29 @@ const Shop = () => {
             <button onClick={() => setShowFilters(true)} className="lg:hidden flex items-center gap-2 text-sm font-bold uppercase">
               <SlidersHorizontal size={18} /> Filters
             </button>
-            <p className="text-sm text-muted-foreground hidden md:block">{filteredProducts.length} Products Found</p>
+            <p className="text-sm text-muted-foreground hidden md:block">{pagination.total} Products Found</p>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="relative">
               <select
                 value={sortPrice}
-                onChange={(e) => setSortPrice(e.target.value)}
+                onChange={(e) => {
+                  setSortPrice(e.target.value);
+                  updateUrlParams({ ...filters, sort: e.target.value });
+                }}
                 className="appearance-none bg-background border border-border px-4 py-2 pr-8 rounded text-sm focus:outline-none focus:border-primary"
               >
-                <option value="default">Newest</option>
-                <option value="lowToHigh">Price: Low to High</option>
-                <option value="highToLow">Price: High to Low</option>
+                <option value="-createdAt">Newest</option>
+                <option value="price">Price: Low to High</option>
+                <option value="-price">Price: High to Low</option>
               </select>
               <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} />
             </div>
           </div>
         </div>
 
-        {paginatedProducts.length === 0 ? (
+        {displayProducts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <h3 className="text-2xl font-serif font-bold mb-2">No products found</h3>
             <p className="text-muted-foreground mb-6">Try adjusting your filters.</p>
@@ -267,7 +258,7 @@ const Shop = () => {
         ) : (
           <>
             <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
-              {paginatedProducts.map((prod) => (
+              {displayProducts.map((prod) => (
                 <motion.div key={prod._id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   <ProductCard product={prod} />
                 </motion.div>
@@ -275,21 +266,21 @@ const Shop = () => {
             </motion.div>
 
             {/* Pagination */}
-            {Math.ceil(sortedProducts.length / ITEMS_PER_PAGE) > 1 && (
+            {pagination.pages > 1 && (
               <div className="flex justify-center mt-12 gap-2">
-                <button disabled={page === 0} onClick={() => setPage(page - 1)} className="p-2 border border-border rounded disabled:opacity-30 hover:bg-accent transition-colors">
+                <button disabled={pagination.page <= 1} onClick={() => handlePageChange(pagination.page - 1)} className="p-2 border border-border rounded disabled:opacity-30 hover:bg-accent transition-colors">
                   <ChevronDown className="rotate-90" size={16} />
                 </button>
-                {[...Array(Math.ceil(sortedProducts.length / ITEMS_PER_PAGE)).keys()].map((i) => (
+                {[...Array(pagination.pages).keys()].map((i) => (
                   <button
                     key={i}
-                    onClick={() => setPage(i)}
-                    className={`w-8 h-8 flex items-center justify-center rounded text-sm font-medium transition-colors ${page === i ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}`}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`w-8 h-8 flex items-center justify-center rounded text-sm font-medium transition-colors ${pagination.page === i + 1 ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}`}
                   >
                     {i + 1}
                   </button>
                 ))}
-                <button disabled={page === Math.ceil(sortedProducts.length / ITEMS_PER_PAGE) - 1} onClick={() => setPage(page + 1)} className="p-2 border border-border rounded disabled:opacity-30 hover:bg-accent transition-colors">
+                <button disabled={pagination.page >= pagination.pages} onClick={() => handlePageChange(pagination.page + 1)} className="p-2 border border-border rounded disabled:opacity-30 hover:bg-accent transition-colors">
                   <ChevronDown className="-rotate-90" size={16} />
                 </button>
               </div>
