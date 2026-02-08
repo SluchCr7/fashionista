@@ -21,6 +21,8 @@ import { UserContext } from '../Context/UserContext';
 import { CartContext } from '../Context/Cart';
 import { AdContext } from '../Context/AdsContext';
 
+import { toast, ecommerceToasts } from '@/lib/toast';
+
 /* =========================================
    Components: Stats, Tables, Forms
    ========================================= */
@@ -70,7 +72,6 @@ const AdminPanel = () => {
   const [search, setSearch] = useState('');
   const [perPage, setPerPage] = useState(10);
   const [page, setPage] = useState(0);
-  const [toast, setToast] = useState('');
   const [confirm, setConfirm] = useState({ open: false, action: null, message: '' });
 
   // Forms State
@@ -88,29 +89,37 @@ const AdminPanel = () => {
     products: products.length
   }), [orders, users, products]);
 
-  // Toast Timer
-  useEffect(() => {
-    if (toast) {
-      const t = setTimeout(() => setToast(''), 3000);
-      return () => clearTimeout(t);
-    }
-  }, [toast]);
-
   // Handlers
   const handleProductSubmit = async (e) => {
     e.preventDefault();
-    if (!productForm.name || !productForm.price) return setToast('Please fill required fields');
+    if (!productForm.name || !productForm.price) return toast.warning('🛎️ Please complete all required inventory details.');
+
+    const toastId = toast.loading('Synchronizing new inventory item...');
     try {
       await AddProduct(
         productForm.name, productForm.description, productForm.price, productForm.quantity,
         productForm.category, productForm.gender, productForm.collection,
         productForm.sizes, productForm.colors, productForm.material, imageFile
       );
-      setToast('Product added successfully');
+
+      toast.update(toastId, {
+        render: '✨ Inventory successfully updated with new product.',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000,
+      });
+
       setProductForm({ name: '', description: '', price: '', quantity: '', category: '', gender: '', material: '', colors: [], sizes: [], collection: '' });
       setImageFile(null);
       setImagePreview(null);
-    } catch { setToast('Error adding product'); }
+    } catch {
+      toast.update(toastId, {
+        render: '⚠️ We encountered an issue updating the inventory.',
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000,
+      });
+    }
   };
 
   /* Render Helpers for Table */
@@ -146,8 +155,8 @@ const AdminPanel = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === tab.id
-                  ? 'bg-black text-white shadow-lg shadow-black/20'
-                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-black text-white shadow-lg shadow-black/20'
+                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
                 }`}
             >
               <span className="text-xl">{tab.icon}</span>
@@ -355,20 +364,6 @@ const AdminPanel = () => {
         .input-field { @apply w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-400 transition-all text-sm; }
         .btn-primary { @apply px-6 py-3 bg-black text-white font-bold rounded-xl shadow-lg shadow-gray-200 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95; }
       `}</style>
-
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, x: '-50%' }}
-            animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0 }}
-            className="fixed bottom-10 left-1/2 bg-black text-white px-6 py-3 rounded-full shadow-2xl z-50 text-sm font-medium"
-          >
-            {toast}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

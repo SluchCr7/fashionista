@@ -36,7 +36,8 @@ const CheckoutPage = () => {
     // Basic Validation
     const emptyFields = Object.keys(formData).filter(key => !formData[key]);
     if (emptyFields.length > 0) {
-      toast.error(`Please fill in your ${emptyFields[0]}`);
+      const fieldName = emptyFields[0].charAt(0).toUpperCase() + emptyFields[0].slice(1);
+      toast.warning(`🛎️ Please provide your ${fieldName} to proceed with the purchase.`);
       return;
     }
 

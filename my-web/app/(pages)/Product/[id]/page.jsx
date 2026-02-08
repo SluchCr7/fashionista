@@ -35,35 +35,38 @@ const Product = ({ params }) => {
 
   const handleAddToCart = async () => {
     if (!user) {
-      toast.error("Please login to shop");
+      ecommerceToasts.mustLogin();
       return;
     }
 
     setAdding(true);
     try {
       await addToCart({
-        id: product._id,
+        _id: product._id,
         name: product.name,
         price: product.price,
-        img: product.Photo?.[0]?.url,
+        image: [product.Photo?.[0]?.url],
         quantity: quantity,
       }, quantity);
-      toast.success(`Added ${quantity} item(s) to bag`);
+      ecommerceToasts.addedToCart(product.name);
     } catch (error) {
-      toast.error("Failed to add to cart");
+      toast.error("An error occurred while updating your selection.");
     } finally {
       setAdding(false);
     }
   };
 
   const handleToggleFavorite = async () => {
-    if (!user) return toast.error("Please login first");
+    if (!user) {
+      toast.error("🔒 Please sign in to curate your wishlist.");
+      return;
+    }
     await AddFavourite(product._id);
   };
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    toast.success("Link copied");
+    ecommerceToasts.copiedToClipboard();
   };
 
   if (!product || Object.keys(product).length === 0) return <ProductSkeleton />;

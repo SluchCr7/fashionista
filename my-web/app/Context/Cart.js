@@ -97,7 +97,7 @@ const CartContextProvider = ({ children }) => {
     setCart([]);
     setNumInCart(0);
     localStorage.removeItem('cart');
-    toast.info('Cart cleared');
+    ecommerceToasts.cartCleared();
   }, []);
 
   // Submit cart
@@ -108,17 +108,17 @@ const CartContextProvider = ({ children }) => {
   // Submit order with new structured data
   const submitOrder = useCallback(async (shippingDetails, subtotal, shippingFee, total) => {
     if (!user || !user.token) {
-      toast.error('Please login to place an order');
+      ecommerceToasts.mustLogin();
       return;
     }
 
     if (cart.length === 0) {
-      toast.error('Your cart is empty');
+      ecommerceToasts.emptyCartError();
       return;
     }
 
     setIsLoading(true);
-    const toastId = toast.loading('Processing your order...');
+    const toastId = toast.loading('Orchestrating your purchase...');
 
     try {
       // Format items for the new Order Model
@@ -153,7 +153,7 @@ const CartContextProvider = ({ children }) => {
       localStorage.removeItem('cart');
 
       toast.update(toastId, {
-        render: '🎉 Your order has been placed successfully!',
+        render: '🎊 Congratulations! Your order has been placed successfully.',
         type: 'success',
         isLoading: false,
         autoClose: 3000,
@@ -164,7 +164,7 @@ const CartContextProvider = ({ children }) => {
     } catch (error) {
       console.error('Order submission error:', error);
       toast.update(toastId, {
-        render: error.response?.data?.message || 'Failed to place order. Please try again.',
+        render: error.response?.data?.message || 'We encountered an issue finalizing your order.',
         type: 'error',
         isLoading: false,
         autoClose: 4000,
@@ -191,13 +191,13 @@ const CartContextProvider = ({ children }) => {
 
   // Delete order
   const deleteOrder = useCallback(async (id) => {
-    const toastId = toast.loading('Cancelling order...');
+    const toastId = toast.loading('Requesting order cancellation...');
 
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order/${id}`);
 
       toast.update(toastId, {
-        render: 'Order cancelled successfully',
+        render: 'Order successfully cancelled. We hope to see you again soon.',
         type: 'success',
         isLoading: false,
         autoClose: 2000,
@@ -210,7 +210,7 @@ const CartContextProvider = ({ children }) => {
     } catch (error) {
       console.error('Error deleting order:', error);
       toast.update(toastId, {
-        render: 'Failed to cancel order',
+        render: 'Cancellation request could not be processed at this time.',
         type: 'error',
         isLoading: false,
         autoClose: 3000,
@@ -239,11 +239,11 @@ const CartContextProvider = ({ children }) => {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/discount`, {
         discount: discountValue,
       });
-      toast.success(res.data.message || 'Discount updated successfully');
+      ecommerceToasts.discountApplied(discountValue);
       setDiscount(discountValue);
     } catch (error) {
       console.error('Error adding discount:', error);
-      toast.error('Failed to update discount');
+      ecommerceToasts.serverError();
     }
   }, []);
 

@@ -12,35 +12,38 @@ const verifyToken = (req, res, next) => {
             return res.status(401).json({ message: "Invalid token" })
         }
     } else {
-        return res.status(401).json({ message: "No token" })
+        return res.status(401).json({ message: "No token provided" })
     }
 }
 
-const verifyAdmain = async (req, res, next) => {
-    verifyToken(req, res, next);
-    if (!req.user.isAdmin) {
-        next();
-    } else {
-        return res.status(403).json("You are not administrator!");
-    }
+const verifyAdmain = (req, res, next) => {
+    verifyToken(req, res, () => {
+        if (req.user.isAdmin) {
+            next();
+        } else {
+            return res.status(403).json({ message: "Access denied. Administrative privileges required." });
+        }
+    });
 }
 
-const verifyUser = async (req, res, next) => {
-    verifyToken(req, res, next);
-    if (req.user._id === req.params.id) {
-        next();
-    } else {
-        return res.status(403).json("You are not User");
-    }
+const verifyTokenAndAdmin = verifyAdmain; // Alias for convenience as used in orderRoute
+
+const verifyUser = (req, res, next) => {
+    verifyToken(req, res, () => {
+        if (req.user._id === req.params.id || req.user.isAdmin) {
+            next();
+        } else {
+            return res.status(403).json({ message: "Access denied. You can only manage your own account." });
+        }
+    });
 }
 
-const verifyAdmainUser = async (req, res, next) => {
-    verifyAdmain(req, res, next);
-    if (req.user.id === req.params.id || req.user.isAdmin) {
-        next();
-    } else {
-        return res.status(403).json("You are not User or Administrator");
-    }
-}
+const verifyAdmainUser = verifyUser; // Alias or similar logic
 
-module.exports = { verifyToken, verifyAdmain, verifyUser, verifyAdmainUser }
+module.exports = {
+    verifyToken,
+    verifyAdmain,
+    verifyTokenAndAdmin,
+    verifyUser,
+    verifyAdmainUser
+}

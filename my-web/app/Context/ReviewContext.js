@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useCallback } from 'react'
 import axios from 'axios';
 import { UserContext } from './UserContext';
 import { ProductContext } from './ProductContext';
-import { toast } from 'react-toastify';
+import { toast, ecommerceToasts } from '@/lib/toast';
 
 export const ReviewContext = createContext();
 
@@ -32,7 +32,7 @@ const ReviewContextProvider = ({ children }) => {
             });
         } catch (error) {
             console.error("Error fetching reviews:", error);
-            toast.error(error.response?.data?.message || "Failed to load reviews");
+            toast.error("We encountered an issue retrieving our guest testimonials.");
         } finally {
             setLoading(false);
         }
@@ -40,7 +40,10 @@ const ReviewContextProvider = ({ children }) => {
 
     // Add new review
     const addReview = async (reviewData) => {
-        if (!user) return toast.error("Please login to review");
+        if (!user) {
+            toast.error("🔒 Please sign in to share your experience.");
+            return;
+        }
 
         try {
             const { data } = await axios.post(
@@ -61,11 +64,11 @@ const ReviewContextProvider = ({ children }) => {
             // Refresh product data to get updated ratings/count
             if (fetchProducts) fetchProducts();
 
-            toast.success("Review added successfully");
+            ecommerceToasts.reviewSubmitted();
             return data.review;
         } catch (error) {
             console.error("Error adding review:", error);
-            toast.error(error.response?.data?.message || "Failed to add review");
+            toast.error(error.response?.data?.message || "There was an error finalizing your review.");
             throw error;
         }
     };
@@ -87,10 +90,10 @@ const ReviewContextProvider = ({ children }) => {
             // Refresh product data
             if (fetchProducts) fetchProducts();
 
-            toast.success("Review updated successfully");
+            toast.success("✨ Your feedback has been successfully refined.");
         } catch (error) {
             console.error("Error updating review:", error);
-            toast.error(error.response?.data?.message || "Failed to update review");
+            toast.error(error.response?.data?.message || "We could not update your review at this time.");
             throw error;
         }
     };
@@ -115,10 +118,10 @@ const ReviewContextProvider = ({ children }) => {
             // Refresh product data
             if (fetchProducts) fetchProducts();
 
-            toast.success("Review deleted successfully");
+            ecommerceToasts.deletedReview();
         } catch (error) {
             console.error("Error deleting review:", error);
-            toast.error(error.response?.data?.message || "Failed to delete review");
+            toast.error(error.response?.data?.message || "Failed to remove your review.");
         }
     };
 

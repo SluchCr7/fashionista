@@ -2,7 +2,7 @@
 import React, { useEffect, useState, createContext, useCallback } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { toast } from '@/lib/toast';
+import { toast, ecommerceToasts } from '@/lib/toast';
 
 export const UserContext = createContext();
 
@@ -47,7 +47,7 @@ const UserContextProvider = ({ children }) => {
 
   // Login
   const Login = useCallback(async (email, password) => {
-    const toastId = toast.loading('Logging in...');
+    const toastId = toast.loading('Establishing secure access...');
     try {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`, {
         email,
@@ -58,7 +58,7 @@ const UserContextProvider = ({ children }) => {
       setUser(userData);
 
       toast.update(toastId, {
-        render: `Welcome back, ${userData.name || 'User'}!`,
+        render: `Welcome back, ${userData.name || 'User'}. Your exclusive access is ready.`,
         type: 'success',
         isLoading: false,
         autoClose: 2000
@@ -69,7 +69,7 @@ const UserContextProvider = ({ children }) => {
     } catch (err) {
       console.error('Login error:', err);
       toast.update(toastId, {
-        render: err?.response?.data?.message || 'Invalid credentials',
+        render: err?.response?.data?.message || 'Access denied. Please verify your credentials.',
         type: 'error',
         isLoading: false,
         autoClose: 3000
@@ -80,7 +80,7 @@ const UserContextProvider = ({ children }) => {
 
   // Register
   const Register = useCallback(async (name, email, password) => {
-    const toastId = toast.loading('Creating account...');
+    const toastId = toast.loading('Finalizing your registration...');
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/register`, {
         name,
@@ -89,7 +89,7 @@ const UserContextProvider = ({ children }) => {
       });
 
       toast.update(toastId, {
-        render: '🎉 Account created! Please login.',
+        render: '👑 Welcome to the elite! Your account has been created successfully. Please sign in.',
         type: 'success',
         isLoading: false,
         autoClose: 2000
@@ -100,7 +100,7 @@ const UserContextProvider = ({ children }) => {
     } catch (err) {
       console.error('Registration error:', err);
       toast.update(toastId, {
-        render: err?.response?.data?.message || 'Registration failed',
+        render: err?.response?.data?.message || 'We could not complete your registration at this time.',
         type: 'error',
         isLoading: false,
         autoClose: 3000
@@ -113,14 +113,14 @@ const UserContextProvider = ({ children }) => {
   const Logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem('Data');
-    toast.info('Logged out successfully');
+    ecommerceToasts.logoutSuccess();
     router.push('/Login');
   }, [router]);
 
   // Add/Remove Favorite
   const AddFavourite = useCallback(async (prodId) => {
     if (!user) {
-      toast.warning('Please login to manage your wishlist');
+      toast.warning('🔒 Please sign in to curate your wishlist.');
       router.push('/Login');
       return null;
     }
@@ -132,12 +132,13 @@ const UserContextProvider = ({ children }) => {
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
 
-      const { message, isFavorite } = res.data;
+      const { message, isFavorite, product } = res.data;
+      const productName = product?.name || 'Item';
 
       if (isFavorite) {
-        toast.success('❤️ Added to wishlist');
+        ecommerceToasts.addedToWishlist(productName);
       } else {
-        toast.info('💔 Removed from wishlist');
+        ecommerceToasts.removedFromWishlist(productName);
       }
 
       // Update local user state specifically for favorites
@@ -159,7 +160,7 @@ const UserContextProvider = ({ children }) => {
       return isFavorite;
     } catch (err) {
       console.error('Favorite error:', err);
-      toast.error('Failed to update wishlist');
+      toast.error('Failed to update your wishlist selection.');
       return null;
     }
   }, [user, router]);

@@ -16,7 +16,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      toast.error("Please enter your credentials");
+      toast.warning("🔑 Please provide your access credentials to continue.");
       return;
     }
 

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Heart, ShoppingBag, Star } from 'lucide-react';
 import { CartContext } from '../Context/Cart';
 import { UserContext } from '../Context/UserContext';
-import { toast } from '@/lib/toast';
+import { toast, ecommerceToasts } from '@/lib/toast';
 
 const ProductCard = ({ product, showRating = false }) => {
     const { addToCart, discount } = useContext(CartContext);
@@ -23,7 +23,7 @@ const ProductCard = ({ product, showRating = false }) => {
         e.stopPropagation();
 
         if (!user) {
-            toast.error("Please login to shop");
+            ecommerceToasts.mustLogin();
             return;
         }
 
@@ -36,16 +36,16 @@ const ProductCard = ({ product, showRating = false }) => {
         setIsAdding(true);
         try {
             await addToCart({
-                id: product._id,
+                _id: product._id,
                 name: product.name,
                 price: finalPrice,
-                img: product.Photo?.[0]?.url,
+                image: [product.Photo?.[0]?.url],
                 quantity: 1
             });
-            toast.success("Added to cart");
+            ecommerceToasts.addedToCart(product.name);
         } catch (error) {
             console.error(error);
-            toast.error("Failed to add to cart");
+            toast.error("Failed to update your selection.");
         } finally {
             setIsAdding(false);
         }
@@ -55,7 +55,7 @@ const ProductCard = ({ product, showRating = false }) => {
         e.preventDefault();
         e.stopPropagation();
         if (!user) {
-            toast.error("Please login first");
+            toast.error("🔒 Please sign in to curate your wishlist.");
             return;
         }
         await AddFavourite(product._id);

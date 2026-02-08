@@ -18,18 +18,18 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!name || !email || !password) {
-      toast.error("Please fil all fields");
+      toast.warning("🛎️ Please complete all required profile details to proceed.");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error("Please enter a valid email");
+      toast.warning("📧 Please provide a valid email address to proceed.");
       return;
     }
 
     if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+      toast.warning("🔒 For your security, passwords must be at least 6 characters.");
       return;
     }
 

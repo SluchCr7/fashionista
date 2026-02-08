@@ -1,4 +1,4 @@
-const { deleteOrder, GetAllOrder, GetOrder, newOrder, updateOrderStatus } = require('../controllers/OrderController')
+const { deleteOrder, GetAllOrder, GetOrder, newOrder, updateOrderStatus } = require('../Controllers/OrderController')
 const express = require('express')
 const route = express.Router()
 const { verifyToken, verifyAdmain, verifyTokenAndAdmin } = require("../Middelware/verifyToken")

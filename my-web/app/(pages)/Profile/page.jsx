@@ -19,7 +19,7 @@ import {
   Trash2
 } from 'lucide-react';
 import axios from 'axios';
-import { toast } from '@/lib/toast';
+import { toast, ecommerceToasts } from '@/lib/toast';
 
 const Profile = () => {
   const [myOrders, setMyOrders] = useState([]);
@@ -223,10 +223,10 @@ const Profile = () => {
                             {status !== 'Delivered' && (
                               <button
                                 onClick={() => {
-                                  if (confirm("Are you sure you want to delete this order record?")) {
+                                  if (confirm("Are you sure you wish to remove this order from your historical records?")) {
                                     deleteOrder(order._id);
                                     setMyOrders(prev => prev.filter(o => o._id !== order._id));
-                                    toast.success("Order record deleted");
+                                    toast.success("🗑️ Order record successfully removed from your history.");
                                   }
                                 }}
                                 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-destructive transition-colors px-3 py-2 rounded-full hover:bg-destructive/10"

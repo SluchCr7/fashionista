@@ -82,71 +82,83 @@ export const toast = {
   },
 };
 
-// Specific e-commerce toast messages
+// Specific e-commerce toast messages with premium wording
 export const ecommerceToasts = {
-  addedToCart: (productName) => 
-    toast.success(`✅ ${productName} added to cart`, { autoClose: 2000 }),
-  
-  removedFromCart: (productName) => 
-    toast.info(`🗑️ ${productName} removed from cart`, { autoClose: 2000 }),
-  
-  updatedQuantity: (productName) => 
-    toast.success(`✅ Updated quantity for ${productName}`, { autoClose: 2000 }),
-  
-  addedToWishlist: (productName) => 
-    toast.success(`❤️ ${productName} added to wishlist`, { autoClose: 2000 }),
-  
-  removedFromWishlist: (productName) => 
-    toast.info(`💔 ${productName} removed from wishlist`, { autoClose: 2000 }),
-  
-  orderPlaced: () => 
-    toast.success('🎉 Order placed successfully!', { autoClose: 4000 }),
-  
-  orderCancelled: () => 
-    toast.info('Order cancelled', { autoClose: 3000 }),
-  
-  loginSuccess: (userName) => 
-    toast.success(`Welcome back, ${userName}!`, { autoClose: 3000 }),
-  
-  logoutSuccess: () => 
-    toast.info('Logged out successfully', { autoClose: 2000 }),
-  
-  registrationSuccess: () => 
-    toast.success('🎉 Account created successfully!', { autoClose: 3000 }),
-  
-  profileUpdated: () => 
-    toast.success('✅ Profile updated successfully', { autoClose: 2000 }),
-  
-  passwordChanged: () => 
-    toast.success('🔒 Password changed successfully', { autoClose: 3000 }),
-  
-  reviewSubmitted: () => 
-    toast.success('⭐ Review submitted successfully', { autoClose: 3000 }),
-  
-  invalidCredentials: () => 
-    toast.error('❌ Invalid email or password', { autoClose: 3000 }),
-  
-  sessionExpired: () => 
-    toast.warning('⚠️ Session expired. Please login again', { autoClose: 4000 }),
-  
-  networkError: () => 
-    toast.error('🌐 Network error. Please check your connection', { autoClose: 4000 }),
-  
-  serverError: () => 
-    toast.error('⚠️ Server error. Please try again later', { autoClose: 4000 }),
-  
-  validationError: (message) => 
-    toast.warning(`⚠️ ${message}`, { autoClose: 3000 }),
-  
-  outOfStock: (productName) => 
-    toast.warning(`⚠️ ${productName} is out of stock`, { autoClose: 3000 }),
-  
-  lowStock: (productName, quantity) => 
-    toast.warning(`⚠️ Only ${quantity} left for ${productName}`, { autoClose: 3000 }),
-  
-  discountApplied: (discount) => 
-    toast.success(`🎁 ${discount}% discount applied!`, { autoClose: 3000 }),
-  
-  copiedToClipboard: () => 
-    toast.success('📋 Copied to clipboard', { autoClose: 1500 }),
+  addedToCart: (productName) =>
+    toast.success(`✨ ${productName} has been added to your selection.`, { autoClose: 2500 }),
+
+  removedFromCart: (productName) =>
+    toast.info(`🛒 ${productName} was removed from your selection.`, { autoClose: 2500 }),
+
+  updatedQuantity: (productName) =>
+    toast.success(`✅ Your selection of ${productName} has been updated.`, { autoClose: 2500 }),
+
+  addedToWishlist: (productName) =>
+    toast.success(`⚜️ ${productName} added to your wishlist.`, { autoClose: 2500 }),
+
+  removedFromWishlist: (productName) =>
+    toast.info(`🕊️ ${productName} removed from your wishlist.`, { autoClose: 2500 }),
+
+  orderPlaced: () =>
+    toast.success('🎊 Congratulations! Your order has been placed successfully.', { autoClose: 5000 }),
+
+  orderCancelled: () =>
+    toast.info('Order successfully cancelled. We hope to see you again soon.', { autoClose: 4000 }),
+
+  loginSuccess: (userName) =>
+    toast.success(`Welcome back, ${userName}. Your exclusive access is ready.`, { autoClose: 3500 }),
+
+  logoutSuccess: () =>
+    toast.info('You have been securely logged out. Farewell for now.', { autoClose: 2500 }),
+
+  registrationSuccess: () =>
+    toast.success('👑 Welcome to the elite! Your account has been created successfully.', { autoClose: 4000 }),
+
+  profileUpdated: () =>
+    toast.success('🛡️ Profile credentials have been successfully updated.', { autoClose: 3000 }),
+
+  passwordChanged: () =>
+    toast.success('🔒 Security check complete. Password updated successfully.', { autoClose: 4000 }),
+
+  reviewSubmitted: () =>
+    toast.success('⭐ Your valuable feedback has been received. Thank you!', { autoClose: 4000 }),
+
+  deletedReview: () =>
+    toast.info('🗑️ Your review has been successfully removed.', { autoClose: 3000 }),
+
+  invalidCredentials: () =>
+    toast.error('❌ Access denied. Please verify your credentials.', { autoClose: 4000 }),
+
+  sessionExpired: () =>
+    toast.warning('⚠️ Session expired. Please sign in to continue.', { autoClose: 5000 }),
+
+  networkError: () =>
+    toast.error('🌐 Connection interrupted. Please check your network.', { autoClose: 5000 }),
+
+  serverError: () =>
+    toast.error('⚠️ Orchestrating a fix... Please try again in a moment.', { autoClose: 5000 }),
+
+  validationError: (message) =>
+    toast.warning(`🛎️ ${message}`, { autoClose: 4000 }),
+
+  outOfStock: (productName) =>
+    toast.warning(`⌛ ${productName} is currently unavailable.`, { autoClose: 4000 }),
+
+  lowStock: (productName, quantity) =>
+    toast.warning(`🔔 Only ${quantity} exquisite pieces remaining for ${productName}.`, { autoClose: 4000 }),
+
+  discountApplied: (discount) =>
+    toast.success(`🎁 Privilege applied: ${discount}% discount enabled!`, { autoClose: 4000 }),
+
+  copiedToClipboard: () =>
+    toast.success('📋 Selection details copied to clipboard.', { autoClose: 2000 }),
+
+  cartCleared: () =>
+    toast.info('🧹 Your shopping selection has been reset.', { autoClose: 3000 }),
+
+  mustLogin: () =>
+    toast.error('🔑 Please sign in to finalize your purchase.', { autoClose: 4000 }),
+
+  emptyCartError: () =>
+    toast.error('🛍️ Your selection is empty. Please add items to proceed.', { autoClose: 4000 }),
 };
