@@ -1,35 +1,24 @@
 'use client'
 
 import React, { useContext, useEffect, useState } from 'react'
-import { CartContext } from '@/app/Context/Cart'
-import { UserContext } from '@/app/Context/UserContext';
+import { OrderContext } from '@/app/Context/OrderContext'
+
+import { AuthContext } from '@/app/Context/AuthContext';
 import Image from 'next/image'
-import axios from 'axios'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Package, Truck, CheckCircle2, Clock, ChevronDown, ChevronUp, MapPin, Phone, Hash, ShoppingBag } from 'lucide-react'
 
 const OrderPage = () => {
-  const [myOrders, setMyOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { orders: myOrders, loading, fetchOrders } = useContext(OrderContext);
   const [expandedOrder, setExpandedOrder] = useState(null);
-  const { user } = useContext(UserContext);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (!user?.token) return;
-      try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/order`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        setMyOrders(res.data);
-      } catch (err) {
-        console.error("Error fetching orders:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOrders();
-  }, [user]);
+    if (user) {
+      fetchOrders();
+    }
+  }, [user, fetchOrders]);
+
 
   const statusConfig = {
     'Pending': { icon: <Clock size={16} />, color: 'bg-amber-500', step: 1 },

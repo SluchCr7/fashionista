@@ -1,49 +1,65 @@
-'use client'
-import React, { useEffect, useState } from 'react'
-import { createContext } from 'react'
-import Notify from '../Components/Notify';
-import axios from 'axios';
+'use client';
+import React, { useEffect, useState, createContext, useCallback } from 'react';
+import api from '@/lib/api';
+import { toast } from '@/lib/toast';
+
 export const AdContext = createContext();
 
-const AdContextProvider = ({children}) => {
-    const [ads, setAds] = useState([])
+const AdProvider = ({ children }) => {
+    const [ads, setAds] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const fetchAds = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await api.get('/api/ads');
+            // Assuming ads returns an array directly based on old code, 
+            // but our new standard returns { success: true, data: ... }
+            // Let's check old code first. res.data was used.
+            setAds(Array.isArray(res) ? res : (res.data || []));
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
-        axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/ads`)
-            .then(res => setAds(res.data))
-            .catch(err => console.log(err))
-    }, [])
-    const AddNewAdd = async(img , category) => {
-        const formData = new FormData()
-        formData.append('image', img)
-        formData.append('category' , category)
-        await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/ads` , formData)
-            .then(res => {
-                setMessage("Ad Banner Added Successfully")
-                setTimeout(() => {
-                    setMessage('')
-                    window.location.reload()
-                }, 3000)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-    }
-    const deleteAd = async(id) => {
-        await axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/ads/${id}`)
-            .then(res => {
-                setMessage("Ad Banner Deleted Successfully")
-                setTimeout(() => {
-                    setMessage('')
-                    window.location.reload()
-                }, 3000)
-            })
-            .catch(err => console.log(err))
-    }
+        fetchAds();
+    }, [fetchAds]);
+
+    const addNewAd = async (img, category) => {
+        console.log("AddNewAd", img, category)
+        const formData = new FormData();
+        formData.append('image', img);
+        formData.append('category', category);
+
+        try {
+            await api.post('/api/ads', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            toast.success("Ad Banner Added Successfully");
+            await fetchAds();
+        } catch (err) {
+            toast.error("Failed to add ad banner");
+        }
+    };
+
+    const deleteAd = async (id) => {
+        try {
+            await api.delete(`/api/ads/${id}`);
+            toast.success("Ad Banner Deleted Successfully");
+            await fetchAds();
+        } catch (err) {
+            toast.error("Failed to delete ad banner");
+        }
+    };
+
     return (
-        <AdContext.Provider value={{ ads, AddNewAdd , deleteAd }}>
+        <AdContext.Provider value={{ ads, loading, addNewAd, deleteAd }}>
             {children}
         </AdContext.Provider>
-    )
-}
+    );
+};
 
-export default AdContextProvider
+export default AdProvider;

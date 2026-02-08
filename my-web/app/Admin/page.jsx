@@ -17,8 +17,8 @@ import {
 import { FaUpload, FaBoxOpen } from 'react-icons/fa6';
 import { IoMdClose } from 'react-icons/io';
 import { ProductContext } from '../Context/ProductContext';
-import { UserContext } from '../Context/UserContext';
-import { CartContext } from '../Context/Cart';
+import { AuthContext } from '../Context/AuthContext';
+import { OrderContext } from '../Context/OrderContext';
 import { AdContext } from '../Context/AdsContext';
 
 import { toast, ecommerceToasts } from '@/lib/toast';
@@ -52,10 +52,17 @@ const SectionTitle = ({ title, subtitle }) => (
 
 const AdminPanel = () => {
   // Contexts
-  const { products = [], AddProduct, deleteProduct } = useContext(ProductContext);
-  const { users = [] } = useContext(UserContext);
-  const { orders = [], deleteOrder, AddDiscount } = useContext(CartContext);
-  const { ads = [], AddAd } = useContext(AdContext || { ads: [], AddAd: () => { } });
+  const { products = [], addProduct, deleteProduct, fetchProducts } = useContext(ProductContext);
+  const { allUsers: users = [], fetchAllUsers } = useContext(AuthContext);
+  const { orders = [], fetchOrders, updateOrderStatus, cancelOrder } = useContext(OrderContext);
+  const { ads = [], addNewAd } = useContext(AdContext);
+
+  useEffect(() => {
+    fetchProducts();
+    fetchOrders();
+    fetchAllUsers();
+  }, [fetchProducts, fetchOrders, fetchAllUsers]);
+
 
   // Navigation
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -96,11 +103,17 @@ const AdminPanel = () => {
 
     const toastId = toast.loading('Synchronizing new inventory item...');
     try {
-      await AddProduct(
-        productForm.name, productForm.description, productForm.price, productForm.quantity,
-        productForm.category, productForm.gender, productForm.collection,
-        productForm.sizes, productForm.colors, productForm.material, imageFile
-      );
+      const formData = new FormData();
+      Object.keys(productForm).forEach(key => {
+        if (Array.isArray(productForm[key])) {
+          productForm[key].forEach(val => formData.append(key, val));
+        } else {
+          formData.append(key, productForm[key]);
+        }
+      });
+      if (imageFile) formData.append('Photo', imageFile);
+
+      await addProduct(formData);
 
       toast.update(toastId, {
         render: '✨ Inventory successfully updated with new product.',
@@ -346,7 +359,7 @@ const AdminPanel = () => {
                       <td className="px-4 font-bold">${o.total}</td>
                       <td className="px-4"><StatusBadge status={o.status || 'Pending'} /></td>
                       <td className="px-4">
-                        <button onClick={() => deleteOrder(o._id)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition"><MdDeleteOutline size={18} /></button>
+                        <button onClick={() => cancelOrder(o._id)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition"><MdDeleteOutline size={18} /></button>
                       </td>
                     </tr>
                   ))}

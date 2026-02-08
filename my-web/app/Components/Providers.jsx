@@ -1,36 +1,38 @@
 'use client';
 
 import React from 'react';
-import AdContextProvider from "../Context/AdsContext";
-import CartContextProvider from "../Context/Cart";
-import ProductContextProvider from "../Context/ProductContext";
-import ReviewContextProvider from "../Context/ReviewContext";
-import UserContextProvider from "../Context/UserContext";
+import AdProvider from "../Context/AdsContext";
+import CartProvider from "../Context/CartContext";
+import ProductProvider from "../Context/ProductContext";
+import ReviewProvider from "../Context/ReviewContext";
+import AuthProvider from "../Context/AuthContext";
+import OrderProvider from "../Context/OrderContext";
 import ThemeProvider from "../Context/ThemeContext";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import LayoutComponent from "./LayoutComponent";
-
-import FeatureContextProvider from "../Context/FeatureContext";
+import FeatureProvider from "../Context/FeatureContext";
 
 export default function Providers({ children }) {
     return (
         <ThemeProvider>
-            <UserContextProvider>
-                <CartContextProvider>
-                    <ProductContextProvider>
-                        <AdContextProvider>
-                            <FeatureContextProvider>
-                                <ReviewContextProvider>
-                                    <LayoutComponent>
-                                        {children}
-                                    </LayoutComponent>
-                                </ReviewContextProvider>
-                            </FeatureContextProvider>
-                        </AdContextProvider>
-                    </ProductContextProvider>
-                </CartContextProvider>
-            </UserContextProvider>
+            <AuthProvider>
+                <ProductProvider>
+                    <CartProvider>
+                        <OrderProvider>
+                            <AdProvider>
+                                <FeatureProvider>
+                                    <ReviewProvider>
+                                        <LayoutComponent>
+                                            {children}
+                                        </LayoutComponent>
+                                    </ReviewProvider>
+                                </FeatureProvider>
+                            </AdProvider>
+                        </OrderProvider>
+                    </CartProvider>
+                </ProductProvider>
+            </AuthProvider>
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
@@ -47,3 +49,4 @@ export default function Providers({ children }) {
         </ThemeProvider>
     );
 }
+

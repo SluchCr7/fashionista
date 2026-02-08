@@ -1,14 +1,14 @@
 "use client";
 import React, { useContext, useEffect, useState } from "react";
 import { ProductContext } from "@/app/Context/ProductContext";
-import { UserContext } from "@/app/Context/UserContext";
-import { CartContext } from "@/app/Context/Cart";
+import { AuthContext } from "@/app/Context/AuthContext";
+import { CartContext } from "@/app/Context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Heart, ShoppingBag, Minus, Plus, Share2, ChevronDown, Check, Info } from "lucide-react";
 import ProductSkeleton from "@/app/Skeletons/ProductSkeleton";
-import { toast } from "@/lib/toast";
+import { toast, ecommerceToasts } from "@/lib/toast";
 import ProductCard from "@/app/Components/ProductCard";
 import ReviewsSection from "@/app/Components/Reviews/ReviewsSection";
 
@@ -16,12 +16,15 @@ const Product = ({ params }) => {
   const { id } = params;
   const { products } = useContext(ProductContext);
   const { addToCart } = useContext(CartContext);
-  const { user, AddFavourite } = useContext(UserContext);
+  const { user, toggleFavorite } = useContext(AuthContext);
+
 
   const [product, setProduct] = useState({});
   const [activeImage, setActiveImage] = useState(0);
   const [adding, setAdding] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [color, setColor] = useState('');
+  const [size, setSize] = useState('');
   const [expandedSection, setExpandedSection] = useState("description");
 
   // Load Product
@@ -30,25 +33,18 @@ const Product = ({ params }) => {
     if (selected) {
       setProduct(selected);
       setActiveImage(0);
+      if (selected.colors?.length > 0) setColor(selected.colors[0]);
+      if (selected.sizes?.length > 0) setSize(selected.sizes[0]);
     }
   }, [id, products]);
 
   const handleAddToCart = async () => {
-    if (!user) {
-      ecommerceToasts.mustLogin();
-      return;
-    }
+    if (product.colors?.length > 0 && !color) return toast.warning("Please select a color");
+    if (product.sizes?.length > 0 && !size) return toast.warning("Please select a size");
 
     setAdding(true);
     try {
-      await addToCart({
-        _id: product._id,
-        name: product.name,
-        price: product.price,
-        image: [product.Photo?.[0]?.url],
-        quantity: quantity,
-      }, quantity);
-      ecommerceToasts.addedToCart(product.name);
+      await addToCart(product, quantity, size || 'M', color || 'Default');
     } catch (error) {
       toast.error("An error occurred while updating your selection.");
     } finally {
@@ -57,12 +53,9 @@ const Product = ({ params }) => {
   };
 
   const handleToggleFavorite = async () => {
-    if (!user) {
-      toast.error("🔒 Please sign in to curate your wishlist.");
-      return;
-    }
-    await AddFavourite(product._id);
+    await toggleFavorite(product._id);
   };
+
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -178,8 +171,57 @@ const Product = ({ params }) => {
             </p>
 
             {/* Selectors */}
-            <div className="space-y-6 mb-10">
-              {/* Example Size/Color Selectors could go here */}
+            <div className="space-y-8 mb-10">
+              {/* Color Selection */}
+              {product.colors?.length > 0 && (
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Select Color</span>
+                    <span className="text-xs font-medium text-foreground">{color}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {product.colors.map((c) => (
+                      <button
+                        key={c}
+                        onClick={() => setColor(c)}
+                        className={`w-10 h-10 rounded-full border-2 transition-all ${color === c ? 'border-primary scale-110 shadow-md' : 'border-transparent hover:border-border'
+                          }`}
+                        title={c}
+                      >
+                        <div
+                          className="w-full h-full rounded-full border border-black/5"
+                          style={{ backgroundColor: c.toLowerCase() }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Size Selection */}
+              {product.sizes?.length > 0 && (
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Select Size</span>
+                    <button className="text-[10px] uppercase font-bold tracking-widest text-primary hover:underline">Size Guide</button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {product.sizes.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setSize(s)}
+                        className={`min-w-[50px] h-12 px-4 rounded-xl border text-sm font-bold transition-all ${size === s
+                          ? "bg-foreground text-background border-foreground shadow-lg"
+                          : "bg-background text-foreground border-border hover:border-foreground"
+                          }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
 
               {/* Quantity */}
               <div className="flex items-center gap-4">

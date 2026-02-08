@@ -1,7 +1,7 @@
 const { deleteOrder, GetAllOrder, GetOrder, newOrder, updateOrderStatus } = require('../Controllers/OrderController')
 const express = require('express')
 const route = express.Router()
-const { verifyToken, verifyAdmain, verifyTokenAndAdmin } = require("../Middelware/verifyToken")
+const { verifyToken, verifyAdmain, verifyTokenAndAdmin } = require("../middlewares/verifyToken")
 
 route.route('/')
     .get(verifyToken, GetAllOrder)

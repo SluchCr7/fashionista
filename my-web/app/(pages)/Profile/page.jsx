@@ -1,6 +1,8 @@
 'use client';
-import { CartContext } from '@/app/Context/Cart';
-import { UserContext } from '@/app/Context/UserContext';
+import { CartContext } from '@/app/Context/CartContext';
+
+import { AuthContext } from '@/app/Context/AuthContext';
+import { OrderContext } from '@/app/Context/OrderContext';
 import React, { useContext, useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,36 +20,18 @@ import {
   ChevronRight,
   Trash2
 } from 'lucide-react';
-import axios from 'axios';
 import { toast, ecommerceToasts } from '@/lib/toast';
 
 const Profile = () => {
-  const [myOrders, setMyOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { deleteOrder } = useContext(CartContext);
-  const { user, Logout } = useContext(UserContext);
+  const { fetchOrders, orders: myOrders, loading, cancelOrder } = useContext(OrderContext);
+  const { user, logout } = useContext(AuthContext);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (user?._id && user?.token) {
-        setLoading(true);
-        try {
-          const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/${user._id}`, {
-            headers: { Authorization: `Bearer ${user.token}` },
-          });
-          setMyOrders(res.data?.orders || []);
-        } catch (err) {
-          console.error(err);
-          toast.error("Failed to fetch orders");
-        } finally {
-          setLoading(false);
-        }
-      } else if (user === null) {
-        setLoading(false);
-      }
-    };
-    fetchUserData();
-  }, [user]);
+    if (user) {
+      fetchOrders();
+    }
+  }, [user, fetchOrders]);
+
 
   const stats = useMemo(() => ({
     delivered: myOrders.filter(o => o.status === "Delivered").length,
@@ -145,9 +129,10 @@ const Profile = () => {
                   </Link>
 
                   <button
-                    onClick={Logout}
+                    onClick={logout}
                     className="w-full p-4 rounded-xl border border-destructive/20 text-destructive hover:bg-destructive/10 transition-colors flex items-center justify-center gap-2 font-medium mt-4"
                   >
+
                     <LogOut size={18} /> Sign Out
                   </button>
                 </nav>
@@ -223,17 +208,16 @@ const Profile = () => {
                             {status !== 'Delivered' && (
                               <button
                                 onClick={() => {
-                                  if (confirm("Are you sure you wish to remove this order from your historical records?")) {
-                                    deleteOrder(order._id);
-                                    setMyOrders(prev => prev.filter(o => o._id !== order._id));
-                                    toast.success("🗑️ Order record successfully removed from your history.");
+                                  if (confirm("Are you sure you wish to cancel this order?")) {
+                                    cancelOrder(order._id);
                                   }
                                 }}
                                 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-destructive transition-colors px-3 py-2 rounded-full hover:bg-destructive/10"
                               >
-                                <Trash2 size={14} /> Delete Record
+                                <Trash2 size={14} /> Cancel Order
                               </button>
                             )}
+
                           </div>
                         </div>
                       </motion.div>

@@ -1,0 +1,64 @@
+const { Order } = require('../models/Order');
+const productService = require('./productService');
+const { User } = require('../models/User');
+const mongoose = require('mongoose');
+
+class OrderService {
+    async createOrder(userId, orderData) {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        try {
+            const { items, shippingDetails, paymentMethod, subtotal, shippingFee, total } = orderData;
+
+            // 1. Verify and Reduce Stock
+            for (const item of items) {
+                await productService.updateStock(item.product, -item.quantity);
+            }
+
+            // 2. Create Order
+            const order = new Order({
+                user: userId,
+                items,
+                shippingDetails,
+                paymentMethod,
+                subtotal,
+                shippingFee,
+                total,
+                status: 'Pending'
+            });
+
+            await order.save({ session });
+
+            // 3. Link to User
+            await User.findByIdAndUpdate(userId, {
+                $push: { orders: order._id }
+            }, { session });
+
+            await session.commitTransaction();
+            return order;
+        } catch (error) {
+            await session.abortTransaction();
+            throw error;
+        } finally {
+            session.endSession();
+        }
+    }
+
+    async getOrders(query) {
+        return await Order.find(query)
+            .populate("user", "name email")
+            .sort({ createdAt: -1 });
+    }
+
+    async updateStatus(orderId, status) {
+        const order = await Order.findById(orderId);
+        if (!order) throw new Error("Order not found");
+
+        order.status = status;
+        await order.save();
+        return order;
+    }
+}
+
+module.exports = new OrderService();

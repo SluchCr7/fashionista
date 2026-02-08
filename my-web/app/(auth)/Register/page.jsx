@@ -1,5 +1,5 @@
 'use client';
-import { UserContext } from '@/app/Context/UserContext';
+import { AuthContext } from '@/app/Context/AuthContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useContext, useState } from 'react';
@@ -13,7 +13,8 @@ const Register = () => {
   const [password, setPass] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { Register } = useContext(UserContext);
+  const { register } = useContext(AuthContext);
+
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -34,8 +35,8 @@ const Register = () => {
     }
 
     setLoading(true);
-    // UserContext expects: (name, email, password)
-    await Register(name, email, password);
+    // AuthContext expects: { name, email, password }
+    await register({ name, email, password });
     setLoading(false);
   }
 

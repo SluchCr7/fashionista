@@ -8,7 +8,7 @@ const {
     getAllReviews,
     getReview
 } = require('../Controllers/ReviewController');
-const { verifyToken, verifyAdmain } = require("../Middelware/verifyToken");
+const { verifyToken, verifyAdmain } = require("../middlewares/verifyToken");
 
 // Public Routes
 router.get('/product/:productId', getProductReviews); // Get reviews for a specific product

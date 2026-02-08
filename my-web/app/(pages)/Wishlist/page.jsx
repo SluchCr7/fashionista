@@ -1,38 +1,37 @@
-'use client'
-import { UserContext } from '@/app/Context/UserContext'
+'use client';
+import { AuthContext } from '@/app/Context/AuthContext'
+
 import React, { useContext, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FaHeart, FaShoppingBag, FaArrowRight } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
-import axios from 'axios'
+import api from '@/lib/api'
 
 const Wishlist = () => {
-  const { user, toggleFavorite } = useContext(UserContext)
+  const { user, toggleFavorite } = useContext(AuthContext)
   const [myProducts, setMyProducts] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (user?._id && user?.token) {
+      if (user?._id) {
         setLoading(true)
         try {
-          const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/${user._id}`, {
-            headers: { Authorization: `Bearer ${user.token}` },
-          })
-          setMyProducts(res.data?.favorites || [])
+          const res = await api.get(`/api/auth/${user._id}`)
+          setMyProducts(res.data?.user?.favorites || res.data?.favorites || [])
         } catch (err) {
-          console.log(err)
+          console.error(err)
         } finally {
           setLoading(false)
         }
       } else {
-        // If no user, stop loading immediately (or handle redirect)
-        if (user === null) setLoading(false); // user null means checked and not found
+        setLoading(false)
       }
     }
     fetchUserData()
   }, [user])
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-20 px-4 sm:px-8">

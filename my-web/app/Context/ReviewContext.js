@@ -1,143 +1,83 @@
-'use client'
-import React, { createContext, useContext, useState, useCallback } from 'react'
-import axios from 'axios';
-import { UserContext } from './UserContext';
+'use client';
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import { AuthContext } from './AuthContext';
 import { ProductContext } from './ProductContext';
 import { toast, ecommerceToasts } from '@/lib/toast';
+import api from '@/lib/api';
 
 export const ReviewContext = createContext();
 
-const ReviewContextProvider = ({ children }) => {
+const ReviewProvider = ({ children }) => {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        pages: 1,
-        totalReviews: 0
-    });
+    const [pagination, setPagination] = useState({ page: 1, pages: 1, totalReviews: 0 });
 
-    const { user } = useContext(UserContext);
+    const { user } = useContext(AuthContext);
     const { fetchProducts } = useContext(ProductContext);
 
-    // Fetch reviews for a specific product
-    const getProductReviews = useCallback(async (productId, page = 1, limit = 5) => {
+    const getProductReviews = useCallback(async (productId, page = 1) => {
         setLoading(true);
         try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/review/product/${productId}?page=${page}&limit=${limit}`);
-            setReviews(data.reviews);
-            setPagination({
-                page: data.page,
-                pages: data.pages,
-                totalReviews: data.totalReviews
-            });
+            const res = await api.get(`/api/review/product/${productId}?page=${page}`);
+            if (res.success) {
+                setReviews(res.data.reviews);
+                setPagination(res.data.pagination);
+            }
         } catch (error) {
-            console.error("Error fetching reviews:", error);
-            toast.error("We encountered an issue retrieving our guest testimonials.");
+            toast.error("Failed to load reviews");
         } finally {
             setLoading(false);
         }
     }, []);
 
-    // Add new review
     const addReview = async (reviewData) => {
         if (!user) {
-            toast.error("🔒 Please sign in to share your experience.");
+            toast.error("Please login to share your experience");
             return;
         }
 
         try {
-            const { data } = await axios.post(
-                `${process.env.NEXT_PUBLIC_BACK_URL}/api/review`,
-                reviewData,
-                {
-                    headers: { 'Authorization': `Bearer ${user.token}` }
-                }
-            );
-
-            // Optimistic update
-            setReviews(prev => [data.review, ...prev]);
-            setPagination(prev => ({
-                ...prev,
-                totalReviews: prev.totalReviews + 1
-            }));
-
-            // Refresh product data to get updated ratings/count
-            if (fetchProducts) fetchProducts();
-
-            ecommerceToasts.reviewSubmitted();
-            return data.review;
+            const res = await api.post('/api/review', reviewData);
+            if (res.success) {
+                // Optimistic update if simple enough, or just refetch
+                setReviews(prev => [res.data.review, ...prev]);
+                if (fetchProducts) fetchProducts();
+                ecommerceToasts.reviewSubmitted();
+                return res.data.review;
+            }
         } catch (error) {
-            console.error("Error adding review:", error);
-            toast.error(error.response?.data?.message || "There was an error finalizing your review.");
+            toast.error(error.message || "Failed to submit review");
             throw error;
         }
     };
 
-    // Update review
-    const updateReview = async (reviewId, reviewData) => {
+    const deleteReview = async (reviewId) => {
         try {
-            const { data } = await axios.put(
-                `${process.env.NEXT_PUBLIC_BACK_URL}/api/review/${reviewId}`,
-                reviewData,
-                {
-                    headers: { 'Authorization': `Bearer ${user.token}` }
-                }
-            );
-
-            // Update local state
-            setReviews(prev => prev.map(rev => rev._id === reviewId ? { ...rev, ...data.review } : rev));
-
-            // Refresh product data
-            if (fetchProducts) fetchProducts();
-
-            toast.success("✨ Your feedback has been successfully refined.");
+            const res = await api.delete(`/api/review/${reviewId}`);
+            if (res.success) {
+                setReviews(prev => prev.filter(rev => rev._id !== reviewId));
+                if (fetchProducts) fetchProducts();
+                ecommerceToasts.deletedReview();
+            }
         } catch (error) {
-            console.error("Error updating review:", error);
-            toast.error(error.response?.data?.message || "We could not update your review at this time.");
-            throw error;
+            toast.error(error.message || "Failed to remove review");
         }
     };
 
-    // Delete review
-    const deleteReview = async (reviewId, productId) => {
-        try {
-            await axios.delete(
-                `${process.env.NEXT_PUBLIC_BACK_URL}/api/review/${reviewId}`,
-                {
-                    headers: { 'Authorization': `Bearer ${user.token}` }
-                }
-            );
-
-            // Update local state
-            setReviews(prev => prev.filter(rev => rev._id !== reviewId));
-            setPagination(prev => ({
-                ...prev,
-                totalReviews: prev.totalReviews - 1
-            }));
-
-            // Refresh product data
-            if (fetchProducts) fetchProducts();
-
-            ecommerceToasts.deletedReview();
-        } catch (error) {
-            console.error("Error deleting review:", error);
-            toast.error(error.response?.data?.message || "Failed to remove your review.");
-        }
+    const value = {
+        reviews,
+        loading,
+        pagination,
+        getProductReviews,
+        addReview,
+        deleteReview
     };
 
     return (
-        <ReviewContext.Provider value={{
-            reviews,
-            loading,
-            pagination,
-            getProductReviews,
-            addReview,
-            updateReview,
-            deleteReview
-        }}>
+        <ReviewContext.Provider value={value}>
             {children}
         </ReviewContext.Provider>
-    )
-}
+    );
+};
 
-export default ReviewContextProvider;
+export default ReviewProvider;

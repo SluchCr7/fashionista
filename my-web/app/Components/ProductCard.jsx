@@ -4,13 +4,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingBag, Star } from 'lucide-react';
-import { CartContext } from '../Context/Cart';
-import { UserContext } from '../Context/UserContext';
+import { CartContext } from '../Context/CartContext';
+import { AuthContext } from '../Context/AuthContext';
 import { toast, ecommerceToasts } from '@/lib/toast';
 
 const ProductCard = ({ product, showRating = false }) => {
     const { addToCart, discount } = useContext(CartContext);
-    const { AddFavourite, user } = useContext(UserContext);
+    const { toggleFavorite, user } = useContext(AuthContext);
     const [isHovered, setIsHovered] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
 
@@ -22,11 +22,6 @@ const ProductCard = ({ product, showRating = false }) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!user) {
-            ecommerceToasts.mustLogin();
-            return;
-        }
-
         // If product has options, redirect to product page
         if (product.sizes?.length > 0 || product.colors?.length > 0) {
             window.location.href = `/Product/${product._id}`;
@@ -35,14 +30,7 @@ const ProductCard = ({ product, showRating = false }) => {
 
         setIsAdding(true);
         try {
-            await addToCart({
-                _id: product._id,
-                name: product.name,
-                price: finalPrice,
-                image: [product.Photo?.[0]?.url],
-                quantity: 1
-            });
-            ecommerceToasts.addedToCart(product.name);
+            await addToCart(product, 1);
         } catch (error) {
             console.error(error);
             toast.error("Failed to update your selection.");
@@ -54,12 +42,9 @@ const ProductCard = ({ product, showRating = false }) => {
     const handleWishlist = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!user) {
-            toast.error("🔒 Please sign in to curate your wishlist.");
-            return;
-        }
-        await AddFavourite(product._id);
+        await toggleFavorite(product._id);
     };
+
 
     return (
         <motion.div

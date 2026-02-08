@@ -1,134 +1,107 @@
 'use client';
 import React, { useEffect, useState, createContext, useCallback, useMemo } from 'react';
-import axios from 'axios';
 import { toast } from '@/lib/toast';
+import api from '@/lib/api';
 
 export const ProductContext = createContext();
 
-const ProductContextProvider = ({ children }) => {
+const ProductProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [product, setProduct] = useState({});
+    const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [loadingProduct, setLoadingProduct] = useState(false);
+    const [filters, setFilters] = useState({
+        page: 1,
+        limit: 12,
+        category: '',
+        gender: '',
+        sort: '-createdAt',
+        search: ''
+    });
 
-    // Fetch All Products
-    const fetchProducts = useCallback(async () => {
+    const fetchProducts = useCallback(async (customFilters = {}) => {
         setLoading(true);
         try {
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product`);
-            setProducts(res.data);
+            const activeFilters = { ...filters, ...customFilters };
+            const queryParams = new URLSearchParams(
+                Object.entries(activeFilters).filter(([_, v]) => v)
+            ).toString();
+
+            const res = await api.get(`/api/product?${queryParams}`);
+            if (res.success) {
+                setProducts(res.data.products);
+                setPagination(res.data.pagination);
+            }
         } catch (err) {
-            console.error('Error fetching products:', err);
-            toast.error("Failed to load products. Please refresh.");
+            toast.error('Failed to load products');
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [filters]);
 
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
 
-    // Add New Product
-    const AddProduct = useCallback(async (formData) => {
-        const toastId = toast.loading("Adding product...");
-        try {
-            await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product`, formData);
-
-            toast.update(toastId, {
-                render: "✅ Product added successfully!",
-                type: "success",
-                isLoading: false,
-                autoClose: 3000
-            });
-
-            await fetchProducts(); // Refresh list
-            return true;
-        } catch (err) {
-            console.error("Add product error:", err);
-            toast.update(toastId, {
-                render: err.response?.data?.message || "Failed to add product",
-                type: "error",
-                isLoading: false,
-                autoClose: 3000
-            });
-            return false;
-        }
-    }, [fetchProducts]);
-
-    // Delete Product
-    const deleteProduct = useCallback(async (prodId) => {
-        // Confirmation is usually handled in UI, but if confirmed:
-        const toastId = toast.loading("Deleting product...");
-        try {
-            await axios.delete(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product/${prodId}`);
-
-            toast.update(toastId, {
-                render: "🗑️ Product deleted successfully",
-                type: "success",
-                isLoading: false,
-                autoClose: 3000
-            });
-
-            setProducts(prev => prev.filter(p => p._id !== prodId));
-        } catch (err) {
-            console.error("Delete product error:", err);
-            toast.update(toastId, {
-                render: "Failed to delete product",
-                type: "error",
-                isLoading: false,
-                autoClose: 3000
-            });
-        }
-    }, []);
-
-    // Get Single Product
-    const getProductBuID = useCallback(async (id) => {
+    const getProductById = async (id) => {
         setLoadingProduct(true);
         try {
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_BACK_URL}/api/product/${id}`);
-            setProduct(res.data);
+            const res = await api.get(`/api/product/${id}`);
+            if (res.success) {
+                setProduct(res.data.product);
+                return res.data.product;
+            }
         } catch (err) {
-            console.error("Get product error:", err);
-            toast.error("Failed to load product details");
+            toast.error('Failed to load product details');
         } finally {
             setLoadingProduct(false);
         }
-    }, []);
+    };
 
-    // Derived State (Memoized for performance)
-    const featuredProducts = useMemo(() => {
-        return products.filter(p => p.isFeatured || p.collections === 'Special').slice(0, 4);
-    }, [products]);
+    const addProduct = async (formData) => {
+        setLoading(true);
+        try {
+            const res = await api.post('/api/product', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            if (res.success) {
+                toast.success('Product added successfully');
+                await fetchProducts();
+                return true;
+            }
+        } catch (err) {
+            toast.error(err.message || 'Failed to add product');
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    const newArrivals = useMemo(() => {
-        // Assuming products are sorted by date or taking the last ones
-        return [...products].reverse().slice(0, 8);
-    }, [products]);
-
-    const bestSellers = useMemo(() => {
-        // Logic for best sellers (mocked if no specific field exists yet)
-        return products.slice(0, 4);
-    }, [products]);
-
-    const getProductsByCategory = useCallback((category) => {
-        return products.filter(p => p.category === category);
-    }, [products]);
+    const deleteProduct = async (id) => {
+        try {
+            const res = await api.delete(`/api/product/${id}`);
+            if (res.success) {
+                toast.success('Product deleted');
+                setProducts(prev => prev.filter(p => p._id !== id));
+            }
+        } catch (err) {
+            toast.error('Failed to delete product');
+        }
+    };
 
     const value = {
         products,
-        loading,
+        pagination,
         product,
+        loading,
         loadingProduct,
-        AddProduct, // Now accepts formData directly for better flexibility
-        deleteProduct,
-        getProductBuID,
+        filters,
+        setFilters,
         fetchProducts,
-        // Computed collections
-        featuredProducts,
-        newArrivals,
-        bestSellers,
-        getProductsByCategory
+        getProductById,
+        addProduct,
+        deleteProduct
     };
 
     return (
@@ -138,4 +111,4 @@ const ProductContextProvider = ({ children }) => {
     );
 };
 
-export default ProductContextProvider;
+export default ProductProvider;

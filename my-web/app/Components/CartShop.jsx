@@ -4,15 +4,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, X, Trash2, Plus, Minus, ArrowRight, Package } from 'lucide-react';
-import { CartContext } from '../Context/Cart';
+import { CartContext } from '../Context/CartContext';
 import { toast } from '@/lib/toast';
 
 const CartShop = () => {
   const {
-    cart,
+    cartItems,
     cartTotal,
     removeFromCart,
-    updateQuantity,
+    addToCart, // Use addToCart for quantity increment
     clearCart
   } = useContext(CartContext);
 
@@ -25,13 +25,13 @@ const CartShop = () => {
   }, []);
 
   const handleQuantityChange = (item, change) => {
-    const newQuantity = item.quantity + change;
-    if (newQuantity < 1) {
-      removeFromCart(item._id, item.name);
+    if (change === -1 && item.quantity === 1) {
+      removeFromCart(item.product._id, item.size, item.color);
     } else {
-      updateQuantity(item._id, newQuantity, item.name);
+      addToCart(item.product, change, item.size, item.color);
     }
   };
+
 
   if (!isClient) return null;
 
@@ -43,11 +43,12 @@ const CartShop = () => {
         aria-label="Open Cart"
       >
         <ShoppingBag className="w-6 h-6" />
-        {cart.length > 0 && (
+        {cartItems.length > 0 && (
           <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white shadow-md animate-in zoom-in">
-            {cart.length}
+            {cartItems.length}
           </span>
         )}
+
       </button>
 
       <AnimatePresence>
@@ -75,8 +76,9 @@ const CartShop = () => {
                 <div className="flex items-center gap-2">
                   <ShoppingBag className="w-5 h-5" />
                   <h2 className="text-xl font-serif font-bold uppercase tracking-wider">
-                    Your Bag <span className="text-muted-foreground text-sm normal-case">({cart.length} items)</span>
+                    Your Bag <span className="text-muted-foreground text-sm normal-case">({cartItems.length} items)</span>
                   </h2>
+
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
@@ -88,7 +90,7 @@ const CartShop = () => {
 
               {/* Items */}
               <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-                {cart.length === 0 ? (
+                {cartItems.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
                     <div className="w-24 h-24 bg-muted/30 rounded-full flex items-center justify-center">
                       <Package className="w-10 h-10 text-muted-foreground" />
@@ -107,18 +109,19 @@ const CartShop = () => {
                     </button>
                   </div>
                 ) : (
+
                   <div className="space-y-6">
-                    {cart.map((item) => (
+                    {cartItems.map((item) => (
                       <motion.div
                         layout
-                        key={item._id}
+                        key={`${item.product._id}-${item.size}-${item.color}`}
                         className="flex gap-4 group"
                       >
                         {/* Image */}
                         <div className="relative w-24 h-32 bg-muted rounded-lg overflow-hidden flex-shrink-0 border border-border">
                           <Image
-                            src={item.image?.[0] || item.Photo?.[0]?.url || '/placeholder.jpg'}
-                            alt={item.name}
+                            src={item.product.Photo?.[0]?.url || item.product.Photo?.url || '/placeholder.jpg'}
+                            alt={item.product.name}
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                           />
@@ -129,20 +132,21 @@ const CartShop = () => {
                           <div className="space-y-1">
                             <div className="flex justify-between items-start gap-4">
                               <Link
-                                href={`/Product/${item._id}`}
+                                href={`/Product/${item.product._id}`}
                                 onClick={() => setIsOpen(false)}
                                 className="font-medium text-foreground hover:text-primary transition-colors line-clamp-2"
                               >
-                                {item.name}
+                                {item.product.name}
                               </Link>
                               <p className="font-bold font-serif whitespace-nowrap">
-                                ${(item.price * item.quantity).toFixed(2)}
+                                ${(item.product.price * item.quantity).toFixed(2)}
                               </p>
                             </div>
                             <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                              {item.category} • {item.size || 'M'} • {item.color || 'Standard'}
+                              {item.product.category} • {item.size || 'M'} • {item.color || 'Standard'}
                             </p>
                           </div>
+
 
                           <div className="flex items-center justify-between gap-4">
                             {/* Quantity Control */}
@@ -166,7 +170,7 @@ const CartShop = () => {
 
                             {/* Remove Button */}
                             <button
-                              onClick={() => removeFromCart(item._id, item.name)}
+                              onClick={() => removeFromCart(item.product._id, item.size, item.color)}
                               className="text-muted-foreground hover:text-destructive transition-colors p-2 rounded-full hover:bg-destructive/10"
                               title="Remove Item"
                             >
@@ -181,7 +185,7 @@ const CartShop = () => {
               </div>
 
               {/* Footer */}
-              {cart.length > 0 && (
+              {cartItems.length > 0 && (
                 <div className="p-6 border-t border-border bg-card/50 backdrop-blur-md space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-sm text-muted-foreground">

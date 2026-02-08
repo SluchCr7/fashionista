@@ -1,124 +1,123 @@
-const asyncHandler = require('express-async-handler')
-const { Product, ProductValidate, UpdateProductValidate } = require('../models/Product')
-const {v2} = require('cloudinary')
-const { cloudRemove , cloudUpload } = require('../Config/cloudUpload')
-const fs = require('fs')
-const path = require('path')
+const productService = require('../services/productService');
+const asyncHandler = require('express-async-handler');
+const { Product, ProductValidate, UpdateProductValidate } = require('../models/Product');
+const { v2 } = require('cloudinary');
+const fs = require('fs');
+const { successResponse, errorResponse } = require('../utils/responseFormatter');
+
 /**
  * @desc Create New Product
- * @route POST /api/auth/product
- * @access Public
+ * @route POST /api/product
+ * @access Private (Admin)
  */
-const NewProduct = async (req, res) => {
-    try {
-        const { name, description, price, quantity, model, category, gender, sizes, colors, collections, material } = req.body;
-        
-        // Ensure an image is uploaded
-        if (!req.files || !req.files.image) {
-            return res.status(400).json({ message: "Image file is required." });
-        }
-
-        let image = req.files.image;
-        
-        // Handle cases where `image` might be an array
-        if (Array.isArray(image)) {
-            image = image[0]; // Get the first image
-        }
-
-        const { error } = ProductValidate(req.body);
-        if (error) {
-            return res.status(400).json({ message: error.details[0].message });
-        }
-
-        // Upload the image to Cloudinary
-        const result = await v2.uploader.upload(image.path, { resource_type: "image" });
-
-        // Create a new product
-        const product = new Product({
-            Photo: {
-                url: result.secure_url,
-                publicId: result.public_id
-            },
-            name,
-            description,
-            price,
-            quantity,
-            model,
-            category,
-            gender,
-            sizes,
-            colors,
-            collections,
-            material
-        });
-
-        await product.save();
-
-        // Remove the uploaded file from local storage
-        fs.unlinkSync(image.path);
-
-        res.status(201).json(product);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+const NewProduct = asyncHandler(async (req, res) => {
+    // Ensure an image is uploaded
+    if (!req.files || !req.files.image) {
+        return errorResponse(res, "Image file is required.", 400);
     }
-};
-/**
- * @method GET
- * @access public
- * @route /api/product
- * @desc ALL Product
- */
 
-const getAllProduct = asyncHandler(async (req, res) => {
-  const products = await Product.find()
-    .populate({
-      path: "reviews",
-      model: "Review",
-      select: "user rating comment",
-      populate: {
-        path: "user",
-        model: "User",
-        select: "name email profilePhoto"
-      }
+    let image = req.files.image;
+    if (Array.isArray(image)) {
+        image = image[0];
+    }
+
+    const { error } = ProductValidate(req.body);
+    if (error) {
+        return errorResponse(res, error.details[0].message, 400);
+    }
+
+    // Upload the image to Cloudinary
+    const result = await v2.uploader.upload(image.path, { resource_type: "image" });
+
+    const product = new Product({
+        Photo: {
+            url: result.secure_url,
+            publicId: result.public_id
+        },
+        ...req.body
     });
 
-  res.status(200).json(products);
+    await product.save();
+    fs.unlinkSync(image.path);
+
+    return successResponse(res, "Product created successfully", { product }, 201);
 });
 
-
 /**
- * @method GET
- * @access public
- * @route /api/product/:id
- * @desc get product by id
+ * @desc Get All Products with filtering, sorting and pagination
+ * @route GET /api/product
+ * @access Public
  */
+const getAllProduct = asyncHandler(async (req, res) => {
+    const {
+        page = 1,
+        limit = 12,
+        sort = '-createdAt',
+        category,
+        gender,
+        minPrice,
+        maxPrice,
+        search
+    } = req.query;
 
-const getProduct = asyncHandler(async(req, res) => {
-    const product = await Product.findById(req.params.id)
-    if (!product) {
-        return res.status(404).json({ message: "Product Not Found" })
+    const filters = {};
+    if (category) filters.category = category;
+    if (gender) filters.gender = gender;
+    if (minPrice || maxPrice) {
+        filters.price = {};
+        if (minPrice) filters.price.$gte = Number(minPrice);
+        if (maxPrice) filters.price.$lte = Number(maxPrice);
     }
-    res.status(200).json(product)
-})
+    if (search) {
+        filters.name = { $regex: search, $options: 'i' };
+    }
+
+    const result = await productService.getAllProducts(filters, {
+        page: Number(page),
+        limit: Number(limit),
+        sort
+    });
+
+    return successResponse(res, "Products fetched", result);
+});
 
 /**
- * @method DELETE
- * @access public
- * @route /api/product/:id
- * @desc delete Product
+ * @desc Get Single Product
+ * @route GET /api/product/:id
+ * @access Public
  */
+const getProduct = asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id)
+        .populate({
+            path: 'reviews',
+            populate: { path: 'user', select: 'name profilePhoto' }
+        });
 
+    if (!product) {
+        return errorResponse(res, "Product Not Found", 404);
+    }
+    return successResponse(res, "Product details fetched", { product });
+});
+
+/**
+ * @desc Delete Product
+ * @route DELETE /api/product/:id
+ * @access Private (Admin)
+ */
 const deleteProduct = asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id)
+    const product = await Product.findById(req.params.id);
     if (!product) {
-        return res.status(404).json({ message: "Product Not Found" })
+        return errorResponse(res, "Product Not Found", 404);
     }
-    await Product.findByIdAndDelete(req.params.id)
-    cloudRemove(product.Photo.publicId)
-    res.status(200).json({message : "Product Deleted Successfully"})
-})
 
+    await Product.findByIdAndDelete(req.params.id);
+    if (product.Photo && product.Photo.publicId) {
+        await v2.uploader.destroy(product.Photo.publicId);
+    }
 
+    return successResponse(res, "Product Deleted Successfully");
+});
 
-module.exports = { NewProduct , getAllProduct, getProduct , deleteProduct}
+module.exports = { NewProduct, getAllProduct, getProduct, deleteProduct };
+
 

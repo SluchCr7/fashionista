@@ -3,10 +3,10 @@ import React, { useContext } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Loader from './Loader';
-import { UserContext } from '../Context/UserContext';
+import { AuthContext } from '../Context/AuthContext';
 
 const LayoutComponent = ({ children }) => {
-  const { isAuthChecked } = useContext(UserContext);
+  const { isAuthChecked } = useContext(AuthContext);
 
   if (!isAuthChecked) {
     return (

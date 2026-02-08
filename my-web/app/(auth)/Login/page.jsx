@@ -1,5 +1,5 @@
 'use client';
-import { UserContext } from '@/app/Context/UserContext';
+import { AuthContext } from '@/app/Context/AuthContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useContext, useState } from 'react';
@@ -11,7 +11,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPass] = useState("");
   const [loading, setLoading] = useState(false);
-  const { Login } = useContext(UserContext);
+  const { login } = useContext(AuthContext);
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -21,8 +22,8 @@ const Login = () => {
     }
 
     setLoading(true);
-    // UserContext's Login function handles success/error toasts
-    await Login(email, password);
+    // AuthContext's login function handles success/error toasts
+    await login(email, password);
     setLoading(false);
   }
 

@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoMdHeart, IoMdAdd, IoMdRemove } from 'react-icons/io';
 import { FaHeart, FaStar } from 'react-icons/fa';
-import { CartContext } from '../Context/Cart';
-import { UserContext } from '../Context/UserContext';
+import { CartContext } from '../Context/CartContext';
+import { AuthContext } from '../Context/AuthContext';
 import { ReviewContext } from '../Context/ReviewContext';
 import { ChevronRight, Share2, ShieldCheck } from 'lucide-react';
 
@@ -18,48 +18,37 @@ const ProductCont = memo(({ product }) => {
   const [activeImg, setActiveImg] = useState(0);
 
   const { addToCart, discount } = useContext(CartContext);
-  const { user, AddFavourite } = useContext(UserContext);
-  const { AddNewReview, Reviews } = useContext(ReviewContext);
+  const { user, toggleFavorite } = useContext(AuthContext);
+  const { addReview, reviews } = useContext(ReviewContext);
 
   const FinalPrice = useMemo(() => (product?.price * (1 - discount / 100)).toFixed(2), [product?.price, discount]);
 
   // 🛒 Handle Add to Cart
   const handleCart = useCallback(() => {
-    if (!user) return setNotify('Please login first');
     if (!color || !size) return setNotify('Please select color and size');
-    addToCart(
-      {
-        id: product?._id,
-        name: product?.name,
-        description: product?.description,
-        price: FinalPrice,
-        color,
-        size,
-        img: product?.Photo[0]?.url,
-      },
-      num
-    );
+    addToCart(product, num, size, color);
     setNotify('Added to cart successfully');
     setColor('');
     setSize('');
     setNum(1);
     setTimeout(() => setNotify(''), 3000);
-  }, [user, color, size, num, FinalPrice, addToCart, product]);
+  }, [color, size, num, addToCart, product]);
 
   // ⭐ Add Review
   const handleStarClick = useCallback(
     (rating) => {
       if (!user) return setNotify('Please login to review');
-      AddNewReview(product?._id, rating);
+      addReview({ product: product?._id, rating });
       setNotify(`Thank you for your ${rating}-star review!`);
       setTimeout(() => setNotify(''), 3000);
     },
-    [user, AddNewReview, product]
+    [user, addReview, product]
   );
 
   useEffect(() => {
-    setProductReviews(Reviews.filter((review) => review.product === product?._id));
-  }, [Reviews, product?._id]);
+    setProductReviews(reviews.filter((review) => review.product === product?._id));
+  }, [reviews, product?._id]);
+
 
   const avgRating = useMemo(() => {
     const total = productReviews.reduce((acc, r) => acc + r.rating, 0);
@@ -117,7 +106,7 @@ const ProductCont = memo(({ product }) => {
             </div>
 
             <button
-              onClick={() => AddFavourite(product?._id)}
+              onClick={() => toggleFavorite(product?._id)}
               className="absolute top-6 right-6 p-3 bg-white/80 backdrop-blur-md rounded-full shadow-sm hover:scale-110 transition-transform"
             >
               {user?.favorites?.includes(product?._id) ? <FaHeart size={18} className="text-red-500" /> : <IoMdHeart size={20} />}

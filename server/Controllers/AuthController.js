@@ -1,151 +1,107 @@
-const {User , UserLogin , UserUpdateValidate , UserValidate } = require('../models/User')
-const asyncHandler = require('express-async-handler')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
-const {Product} = require('../models/Product')
+const authService = require('../services/authService');
+const { User, UserLogin, UserValidate } = require('../models/User');
+const { Product } = require('../models/Product');
+const asyncHandler = require('express-async-handler');
+const { successResponse, errorResponse } = require('../utils/responseFormatter');
+
 /**
  * @desc Register New User
  * @route POST /api/auth/register
  * @access Public
  */
-
 const RegisterNewUser = asyncHandler(async (req, res) => {
-    const { error } = UserValidate(req.body)
-    if (error) {
-        return res.status(400).json({message : error.details[0].message})
-    }
-    const userExist = await User.findOne({ email: req.body.email })
-    if (userExist) return res.status(400).send("User already exists");
-    
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(req.body.password, salt)
-    const user = new User({
-        name: req.body.name,
-        email: req.body.email,
-        password: hashPassword,
-    })
-    await user.save()
-    res.status(201).json({ message: "User Created Successfully" });
-})
+  const { error } = UserValidate(req.body);
+  if (error) {
+    return errorResponse(res, error.details[0].message, 400);
+  }
+
+  const user = await authService.registerUser(req.body);
+  return successResponse(res, "User Created Successfully", { userId: user._id }, 201);
+});
 
 /**
  * @desc Login
- * @route GET /api/auth/login
+ * @route POST /api/auth/login
  * @access Public
  */
-
 const LoginUser = asyncHandler(async (req, res) => {
-    const { error } = UserLogin(req.body)
-    if (error) {
-        res.status(400).json({message : error.details[0].message})
-    }
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-        res.status(400).json({message : "Email or Password are not Correct"})
-    }
-    const validPassword = await bcrypt.compare(req.body.password , user.password)
-    if (!validPassword) {
-        return res.status(400).send("Invalid email or password");
-    }
-    const token = jwt.sign({ _id: user._id , isAdmain: user.isAdmin }, process.env.TOKEN_SECRET);
-    const { password, ...others } = user._doc
-    res.send({ ...others, token });
-})
+  const { error } = UserLogin(req.body);
+  if (error) {
+    return errorResponse(res, error.details[0].message, 400);
+  }
+
+  try {
+    const userData = await authService.loginUser(req.body.email, req.body.password);
+    return successResponse(res, "Login successful", userData);
+  } catch (err) {
+    return errorResponse(res, err.message, 400);
+  }
+});
 
 /**
  * @desc get All Users
  * @route GET /api/auth
- * @access Public
+ * @access Private (Admin)
  */
-
 const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find().populate({
-    path: "orders",
-    populate: [
-      {
-        path: "user",
-        model: "User",
-        select: "ProfileName profilePhoto name",
-      },
-      {
-        path: "Products",
-        model: "Product",
-        select: "Photo name description price gender",
-      },
-    ],
-  }).populate({
+  const users = await User.find()
+    .select("-password")
+    .populate({
       path: "favorites",
-      model: "Product",
-      select: "Photo name description price category gender material",
+      select: "name price Photo category"
     });
 
-  res.status(200).json(users);
+  return successResponse(res, "Users fetched successfully", { users });
 });
 
 /**
  * @desc get user by id
  * @route GET /api/auth/:id
- * @access Public
+ * @access Private (Self/Admin)
  */
 const getUserById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id)
-    .populate({
-      path: "orders",
-      populate: [
-        {
-          path: "user",
-          model: "User",
-          select: "ProfileName profilePhoto name",
-        },
-        {
-          path: "Products", // ✅ نفس الحرف الكبير كما في OrderSchema
-          model: "Product",
-          select: "Photo name description price gender category",
-        },
-      ],
-    })
-    .populate({
-      path: "favorites",
-      model: "Product",
-      select: "Photo name description price category gender material",
-    });
+    .select("-password")
+    .populate("favorites");
 
   if (!user) {
-    return res.status(404).json({ message: "User Not Found" });
+    return errorResponse(res, "User Not Found", 404);
   }
 
-  res.status(200).json(user);
+  return successResponse(res, "User details fetched", { user });
 });
-
-
-
 
 /**
  * @desc delete User
  * @route DELETE /api/auth/:id
- * @access Public
+ * @access Private (Self/Admin)
  */
-
 const DeleteUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id)
-    if (!user) {
-        return res.status(404).json({ message: "User Not Found" })
-    }
-    await User.findByIdAndDelete(req.params.id)
-    res.status(200).json({message : "User Deleted Successfully"})
-})
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return errorResponse(res, "User Not Found", 404);
+  }
 
+  await User.findByIdAndDelete(req.params.id);
+  return successResponse(res, "User Deleted Successfully");
+});
+
+/**
+ * @desc Toggle Favorite Product
+ * @route POST /api/auth/favorite/:id
+ * @access Private
+ */
 const toggleFavorite = asyncHandler(async (req, res) => {
   const productId = req.params.id;
   const user = await User.findById(req.user._id);
 
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return errorResponse(res, "User not found", 404);
   }
 
   const product = await Product.findById(productId);
   if (!product) {
-    return res.status(404).json({ message: "Product not found" });
+    return errorResponse(res, "Product not found", 404);
   }
 
   const isFavorite = user.favorites.includes(productId);
@@ -153,21 +109,36 @@ const toggleFavorite = asyncHandler(async (req, res) => {
   if (isFavorite) {
     user.favorites.pull(productId);
     await user.save();
-    return res.status(200).json({
-      message: "Removed from favorites",
-      isFavorite: false,
-      favoritesCount: user.favorites.length
-    });
+    return successResponse(res, "Removed from favorites", { isFavorite: false });
   } else {
     user.favorites.push(productId);
     await user.save();
-    return res.status(200).json({
-      message: "Added to favorites",
-      isFavorite: true,
-      favoritesCount: user.favorites.length
-    });
+    return successResponse(res, "Added to favorites", { isFavorite: true, product });
   }
 });
 
+const refreshToken = asyncHandler(async (req, res) => {
+  const { token } = req.body;
+  if (!token) return errorResponse(res, "Refresh token required", 401);
 
-module.exports = {DeleteUser , toggleFavorite, LoginUser , RegisterNewUser , getAllUsers , getUserById}
+  try {
+    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET || 'refresh_secret_key');
+    const user = await User.findById(decoded._id);
+    if (!user) return errorResponse(res, "User not found", 401);
+
+    const tokens = authService.generateTokens(user);
+    return successResponse(res, "Token refreshed", tokens);
+  } catch (err) {
+    return errorResponse(res, "Invalid refresh token", 401);
+  }
+});
+
+module.exports = {
+  DeleteUser,
+  toggleFavorite,
+  LoginUser,
+  RegisterNewUser,
+  getAllUsers,
+  getUserById,
+  refreshToken
+};

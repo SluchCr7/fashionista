@@ -2,12 +2,12 @@
 import React, { useContext, useState } from "react";
 import StarRating from "./StarRating";
 import { ReviewContext } from "@/app/Context/ReviewContext";
-import { UserContext } from "@/app/Context/UserContext";
+import { AuthContext } from "@/app/Context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, AlertCircle, CheckCircle2 } from "lucide-react";
 
 const ReviewForm = ({ productId, onFinish }) => {
-    const { user } = useContext(UserContext);
+    const { user } = useContext(AuthContext);
     const { addReview } = useContext(ReviewContext);
 
     const [rating, setRating] = useState(0);

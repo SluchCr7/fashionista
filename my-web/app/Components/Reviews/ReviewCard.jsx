@@ -2,7 +2,7 @@
 import React, { useContext, useState } from "react";
 import Image from "next/image";
 import StarRating from "./StarRating";
-import { UserContext } from "@/app/Context/UserContext";
+import { AuthContext } from "@/app/Context/AuthContext";
 import { ReviewContext } from "@/app/Context/ReviewContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { MoreVertical, Edit2, Trash2, Check, X } from "lucide-react";
@@ -17,7 +17,7 @@ const formatDate = (dateString) => {
 };
 
 const ReviewCard = ({ review }) => {
-    const { user } = useContext(UserContext);
+    const { user } = useContext(AuthContext);
     const { deleteReview, updateReview } = useContext(ReviewContext);
     const [isEditing, setIsEditing] = useState(false);
     const [showOptions, setShowOptions] = useState(false);

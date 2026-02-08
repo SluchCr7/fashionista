@@ -1,7 +1,7 @@
+const orderService = require('../services/orderService');
 const asyncHandler = require('express-async-handler');
-const { Order, OrderValidate } = require('../models/Order');
-const Product = require('../models/Product');
-const User = require('../models/User');
+const { OrderValidate } = require('../models/Order');
+const { successResponse, errorResponse } = require('../utils/responseFormatter');
 
 /**
  * @method POST
@@ -12,47 +12,15 @@ const User = require('../models/User');
 const newOrder = asyncHandler(async (req, res) => {
     const { error } = OrderValidate(req.body);
     if (error) {
-        return res.status(400).json({ message: error.details[0].message });
+        return errorResponse(res, error.details[0].message, 400);
     }
 
-    const { items, shippingDetails, paymentMethod, subtotal, shippingFee, total } = req.body;
-
-    // 1. Check stock and reduce it
-    for (const item of items) {
-        const product = await Product.findById(item.product);
-        if (!product) {
-            return res.status(404).json({ message: `Product ${item.name} not found.` });
-        }
+    try {
+        const order = await orderService.createOrder(req.user._id, req.body);
+        return successResponse(res, "Order placed successfully", { orderId: order._id }, 201);
+    } catch (err) {
+        return errorResponse(res, err.message, 400);
     }
-
-    // 2. Create the order
-    const order = new Order({
-        user: req.user._id,
-        items,
-        shippingDetails,
-        paymentMethod,
-        subtotal,
-        shippingFee,
-        total
-    });
-
-    await order.save();
-
-    // 3. Reduce stock and add order to user's history
-    for (const item of items) {
-        await Product.findByIdAndUpdate(item.product, {
-            $inc: { quantity: -item.quantity }
-        });
-    }
-
-    await User.findByIdAndUpdate(req.user._id, {
-        $push: { orders: order._id }
-    });
-
-    res.status(201).json({
-        message: "Order placed successfully",
-        orderId: order._id
-    });
 });
 
 /**
@@ -67,11 +35,8 @@ const GetAllOrder = asyncHandler(async (req, res) => {
         query.user = req.user._id;
     }
 
-    const orders = await Order.find(query)
-        .populate("user", "name email")
-        .sort({ createdAt: -1 });
-
-    res.status(200).json(orders);
+    const orders = await orderService.getOrders(query);
+    return successResponse(res, "Orders fetched", { orders });
 });
 
 /**
@@ -81,18 +46,18 @@ const GetAllOrder = asyncHandler(async (req, res) => {
  * @desc Get a single order
  */
 const GetOrder = asyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id).populate("user", "name email");
+    const order = await (await orderService.getOrders({ _id: req.params.id }))[0];
 
     if (!order) {
-        return res.status(404).json({ message: "Order Not Found" });
+        return errorResponse(res, "Order Not Found", 404);
     }
 
     // Authorization check
     if (!req.user.isAdmin && order.user._id.toString() !== req.user._id.toString()) {
-        return res.status(403).json({ message: "Access denied" });
+        return errorResponse(res, "Access denied", 403);
     }
 
-    res.status(200).json(order);
+    return successResponse(res, "Order details fetched", { order });
 });
 
 /**
@@ -103,16 +68,12 @@ const GetOrder = asyncHandler(async (req, res) => {
  */
 const updateOrderStatus = asyncHandler(async (req, res) => {
     const { status } = req.body;
-    const order = await Order.findById(req.params.id);
-
-    if (!order) {
-        return res.status(404).json({ message: "Order Not Found" });
+    try {
+        const order = await orderService.updateStatus(req.params.id, status);
+        return successResponse(res, "Order status updated successfully", { order });
+    } catch (err) {
+        return errorResponse(res, err.message, 400);
     }
-
-    order.status = status;
-    await order.save();
-
-    res.status(200).json({ message: "Order status updated successfully", order });
 });
 
 /**
@@ -122,13 +83,13 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
  * @desc Delete Order
  */
 const deleteOrder = asyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id);
+    const order = await (await orderService.getOrders({ _id: req.params.id }))[0];
     if (!order) {
-        return res.status(404).json({ message: "Order Not Found" });
+        return errorResponse(res, "Order Not Found", 404);
     }
 
-    await Order.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Order Deleted Successfully" });
+    await order.deleteOne();
+    return successResponse(res, "Order Deleted Successfully");
 });
 
 module.exports = { deleteOrder, GetAllOrder, GetOrder, newOrder, updateOrderStatus };
