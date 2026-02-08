@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
 import api from '@/lib/api';
-import { Skeleton } from '@/app/Skeletons/Skeleton'; // Assuming there's a skeleton
+import { ProductSkeleton as Skeleton } from '@/app/Skeletons/ProductSkeleton'; // Assuming there's a skeleton
 
 const ClothesGender = memo(({ gender, title, Para }) => {
   const [genderProducts, setGenderProducts] = useState([]);

@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import React, { useContext, useState } from 'react';
 import { ArrowRight, Lock, MapPin, Truck, CheckCircle, ShoppingBag, ShieldCheck } from 'lucide-react';
-import { CartContext } from '@/app/Context/Cart';
+import { CartContext } from '@/app/Context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/lib/toast';

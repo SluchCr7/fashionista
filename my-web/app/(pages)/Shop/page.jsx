@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Heart, SlidersHorizontal, ChevronDown, ChevronUp, Check, X, Grid, List } from "lucide-react";
 import { ProductContext } from "@/app/Context/ProductContext";
-import { CartContext } from "@/app/Context/Cart";
+import { CartContext } from "@/app/Context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/app/Components/ProductCard";
 

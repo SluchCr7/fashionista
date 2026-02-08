@@ -1,6 +1,6 @@
 'use client';
 import React, { useContext } from "react";
-import { CartContext } from "./Context/Cart";
+import { CartContext } from "./Context/CartContext";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
