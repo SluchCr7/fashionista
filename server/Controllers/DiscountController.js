@@ -1,5 +1,6 @@
 const { Discount, DiscountValidate } = require('../models/Discount')
 const asyncHandler = require('express-async-handler')
+const { successResponse, errorResponse } = require('../utils/responseFormatter');
 
 /**
  * @method POST
@@ -11,13 +12,13 @@ const asyncHandler = require('express-async-handler')
 const newDiscount = asyncHandler(async (req, res) => {
     const { error } = DiscountValidate(req.body)
     if (error) {
-        res.status(400).json({message : error.details[0].message})
+        return errorResponse(res, error.details[0].message, 400);
     }
     const discount = new Discount({
         discount: req.body.discount
     })
     await discount.save()
-    res.status(201).json({message : "Discount Created Successfully"})
+    return successResponse(res, "Discount Created Successfully", { discount }, 201);
 })
 
 
@@ -29,9 +30,9 @@ const newDiscount = asyncHandler(async (req, res) => {
  */
 
 const getDiscount = asyncHandler(async (req, res) => {
-    const discount = await Discount.find()
-    res.status(200).json(discount)
+    const discounts = await Discount.find()
+    return successResponse(res, "Discounts fetched", discounts);
 })
 
 
-module.exports = { newDiscount , getDiscount }
+module.exports = { newDiscount, getDiscount }

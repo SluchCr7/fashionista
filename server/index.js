@@ -28,6 +28,7 @@ app.use("/api/ads", require('./routes/adRoute'))
 app.use("/api/review", require('./routes/reviewRoute'))
 app.use("/api/discount", require('./routes/discountRoute'))
 app.use("/api/feature", require('./routes/featureRoute'))
+app.use("/api/coupon", require('./routes/couponRoute'))
 
 
 // Error Handling

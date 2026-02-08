@@ -1,6 +1,7 @@
 const { Order } = require('../models/Order');
 const productService = require('./productService');
 const { User } = require('../models/User');
+const { Coupon } = require('../models/Coupon');
 const mongoose = require('mongoose');
 
 class OrderService {
@@ -9,14 +10,23 @@ class OrderService {
         session.startTransaction();
 
         try {
-            const { items, shippingDetails, paymentMethod, subtotal, shippingFee, total } = orderData;
+            const { items, shippingDetails, paymentMethod, subtotal, shippingFee, total, coupon, discountAmount } = orderData;
 
             // 1. Verify and Reduce Stock
             for (const item of items) {
-                await productService.updateStock(item.product, -item.quantity);
+                await productService.updateStock(item.product, -item.quantity, session);
             }
 
-            // 2. Create Order
+            // 2. Handle Coupon Usage
+            if (coupon && coupon.code) {
+                const dbCoupon = await Coupon.findOne({ code: coupon.code.toUpperCase() }).session(session);
+                if (dbCoupon) {
+                    dbCoupon.usageCount += 1;
+                    await dbCoupon.save({ session });
+                }
+            }
+
+            // 3. Create Order
             const order = new Order({
                 user: userId,
                 items,
@@ -24,6 +34,8 @@ class OrderService {
                 paymentMethod,
                 subtotal,
                 shippingFee,
+                coupon,
+                discountAmount,
                 total,
                 status: 'Pending'
             });

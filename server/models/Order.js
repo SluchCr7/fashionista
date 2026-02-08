@@ -43,6 +43,12 @@ const OrderSchema = new mongoose.Schema({
     },
     subtotal: { type: Number, required: true },
     shippingFee: { type: Number, default: 0 },
+    coupon: {
+        code: String,
+        discountValue: Number,
+        discountType: String
+    },
+    discountAmount: { type: Number, default: 0 },
     total: { type: Number, required: true }
 }, {
     timestamps: true,
@@ -75,6 +81,12 @@ const OrderValidate = (obj) => {
         paymentMethod: joi.string().valid('COD', 'Card'),
         subtotal: joi.number().required(),
         shippingFee: joi.number(),
+        coupon: joi.object({
+            code: joi.string(),
+            discountValue: joi.number(),
+            discountType: joi.string()
+        }),
+        discountAmount: joi.number(),
         total: joi.number().required()
     });
     return schema.validate(obj);

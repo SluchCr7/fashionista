@@ -46,15 +46,11 @@ const ProductProvider = ({ children }) => {
                 setPagination(res.data.pagination);
             }
         } catch (err) {
-            toast.error('Failed to load products');
+            console.error('Fetch products error:', err);
         } finally {
             setLoading(false);
         }
     }, [filters]);
-
-    useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]);
 
     const getProductById = async (id) => {
         setLoadingProduct(true);
@@ -101,6 +97,11 @@ const ProductProvider = ({ children }) => {
             toast.error('Failed to delete product');
         }
     };
+
+    useEffect(() => {
+        // Initial fetch on mount
+        fetchProducts();
+    }, []);
 
     const value = {
         products,

@@ -11,6 +11,8 @@ const CartProvider = ({ children }) => {
   const [discount, setDiscount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const { user, isAuthenticated } = useContext(AuthContext);
 
   // Fetch latest discount percentage
@@ -134,6 +136,34 @@ const CartProvider = ({ children }) => {
       setCartItems([]);
       localStorage.removeItem('cart');
     }
+    setAppliedCoupon(null);
+  };
+
+  const applyCoupon = async (code) => {
+    if (!code) return;
+    setIsApplyingCoupon(true);
+    try {
+      const res = await api.post('/api/coupon/validate', {
+        code,
+        amount: cartTotal
+      });
+      if (res.success) {
+        setAppliedCoupon(res.data);
+        toast.success(`Coupon "${code}" applied!`);
+        return true;
+      }
+    } catch (err) {
+      toast.error(err.message || "Invalid coupon");
+      setAppliedCoupon(null);
+      return false;
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    toast.success("Coupon removed");
   };
 
   const cartTotal = useMemo(() => {
@@ -158,7 +188,11 @@ const CartProvider = ({ children }) => {
     removeFromCart,
     clearCart,
     isCartOpen,
-    setIsCartOpen
+    setIsCartOpen,
+    appliedCoupon,
+    applyCoupon,
+    removeCoupon,
+    isApplyingCoupon
   };
 
 

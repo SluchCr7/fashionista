@@ -11,7 +11,16 @@ import { toast } from '@/lib/toast';
 
 const CheckoutPage = () => {
   const router = useRouter();
-  const { cartItems, cartTotal, clearCart, loading: cartLoading } = useContext(CartContext);
+  const {
+    cartItems,
+    cartTotal,
+    clearCart,
+    loading: cartLoading,
+    appliedCoupon,
+    applyCoupon,
+    removeCoupon,
+    isApplyingCoupon
+  } = useContext(CartContext);
   const { placeOrder, loading: orderLoading } = useContext(OrderContext);
 
   const isLoading = cartLoading || orderLoading;
@@ -26,8 +35,17 @@ const CheckoutPage = () => {
     zip: "",
   });
 
+  const [couponCode, setCouponCode] = useState("");
+
   const shippingFee = cartTotal > 500 ? 0 : 25; // Dynamic shipping
-  const grandTotal = cartTotal + shippingFee;
+  const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+  const grandTotal = Math.max(0, cartTotal + shippingFee - discountAmount);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    const success = await applyCoupon(couponCode);
+    if (success) setCouponCode("");
+  };
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -68,6 +86,12 @@ const CheckoutPage = () => {
       shippingDetails,
       subtotal: cartTotal,
       shippingFee,
+      coupon: appliedCoupon ? {
+        code: appliedCoupon.code,
+        discountValue: appliedCoupon.discountValue,
+        discountType: appliedCoupon.discountType
+      } : null,
+      discountAmount,
       total: grandTotal,
       paymentMethod: 'COD'
     };
@@ -219,11 +243,45 @@ const CheckoutPage = () => {
                     {shippingFee === 0 ? <span className="text-success uppercase tracking-widest text-[10px]">Free</span> : `$${shippingFee.toFixed(2)}`}
                   </span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-sm text-success">
+                    <span className="flex items-center gap-1.5">
+                      Coupon ({appliedCoupon.code})
+                      <button onClick={removeCoupon} className="text-muted-foreground hover:text-destructive">
+                        <CheckCircle size={12} className="fill-success text-white" />
+                      </button>
+                    </span>
+                    <span className="font-bold">-${discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-xl font-bold font-serif pt-6 border-t border-border mt-4">
                   <span>Total</span>
                   <span className="text-primary">${grandTotal.toFixed(2)}</span>
                 </div>
               </div>
+
+              {/* Coupon Input */}
+              {!appliedCoupon && (
+                <div className="mt-8 pt-6 border-t border-border/50">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Promo Code</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      placeholder="Enter code..."
+                      className="flex-1 bg-background border border-border rounded-xl px-4 py-2 text-xs focus:ring-1 focus:ring-primary outline-none uppercase font-bold tracking-widest"
+                    />
+                    <button
+                      onClick={handleApplyCoupon}
+                      disabled={isApplyingCoupon || !couponCode}
+                      className="bg-primary text-primary-foreground px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/90 disabled:opacity-50 transition-all"
+                    >
+                      {isApplyingCoupon ? "..." : "Apply"}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-8 p-4 bg-primary/5 rounded-2xl border border-primary/10 flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">

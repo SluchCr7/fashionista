@@ -17,6 +17,8 @@ const ProductCard = ({ product, showRating = false }) => {
     // Calculate final price
     const price = parseFloat(product.price);
     const finalPrice = discount > 0 ? (price * (1 - discount / 100)).toFixed(2) : price.toFixed(2);
+    const isOutOfStock = product.quantity <= 0;
+    const isNew = new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     const handleAddToCart = async (e) => {
         e.preventDefault();
@@ -83,9 +85,19 @@ const ProductCard = ({ product, showRating = false }) => {
 
                 {/* Badges */}
                 <div className="absolute top-3 left-3 flex flex-col gap-2 pointer-events-none">
+                    {isNew && (
+                        <span className="bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest px-2 py-1">
+                            New
+                        </span>
+                    )}
                     {discount > 0 && (
                         <span className="bg-destructive text-destructive-foreground text-[10px] font-bold uppercase tracking-widest px-2 py-1">
                             -{discount}%
+                        </span>
+                    )}
+                    {isOutOfStock && (
+                        <span className="bg-gray-500 text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1">
+                            Sold Out
                         </span>
                     )}
                 </div>
@@ -104,11 +116,13 @@ const ProductCard = ({ product, showRating = false }) => {
                 <div className="absolute bottom-4 left-0 w-full px-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-10">
                     <button
                         onClick={handleAddToCart}
-                        disabled={isAdding}
-                        className="w-full bg-background/90 backdrop-blur-xl text-foreground hover:bg-primary hover:text-primary-foreground py-3 text-[10px] font-bold uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-2 rounded-lg border border-border/40"
+                        disabled={isAdding || isOutOfStock}
+                        className={`w-full bg-background/90 backdrop-blur-xl text-foreground py-3 text-[10px] font-bold uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-2 rounded-lg border border-border/40 ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-primary-foreground'}`}
                     >
                         {isAdding ? (
                             <span className="animate-pulse">Processing...</span>
+                        ) : isOutOfStock ? (
+                            "Sold Out"
                         ) : (
                             <>
                                 <ShoppingBag size={14} /> {product.sizes?.length > 0 || product.colors?.length > 0 ? 'Select Options' : 'Quick Add'}

@@ -27,8 +27,8 @@ class ProductService {
         return await Product.findById(id).populate('reviews');
     }
 
-    async updateStock(productId, quantityChange) {
-        const product = await Product.findById(productId);
+    async updateStock(productId, quantityChange, session = null) {
+        const product = await Product.findById(productId).session(session);
         if (!product) throw new Error("Product not found");
 
         if (product.quantity + quantityChange < 0) {
@@ -36,7 +36,7 @@ class ProductService {
         }
 
         product.quantity += quantityChange;
-        await product.save();
+        await product.save({ session });
         return product;
     }
 
