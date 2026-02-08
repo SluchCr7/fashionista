@@ -10,6 +10,7 @@ const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [discount, setDiscount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const { user, isAuthenticated } = useContext(AuthContext);
 
   // Fetch latest discount percentage
@@ -78,6 +79,7 @@ const CartProvider = ({ children }) => {
         if (res.success) {
           setCartItems(res.data.items);
           ecommerceToasts.addedToCart(product.name);
+          setIsCartOpen(true);
         }
       } catch (err) {
         toast.error(err.message || 'Failed to add to cart');
@@ -99,6 +101,7 @@ const CartProvider = ({ children }) => {
         return [...prev, { product, quantity, size, color }];
       });
       ecommerceToasts.addedToCart(product.name);
+      setIsCartOpen(true);
     }
   };
 
@@ -153,7 +156,9 @@ const CartProvider = ({ children }) => {
     discount,
     addToCart,
     removeFromCart,
-    clearCart
+    clearCart,
+    isCartOpen,
+    setIsCartOpen
   };
 
 

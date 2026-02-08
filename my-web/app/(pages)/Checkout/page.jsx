@@ -4,13 +4,17 @@ import Image from 'next/image';
 import React, { useContext, useState } from 'react';
 import { ArrowRight, Lock, MapPin, Truck, CheckCircle, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { CartContext } from '@/app/Context/CartContext';
+import { OrderContext } from '@/app/Context/OrderContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/lib/toast';
 
 const CheckoutPage = () => {
   const router = useRouter();
-  const { cart, cartTotal, submitOrder, isLoading } = useContext(CartContext);
+  const { cartItems, cartTotal, clearCart, loading: cartLoading } = useContext(CartContext);
+  const { placeOrder, loading: orderLoading } = useContext(OrderContext);
+
+  const isLoading = cartLoading || orderLoading;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -51,14 +55,32 @@ const CheckoutPage = () => {
       zip: formData.zip
     };
 
-    const success = await submitOrder(shippingDetails, cartTotal, shippingFee, grandTotal);
+    const orderData = {
+      items: cartItems.map(item => ({
+        product: item.product._id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+        image: item.product.Photo?.[0]?.url || item.product.Photo?.url || ''
+      })),
+      shippingDetails,
+      subtotal: cartTotal,
+      shippingFee,
+      total: grandTotal,
+      paymentMethod: 'COD'
+    };
 
-    if (success) {
+    const result = await placeOrder(orderData);
+
+    if (result) {
+      await clearCart();
       router.push('/Order');
     }
   };
 
-  if (cart.length === 0 && !isLoading) {
+  if (cartItems.length === 0 && !isLoading) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-6">
         <div className="w-24 h-24 bg-muted/20 rounded-full flex items-center justify-center">
@@ -165,22 +187,22 @@ const CheckoutPage = () => {
               <h2 className="text-2xl font-serif font-bold mb-8 uppercase tracking-wider">Order Summary</h2>
 
               <div className="space-y-6 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar mb-8">
-                {cart.map((item) => (
-                  <div key={item._id} className="flex gap-4">
+                {cartItems.map((item) => (
+                  <div key={`${item.product._id}-${item.size}-${item.color}`} className="flex gap-4">
                     <div className="relative w-20 h-28 bg-background rounded-xl overflow-hidden border border-border flex-shrink-0 shadow-sm">
                       <Image
-                        src={item.image?.[0] || item.Photo?.[0]?.url || '/placeholder.jpg'}
-                        alt={item.name}
+                        src={item.product.Photo?.[0]?.url || item.product.Photo?.url || '/placeholder.jpg'}
+                        alt={item.product.name}
                         fill
                         className="object-cover"
                       />
                     </div>
                     <div className="flex-1 flex flex-col justify-center py-1">
-                      <h3 className="font-bold text-sm leading-tight line-clamp-2">{item.name}</h3>
+                      <h3 className="font-bold text-sm leading-tight line-clamp-2">{item.product.name}</h3>
                       <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">
                         {item.size || 'M'} • {item.color || 'Standard'} • Qty: {item.quantity}
                       </p>
-                      <p className="font-bold mt-2">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-bold mt-2">${(item.product.price * item.quantity).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}

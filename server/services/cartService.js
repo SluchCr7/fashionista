@@ -36,7 +36,7 @@ class CartService {
         }
 
         await cart.save();
-        return cart;
+        return await cart.populate('items.product');
     }
 
     async removeFromCart(userId, productId, size, color) {
@@ -48,7 +48,7 @@ class CartService {
         );
 
         await cart.save();
-        return cart;
+        return await cart.populate('items.product');
     }
 
     async clearCart(userId) {
