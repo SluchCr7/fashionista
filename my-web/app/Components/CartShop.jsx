@@ -153,7 +153,7 @@ const CartShop = () => {
                     <div className="space-y-3">
                       <h3 className="text-xl font-bold font-serif">Your bag is empty</h3>
                       <p className="text-sm text-muted-foreground max-w-[240px] leading-relaxed">
-                        Start adding items to your cart and they'll appear here
+                        Start adding items to your cart and they will appear here
                       </p>
                     </div>
                     <motion.button
