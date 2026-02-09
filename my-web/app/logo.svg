@@ -1,0 +1,29 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Stylized Fashion Icon -->
+  <g id="icon">
+    <!-- Hanger hook -->
+    <path d="M15 8 Q15 5, 18 5 Q21 5, 21 8 L21 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <!-- Hanger bar -->
+    <path d="M8 12 L28 12 L25 20 L11 20 Z" fill="currentColor" opacity="0.15"/>
+    <path d="M8 12 L28 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <!-- Dress silhouette -->
+    <path d="M11 20 L8 35 L8 42 Q8 44, 10 44 L26 44 Q28 44, 28 42 L28 35 L25 20" fill="currentColor" opacity="0.1"/>
+    <path d="M11 20 L8 35 L8 42 Q8 44, 10 44 L26 44 Q28 44, 28 42 L28 35 L25 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Decorative detail -->
+    <circle cx="18" cy="28" r="1.5" fill="currentColor" opacity="0.6"/>
+    <circle cx="18" cy="34" r="1.5" fill="currentColor" opacity="0.6"/>
+  </g>
+  
+  <!-- Text: FASHION -->
+  <text x="42" y="35" font-family="serif" font-size="28" font-weight="700" letter-spacing="1" fill="currentColor">
+    FASHION
+  </text>
+  
+  <!-- Text: ISTA (with accent color) -->
+  <text x="152" y="35" font-family="serif" font-size="28" font-weight="700" font-style="italic" letter-spacing="0.5" fill="#FF6B9D">
+    ISTA
+  </text>
+  
+  <!-- Decorative underline -->
+  <path d="M42 42 L195 42" stroke="#FF6B9D" stroke-width="1.5" opacity="0.3"/>
+</svg>
