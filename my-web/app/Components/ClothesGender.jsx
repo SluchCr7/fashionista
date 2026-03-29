@@ -39,7 +39,7 @@ const ClothesGender = memo(({ gender, title, Para }) => {
   }
 
   return (
-    <section className="w-full px-6 md:px-12 py-16 bg-white">
+    <section className="w-full px-6 md:px-12 py-16 ">
       {/* Introduction Header */}
       {title && (
         <div className="mb-12">

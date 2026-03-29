@@ -58,7 +58,7 @@ export default function CheckoutPage() {
                 zip: formData.zip
             },
             subtotal: cartTotal, shippingFee, discountAmount, total: grandTotal, paymentMethod: 'COD',
-            coupon: appliedCoupon ? { code: appliedCoupon.code, discountValue: appliedCoupon.discountValue, discountType: appliedCoupon.discountType } : null
+            ...(appliedCoupon && { coupon: { code: appliedCoupon.code, discountValue: appliedCoupon.discountValue, discountType: appliedCoupon.discountType } })
         };
 
         if (await placeOrder(orderData)) { await clearCart(); router.push('/Order'); }

@@ -149,11 +149,11 @@ const CartProvider = ({ children }) => {
       });
       if (res.success) {
         setAppliedCoupon(res.data);
-        toast.success(`Coupon "${code}" applied!`);
+        ecommerceToasts.discountApplied(res.data.discountValue);
         return true;
       }
     } catch (err) {
-      toast.error(err.message || "Invalid coupon");
+      toast.error(err.message || "Invalid or expired promo code");
       setAppliedCoupon(null);
       return false;
     } finally {
@@ -163,7 +163,7 @@ const CartProvider = ({ children }) => {
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
-    toast.success("Coupon removed");
+    toast.info("Promo code removed");
   };
 
   const cartTotal = useMemo(() => {
