@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import React, { useContext, useState } from 'react';
-import { ArrowRight, Lock, ShieldCheck, ShoppingBag, CheckCircle, Truck } from 'lucide-react';
+import { ArrowRight, Lock, ShieldCheck, ShoppingBag, CheckCircle, Truck, X } from 'lucide-react';
 import { CartContext } from '@/app/Context/CartContext';
 import { OrderContext } from '@/app/Context/OrderContext';
 import { easeOut, motion } from 'framer-motion';

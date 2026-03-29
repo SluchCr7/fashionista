@@ -40,6 +40,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const Hero = () => {
   return (
@@ -66,7 +67,7 @@ const Hero = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.8, duration: 1 }}
           >
-            <p className="typography-display !text-white/60 mb-4">L'Homme Archive</p>
+            <p className="typography-display !text-white/60 mb-4">L&apos;Homme Archive</p>
             <h2 className="text-5xl md:text-8xl font-serif font-black text-white italic tracking-tighter mb-8">Ethereal.</h2>
             <Link href="/Shop/Men" className="button-luxury !bg-white !text-black hover:!bg-black hover:!text-white border-none py-6 px-12">
               Explore Men

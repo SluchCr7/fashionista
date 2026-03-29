@@ -128,7 +128,7 @@ const CartShop = () => {
                             animate={{ scale: 1, opacity: 1 }}
                             className="flex items-center gap-1 text-yellow-600 dark:text-yellow-500"
                           >
-                            <Sparkles size={16} /> You've unlocked free shipping!
+                            <Sparkles size={16} /> You&apos;ve unlocked free shipping!
                           </motion.span>
                         ) : (
                           <>Spend <span className="font-bold border-b border-dashed border-black/30 dark:border-white/30">${remainingForFreeShipping.toFixed(2)}</span> more for Free Shipping</>
@@ -158,7 +158,7 @@ const CartShop = () => {
                         <ShoppingCart size={40} strokeWidth={1} />
                       </div>
                       <h3 className="text-xl font-medium tracking-wide">Your cart is empty</h3>
-                      <p className="text-sm max-w-[250px]">Looks like you haven't added any items to your bag yet.</p>
+                      <p className="text-sm max-w-[250px]">Looks like you haven&apos;t added any items to your bag yet.</p>
                       <button 
                         onClick={() => setIsCartOpen(false)}
                         className="mt-6 px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-full text-sm font-medium hover:scale-105 transition-transform"
