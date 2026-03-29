@@ -4,14 +4,16 @@ import React, { useContext, useState } from 'react';
 import { ArrowRight, Lock, ShieldCheck, ShoppingBag, CheckCircle, Truck, X } from 'lucide-react';
 import { CartContext } from '@/app/Context/CartContext';
 import { OrderContext } from '@/app/Context/OrderContext';
+import { AuthContext } from '@/app/Context/AuthContext';
 import { easeOut, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/lib/toast';
 
 export default function CheckoutPage() {
     const router = useRouter();
-    const { cartItems, cartTotal, clearCart, loading: cartLoading, appliedCoupon, applyCoupon, removeCoupon, isApplyingCoupon } = useContext(CartContext);
+    const { cartItems, cartTotal, clearCart, loading: cartLoading, appliedCoupon, applyCoupon, removeCoupon, isApplyingCoupon, discount } = useContext(CartContext);
     const { placeOrder, loading: orderLoading } = useContext(OrderContext);
+    const { isAuthenticated } = useContext(AuthContext);
 
     const isLoading = cartLoading || orderLoading;
 
@@ -27,6 +29,12 @@ export default function CheckoutPage() {
 
     const handleCheckOut = async (e) => {
         e.preventDefault();
+        if (!isAuthenticated) {
+            toast.error("Please log in to your account to finalize the purchase.");
+            router.push('/Login');
+            return;
+        }
+
         const emptyFields = Object.keys(formData).filter(key => !formData[key]);
         if (emptyFields.length > 0) return toast.warning(`Please provide your ${emptyFields[0]} to proceed.`);
 
@@ -34,7 +42,7 @@ export default function CheckoutPage() {
             items: cartItems.map(item => ({
                 product: item.product._id,
                 name: item.product.name,
-                price: item.product.price,
+                price: item.product.price - (item.product.price * discount) / 100,
                 quantity: item.quantity,
                 size: item.size,
                 color: item.color,
@@ -153,7 +161,7 @@ export default function CheckoutPage() {
                                         <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-black/50 dark:text-white/50 mb-4">
                                             {item.size || 'M'} / {item.color || 'ST'} / Qty: {item.quantity}
                                         </p>
-                                        <p className="font-bold">${(item.product.price * item.quantity).toFixed(2)}</p>
+                                        <p className="font-bold">${((item.product.price - (item.product.price * discount) / 100) * item.quantity).toFixed(2)}</p>
                                     </div>
                                 </div>
                             ))}

@@ -232,7 +232,7 @@ const CartShop = () => {
                               </div>
 
                               <p className="font-semibold text-lg tracking-tight">
-                                ${(item.product.price * item.quantity).toFixed(2)}
+                                ${((item.product.price - (item.product.price * discount) / 100) * item.quantity).toFixed(2)}
                               </p>
                             </div>
                           </div>
