@@ -48,7 +48,15 @@ export default function CheckoutPage() {
                 color: item.color,
                 image: item.product.Photo?.[0]?.url || item.product.Photo?.url || ''
             })),
-            shippingDetails: formData,
+            shippingDetails: {
+                name: formData.name,
+                email: formData.email,
+                phoneNumber: formData.phone,
+                address: formData.address,
+                city: formData.city,
+                country: formData.country,
+                zip: formData.zip
+            },
             subtotal: cartTotal, shippingFee, discountAmount, total: grandTotal, paymentMethod: 'COD',
             coupon: appliedCoupon ? { code: appliedCoupon.code, discountValue: appliedCoupon.discountValue, discountType: appliedCoupon.discountType } : null
         };

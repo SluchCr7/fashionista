@@ -34,9 +34,9 @@ export default function Providers({ children }) {
                 </ProductProvider>
             </AuthProvider>
             <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
+                position="bottom-right"
+                autoClose={4000}
+                hideProgressBar={true}
                 newestOnTop
                 closeOnClick
                 rtl={false}
@@ -44,7 +44,9 @@ export default function Providers({ children }) {
                 draggable
                 pauseOnHover
                 theme="light"
-                style={{ zIndex: 99999 }}
+                toastClassName="!bg-transparent !shadow-none !p-0 !m-0 overflow-visible"
+                bodyClassName="!bg-transparent !shadow-none !p-0 !m-0 overflow-visible"
+                style={{ zIndex: 99999, width: 'auto', background: 'transparent' }}
             />
         </ThemeProvider>
     );
