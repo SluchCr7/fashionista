@@ -52,8 +52,8 @@ const SectionTitle = ({ title, subtitle }) => (
 
 const AdminPanel = () => {
   // Contexts
-  const { products = [], addProduct, deleteProduct, fetchProducts } = useContext(ProductContext);
-  const { allUsers: users = [], fetchAllUsers } = useContext(AuthContext);
+  const { products = [], addProduct, updateProduct, deleteProduct, fetchProducts } = useContext(ProductContext);
+  const { allUsers: users = [], fetchAllUsers, deleteUser } = useContext(AuthContext);
   const { orders = [], fetchOrders, updateOrderStatus, cancelOrder } = useContext(OrderContext);
   const { ads = [], addNewAd } = useContext(AdContext);
 
@@ -71,20 +71,19 @@ const AdminPanel = () => {
     { id: 'orders', label: 'Orders', icon: <MdShoppingBag /> },
     { id: 'products', label: 'Inventory', icon: <MdOutlineInventory2 /> },
     { id: 'customers', label: 'Customers', icon: <MdPeopleOutline /> },
-    { id: 'add-product', label: 'Add Product', icon: <MdAddCircleOutline /> },
+    { id: 'add-product', label: 'Product Manager', icon: <MdAddCircleOutline /> },
     { id: 'marketing', label: 'Marketing', icon: <MdLocalOffer /> },
   ];
 
   // State
   const [search, setSearch] = useState('');
-  const [perPage, setPerPage] = useState(10);
-  const [page, setPage] = useState(0);
-  const [confirm, setConfirm] = useState({ open: false, action: null, message: '' });
+  const [editingProduct, setEditingProduct] = useState(null);
 
   // Forms State
-  const [productForm, setProductForm] = useState({
-    name: '', description: '', price: '', quantity: '', category: '', gender: '', material: '', colors: [], sizes: [], collection: ''
-  });
+  const initialProductState = {
+    name: '', description: '', price: '', quantity: '', category: '', gender: '', material: '', colors: [], sizes: [], collections: ''
+  };
+  const [productForm, setProductForm] = useState(initialProductState);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -99,9 +98,11 @@ const AdminPanel = () => {
   // Handlers
   const handleProductSubmit = async (e) => {
     e.preventDefault();
-    if (!productForm.name || !productForm.price) return toast.warning('🛎️ Please complete all required inventory details.');
+    if (!productForm.name || !productForm.price) return toast.warning('Please complete all required fields.');
 
-    const toastId = toast.loading('Synchronizing new inventory item...');
+    const isEdit = !!editingProduct;
+    const toastId = toast.loading(isEdit ? 'Updating product...' : 'Creating new product...');
+
     try {
       const formData = new FormData();
       Object.keys(productForm).forEach(key => {
@@ -111,28 +112,54 @@ const AdminPanel = () => {
           formData.append(key, productForm[key]);
         }
       });
-      if (imageFile) formData.append('Photo', imageFile);
+      if (imageFile) formData.append('image', imageFile);
 
-      await addProduct(formData);
+      let success;
+      if (isEdit) {
+        success = await updateProduct(editingProduct._id, formData);
+      } else {
+        success = await addProduct(formData);
+      }
 
+      if (success) {
+        toast.update(toastId, {
+          render: isEdit ? 'Product updated successfully' : 'Product created successfully',
+          type: 'success',
+          isLoading: false,
+          autoClose: 3000,
+        });
+        setProductForm(initialProductState);
+        setEditingProduct(null);
+        setImageFile(null);
+        setImagePreview(null);
+        setActiveTab('products');
+      }
+    } catch (err) {
       toast.update(toastId, {
-        render: '✨ Inventory successfully updated with new product.',
-        type: 'success',
-        isLoading: false,
-        autoClose: 3000,
-      });
-
-      setProductForm({ name: '', description: '', price: '', quantity: '', category: '', gender: '', material: '', colors: [], sizes: [], collection: '' });
-      setImageFile(null);
-      setImagePreview(null);
-    } catch {
-      toast.update(toastId, {
-        render: '⚠️ We encountered an issue updating the inventory.',
+        render: 'Failed to process request.',
         type: 'error',
         isLoading: false,
         autoClose: 3000,
       });
     }
+  };
+
+  const handleEditClick = (product) => {
+    setEditingProduct(product);
+    setProductForm({
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      quantity: product.quantity,
+      category: product.category,
+      gender: product.gender,
+      material: product.material,
+      colors: product.colors || [],
+      sizes: product.sizes || [],
+      collections: product.collections || ''
+    });
+    setImagePreview(product.Photo?.[0]?.url || null);
+    setActiveTab('add-product');
   };
 
   /* Render Helpers for Table */
@@ -144,12 +171,30 @@ const AdminPanel = () => {
     </thead>
   );
 
-  const StatusBadge = ({ status }) => {
+  const StatusBadge = ({ status, onUpdate }) => {
     let color = 'bg-gray-100 text-gray-600';
     if (status === 'Delivered') color = 'bg-green-100 text-green-700';
     if (status === 'Pending') color = 'bg-yellow-100 text-yellow-700';
+    if (status === 'Processing') color = 'bg-blue-100 text-blue-700';
+    if (status === 'Shipped') color = 'bg-purple-100 text-purple-700';
     if (status === 'Canceled') color = 'bg-red-100 text-red-700';
-    return <span className={`px-2 py-1 rounded-full text-xs font-bold ${color}`}>{status}</span>;
+
+    return (
+      <div className="flex items-center gap-2">
+        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${color}`}>{status}</span>
+        <select
+          value={status}
+          onChange={(e) => onUpdate(e.target.value)}
+          className="text-[10px] border border-gray-200 rounded px-1 py-0.5 focus:outline-none"
+        >
+          <option value="Pending">Pending</option>
+          <option value="Processing">Processing</option>
+          <option value="Shipped">Shipped</option>
+          <option value="Delivered">Delivered</option>
+          <option value="Canceled">Canceled</option>
+        </select>
+      </div>
+    );
   };
 
   return (
@@ -166,7 +211,10 @@ const AdminPanel = () => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id);
+                if (tab.id !== 'add-product') setEditingProduct(null);
+              }}
               className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === tab.id
                 ? 'bg-black text-white shadow-lg shadow-black/20'
                 : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
@@ -180,8 +228,8 @@ const AdminPanel = () => {
 
         <div className="p-4 border-t border-gray-50">
           <div className="flex items-center gap-3 px-2">
-            <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0 overflow-hidden">
-              <Image src="/admin-avatar.png" width={40} height={40} alt="Admin" />
+            <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0 overflow-hidden relative">
+              <Image src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" fill className="object-cover" alt="Admin" />
             </div>
             <div className="hidden lg:block overflow-hidden">
               <p className="text-sm font-bold truncate">Admin User</p>
@@ -197,23 +245,19 @@ const AdminPanel = () => {
         <header className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-2xl font-bold">{tabs.find(t => t.id === activeTab)?.label}</h1>
-            <p className="text-sm text-gray-400">Welcome back, here is what is happening.</p>
+            <p className="text-sm text-gray-400">Manage your store activities.</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative hidden md:block">
               <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search everything..."
                 className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-black/5 block w-64"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
-            <button className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-50 relative">
-              <MdNotificationsNone size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
           </div>
         </header>
 
@@ -228,23 +272,30 @@ const AdminPanel = () => {
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-              {/* Recent Orders */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-lg">Recent Orders</h3>
+                  <h3 className="font-bold text-lg">Recent Transactions</h3>
                   <button onClick={() => setActiveTab('orders')} className="text-sm text-blue-600 font-medium hover:underline">View All</button>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <TableHeader cols={['Order ID', 'Customer', 'Items', 'Total', 'Status']} />
-                    <tbody className="text-sm">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-50 text-gray-400 uppercase">
+                        <th className="py-2 text-left">ID</th>
+                        <th className="py-2 text-left">Customer</th>
+                        <th className="py-2 text-left">Total</th>
+                        <th className="py-2 text-left">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {orders.slice(0, 5).map(o => (
-                        <tr key={o._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition">
-                          <td className="py-4 px-4 text-gray-500">#{o._id.slice(-6)}</td>
-                          <td className="px-4 font-medium">{o.user?.name || 'Guest'}</td>
-                          <td className="px-4 text-center">{o.Products?.length || 0}</td>
-                          <td className="px-4 font-bold text-gray-700">${o.total}</td>
-                          <td className="px-4"><StatusBadge status={o.status || 'Pending'} /></td>
+                        <tr key={o._id} className="border-b border-gray-50 last:border-0">
+                          <td className="py-4 font-mono text-gray-400">#{o._id.slice(-6)}</td>
+                          <td className="py-4 font-bold">{o.user?.name}</td>
+                          <td className="py-4 font-black">${o.total}</td>
+                          <td className="py-4">
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${o.status === 'Delivered' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>{o.status}</span>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -252,79 +303,125 @@ const AdminPanel = () => {
                 </div>
               </div>
 
-              {/* Top Products */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-lg">New Inventory</h3>
-                  <button onClick={() => setActiveTab('products')} className="text-sm text-blue-600 font-medium hover:underline">View All</button>
-                </div>
-                <ul className="space-y-4">
+                <h3 className="font-bold text-lg mb-6">Inventory Quick-look</h3>
+                <div className="space-y-4">
                   {products.slice(0, 5).map(p => (
-                    <li key={p._id} className="flex items-center gap-4 p-2 hover:bg-gray-50 rounded-xl transition">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden shrink-0 relative">
+                    <div key={p._id} className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden relative shrink-0">
                         <Image src={p.Photo?.[0]?.url || '/placeholder.png'} fill className="object-cover" alt={p.name} />
                       </div>
                       <div className="flex-1">
-                        <p className="font-bold text-sm text-gray-900">{p.name}</p>
-                        <p className="text-xs text-gray-500">{p.category}</p>
+                        <p className="text-sm font-bold text-gray-900">{p.name}</p>
+                        <p className="text-[10px] text-gray-400 uppercase">{p.category} • {p.quantity} In Stock</p>
                       </div>
-                      <span className="font-bold text-sm text-gray-700">${p.price}</span>
-                    </li>
+                      <p className="text-sm font-black text-gray-800">${p.price}</p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* --- ADD PRODUCT VIEW --- */}
+        {/* --- INVENTORY VIEW --- */}
+        {activeTab === 'products' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="font-bold text-lg">Product Inventory</h3>
+              <button onClick={() => setActiveTab('add-product')} className="text-sm bg-black text-white px-4 py-2 rounded-lg font-bold">Add Item</button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <TableHeader cols={['Product', 'Price', 'Stock', 'Category', 'Actions']} />
+                <tbody>
+                  {products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).map(p => (
+                    <tr key={p._id} className="border-b border-gray-50 hover:bg-gray-50 group transition">
+                      <td className="px-4 py-4 flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-gray-100 overflow-hidden relative">
+                          <Image src={p.Photo?.[0]?.url || '/placeholder.png'} fill className="object-cover" alt={p.name} />
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm">{p.name}</p>
+                          <p className="text-[10px] text-gray-400 uppercase tracking-tighter">{p.gender} • {p.material}</p>
+                        </div>
+                      </td>
+                      <td className="px-4 font-black">${p.price}</td>
+                      <td className="px-4">
+                        <span className={`text-xs font-bold ${p.quantity < 5 ? 'text-red-500' : 'text-gray-600'}`}>
+                          {p.quantity} Units
+                        </span>
+                      </td>
+                      <td className="px-4 text-xs text-gray-500 capitalize">{p.category}</td>
+                      <td className="px-4">
+                        <div className="flex gap-2">
+                          <button onClick={() => handleEditClick(p)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"><MdEdit size={18} /></button>
+                          <button onClick={() => deleteProduct(p._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><MdDeleteOutline size={18} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* --- PRODUCT MANAGER VIEW (Add/Edit) --- */}
         {activeTab === 'add-product' && (
           <div className="max-w-4xl bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mx-auto">
-            <SectionTitle title="Add New Product" subtitle="Fill in details to upload a new item to the store." />
+            <SectionTitle
+              title={editingProduct ? "Revise Product" : "System Entry"}
+              subtitle={editingProduct ? `Updating: ${editingProduct.name}` : "Create a new entry in the store inventory."}
+            />
             <form onSubmit={handleProductSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Image Upload */}
-              <div className="flex flex-col gap-4">
-                <div className="aspect-square bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center relative overflow-hidden group hover:border-blue-500 transition-colors cursor-pointer">
+              <div className="space-y-4">
+                <div onClick={() => document.getElementById('imageInput').click()} className="aspect-square bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center relative overflow-hidden group hover:border-black transition-colors cursor-pointer">
                   {imagePreview ? (
                     <Image src={imagePreview} fill className="object-cover" alt="Preview" />
                   ) : (
                     <div className="text-center p-6">
-                      <FaUpload className="text-3xl text-gray-300 mx-auto mb-2 group-hover:text-blue-500 transition" />
-                      <p className="text-sm text-gray-500 font-medium">Click to upload image</p>
+                      <FaUpload className="text-3xl text-gray-200 mx-auto mb-2 group-hover:text-black transition" />
+                      <p className="text-xs text-gray-400 font-bold uppercase">Upload Media</p>
                     </div>
                   )}
-                  <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={e => {
+                  <input id="imageInput" type="file" className="hidden" onChange={e => {
                     const f = e.target.files[0];
                     if (f) { setImageFile(f); setImagePreview(URL.createObjectURL(f)); }
                   }} />
                 </div>
+                <p className="text-[10px] text-center text-gray-400 uppercase tracking-widest font-medium">Recommended: 1000 x 1000px JPG/PNG</p>
               </div>
 
-              {/* Fields */}
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="label-text">Product Name</label>
-                    <input className="input-field" value={productForm.name} onChange={e => setProductForm({ ...productForm, name: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className="label-text">Price</label>
-                    <input className="input-field" type="number" value={productForm.price} onChange={e => setProductForm({ ...productForm, price: e.target.value })} />
-                  </div>
-                </div>
-
                 <div>
-                  <label className="label-text">Description</label>
-                  <textarea className="input-field h-32 resize-none" value={productForm.description} onChange={e => setProductForm({ ...productForm, description: e.target.value })}></textarea>
+                  <label className="label-text">Identifier Name</label>
+                  <input className="input-field" placeholder="Ex: Premium Wool Suit" value={productForm.name} onChange={e => setProductForm({ ...productForm, name: e.target.value })} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="label-text">Category</label>
-                    <input className="input-field" value={productForm.category} onChange={e => setProductForm({ ...productForm, category: e.target.value })} />
+                    <label className="label-text">Quote Price</label>
+                    <input className="input-field" type="number" placeholder="299" value={productForm.price} onChange={e => setProductForm({ ...productForm, price: e.target.value })} />
                   </div>
                   <div>
-                    <label className="label-text">Gender</label>
+                    <label className="label-text">Initial Inventory</label>
+                    <input className="input-field" type="number" placeholder="100" value={productForm.quantity} onChange={e => setProductForm({ ...productForm, quantity: e.target.value })} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="label-text">Collection</label>
+                    <select className="input-field" value={productForm.collections} onChange={e => setProductForm({ ...productForm, collections: e.target.value })}>
+                      <option value="">None</option>
+                      <option value="Spring 2024">Spring 2024</option>
+                      <option value="Essentials">Essentials</option>
+                      <option value="Limited Edition">Limited Edition</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="label-text">Section</label>
                     <select className="input-field" value={productForm.gender} onChange={e => setProductForm({ ...productForm, gender: e.target.value })}>
                       <option value="">Select</option>
                       <option value="Men">Men</option>
@@ -335,31 +432,78 @@ const AdminPanel = () => {
                   </div>
                 </div>
 
-                <button className="w-full btn-primary mt-4">Publish Product</button>
+                <button className="w-full btn-primary mt-6">{editingProduct ? 'Commit Changes' : 'Initialize Entry'}</button>
+                {editingProduct && (
+                  <button type="button" onClick={() => { setEditingProduct(null); setProductForm(initialProductState); setImagePreview(null); }} className="w-full text-sm font-bold text-gray-400 hover:text-black mt-2">Abort Editing</button>
+                )}
               </div>
             </form>
           </div>
         )}
 
-        {/* --- OTHER VIEWS (Simplified for brevity but maintaining style) --- */}
-        {activeTab === 'orders' && (
+        {/* --- CUSTOMERS VIEW --- */}
+        {activeTab === 'customers' && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-100">
-              <h3 className="font-bold text-lg">All Orders</h3>
+              <h3 className="font-bold text-lg">Customer Directory</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <TableHeader cols={['ID', 'Date', 'Customer', 'Total', 'Status', 'Actions']} />
-                <tbody className="text-sm">
-                  {orders.map(o => (
-                    <tr key={o._id} className="border-b border-gray-50 hover:bg-gray-50 group">
-                      <td className="px-4 py-4 font-mono text-gray-500">#{o._id.slice(-6)}</td>
-                      <td className="px-4 text-gray-500">{new Date(o.createdAt).toLocaleDateString()}</td>
-                      <td className="px-4 font-medium">{o.user?.name}</td>
-                      <td className="px-4 font-bold">${o.total}</td>
-                      <td className="px-4"><StatusBadge status={o.status || 'Pending'} /></td>
+                <TableHeader cols={['User', 'Email', 'Verified', 'Role', 'Actions']} />
+                <tbody>
+                  {users.map(u => (
+                    <tr key={u._id} className="border-b border-gray-50 hover:bg-gray-50 group">
+                      <td className="px-4 py-4 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden relative border-2 border-white shadow-sm">
+                          <Image src={u.profilePhoto?.url || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} fill className="object-cover" alt={u.name} />
+                        </div>
+                        <span className="font-bold text-sm">{u.name}</span>
+                      </td>
+                      <td className="px-4 text-sm text-gray-500">{u.email}</td>
+                      <td className="px-4 text-xs font-bold uppercase transition">
+                        {u.isVerified ? (
+                          <span className="text-green-500">Verified</span>
+                        ) : (
+                          <span className="text-gray-400">Pending</span>
+                        )}
+                      </td>
                       <td className="px-4">
-                        <button onClick={() => cancelOrder(o._id)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition"><MdDeleteOutline size={18} /></button>
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${u.isAdmin ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'}`}>
+                          {u.isAdmin ? 'Administrator' : 'Client'}
+                        </span>
+                      </td>
+                      <td className="px-4">
+                        <button onClick={() => deleteUser(u._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><MdDeleteOutline size={18} /></button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* --- ORDERS VIEW --- */}
+        {activeTab === 'orders' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="font-bold text-lg">Order Management</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <TableHeader cols={['Order ID', 'Timestamp', 'Customer', 'Total Value', 'Status', 'Options']} />
+                <tbody>
+                  {orders.map(o => (
+                    <tr key={o._id} className="border-b border-gray-50 hover:bg-gray-50 transition">
+                      <td className="px-4 py-4 font-mono text-[10px] text-gray-400">#{o._id.slice(-8)}</td>
+                      <td className="px-4 text-[11px] text-gray-500 uppercase font-medium">{new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                      <td className="px-4 font-bold text-sm">{o.user?.name}</td>
+                      <td className="px-4 font-black text-gray-800">${o.total}</td>
+                      <td className="px-4">
+                        <StatusBadge status={o.status} onUpdate={(s) => updateOrderStatus(o._id, s)} />
+                      </td>
+                      <td className="px-4">
+                        <button onClick={() => cancelOrder(o._id)} className="p-2 text-gray-400 hover:text-red-500 rounded-lg transition"><MdDeleteOutline size={18} /></button>
                       </td>
                     </tr>
                   ))}
@@ -371,11 +515,10 @@ const AdminPanel = () => {
 
       </main>
 
-      {/* Global Styles for Inputs (Tailwind utility classes abstraction) */}
       <style jsx global>{`
-        .label-text { @apply block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide; }
-        .input-field { @apply w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-400 transition-all text-sm; }
-        .btn-primary { @apply px-6 py-3 bg-black text-white font-bold rounded-xl shadow-lg shadow-gray-200 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95; }
+        .label-text { @apply block text-[10px] font-black text-gray-400 mb-1.5 uppercase tracking-widest; }
+        .input-field { @apply w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-black/5 focus:bg-white focus:border-gray-200 transition-all text-sm font-medium; }
+        .btn-primary { @apply px-8 py-4 bg-black text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-black/10 hover:shadow-black/20 hover:-translate-y-1 transition-all active:scale-95; }
       `}</style>
     </div>
   );

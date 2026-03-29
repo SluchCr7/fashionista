@@ -14,7 +14,6 @@ const ProductCard = ({ product, showRating = false }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
 
-    // Calculate final price
     const price = parseFloat(product.price);
     const finalPrice = discount > 0 ? (price * (1 - discount / 100)).toFixed(2) : price.toFixed(2);
     const isOutOfStock = product.quantity <= 0;
@@ -23,19 +22,15 @@ const ProductCard = ({ product, showRating = false }) => {
     const handleAddToCart = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-
-        // If product has options, redirect to product page
         if (product.sizes?.length > 0 || product.colors?.length > 0) {
             window.location.href = `/Product/${product._id}`;
             return;
         }
-
         setIsAdding(true);
         try {
             await addToCart(product, 1);
         } catch (error) {
-            console.error(error);
-            toast.error("Failed to update your selection.");
+            toast.error("Process interrupted. Please try again.");
         } finally {
             setIsAdding(false);
         }
@@ -47,110 +42,88 @@ const ProductCard = ({ product, showRating = false }) => {
         await toggleFavorite(product._id);
     };
 
-
     return (
         <motion.div
             className="group relative w-full"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            {/* Image Container */}
-            <div className="relative aspect-[3/4] overflow-hidden bg-secondary/20 rounded-sm mb-4">
+            {/* Visual Container */}
+            <div className="relative aspect-[3/4] overflow-hidden bg-[#F2F2F2] mb-6 shadow-sm">
                 <Link href={`/Product/${product._id}`}>
-                    {/* Main Image */}
                     <Image
                         src={product.Photo?.[0]?.url || '/placeholder.jpg'}
                         alt={product.name}
                         fill
-                        className={`object-cover transition-all duration-700 ease-in-out ${isHovered && product.Photo?.[1] ? 'opacity-0' : 'opacity-100 scale-100 group-hover:scale-105'
-                            }`}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className={`object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                            isHovered ? 'scale-110' : 'scale-100'
+                        }`}
+                        sizes="(max-width: 768px) 100vw, 33vw"
                     />
-
-                    {/* Hover Image */}
-                    {product.Photo?.[1] && (
-                        <Image
-                            src={product.Photo[1].url}
-                            alt={product.name}
-                            fill
-                            className={`absolute inset-0 object-cover transition-all duration-700 ease-in-out ${isHovered ? 'opacity-100 scale-105' : 'opacity-0 scale-100'
-                                }`}
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                    )}
+                    
+                    {/* Subtle Overlay */}
+                    <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
                 </Link>
 
-                {/* Badges */}
-                <div className="absolute top-3 left-3 flex flex-col gap-2 pointer-events-none">
+                {/* Status Badges - Top Left */}
+                <div className="absolute top-4 left-4 flex flex-col gap-1 z-10">
                     {isNew && (
-                        <span className="bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest px-2 py-1">
-                            New
+                        <span className="typography-display !text-[8px] bg-white px-2 py-1 shadow-sm text-black">
+                            New Arrival
                         </span>
                     )}
                     {discount > 0 && (
-                        <span className="bg-destructive text-destructive-foreground text-[10px] font-bold uppercase tracking-widest px-2 py-1">
+                        <span className="typography-display !text-[8px] bg-accent px-2 py-1 shadow-sm text-white">
                             -{discount}%
-                        </span>
-                    )}
-                    {isOutOfStock && (
-                        <span className="bg-gray-500 text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1">
-                            Sold Out
                         </span>
                     )}
                 </div>
 
-                {/* Wishlist Button */}
+                {/* Wishlist - Top Right */}
                 <button
                     onClick={handleWishlist}
-                    className="absolute top-3 right-3 p-2 bg-background/80 backdrop-blur-md rounded-full text-foreground hover:text-destructive transition-all hover:bg-background shadow-sm opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 duration-300 z-10 border border-border/20"
+                    className="absolute top-4 right-4 p-2 transition-transform duration-500 z-10 group-hover:scale-110 active:scale-95"
                 >
                     <Heart
-                        className={`w-4 h-4 ${user?.favorites?.includes(product._id) ? 'fill-destructive text-destructive' : ''}`}
+                        strokeWidth={1.2}
+                        className={`w-5 h-5 ${user?.favorites?.includes(product._id) ? 'fill-accent text-accent' : 'text-black'}`}
                     />
                 </button>
 
-                {/* Quick Action Overlay */}
-                <div className="absolute bottom-4 left-0 w-full px-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-10">
+                {/* Action Bar - Bottom Reveal */}
+                <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
                     <button
                         onClick={handleAddToCart}
                         disabled={isAdding || isOutOfStock}
-                        className={`w-full bg-background/90 backdrop-blur-xl text-foreground py-3 text-[10px] font-bold uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-2 rounded-lg border border-border/40 ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-primary-foreground'}`}
+                        className="w-full bg-black text-white py-4 text-[9px] font-black uppercase tracking-[0.3em] hover:bg-accent transition-colors disabled:opacity-50"
                     >
-                        {isAdding ? (
-                            <span className="animate-pulse">Processing...</span>
-                        ) : isOutOfStock ? (
-                            "Sold Out"
-                        ) : (
-                            <>
-                                <ShoppingBag size={14} /> {product.sizes?.length > 0 || product.colors?.length > 0 ? 'Select Options' : 'Quick Add'}
-                            </>
-                        )}
+                        {isAdding ? "Syncing..." : isOutOfStock ? "Unavailable" : "Acquire Piece"}
                     </button>
                 </div>
             </div>
 
-            {/* Product Info */}
-            <div className="space-y-1">
-                <div className="flex justify-between items-start">
-                    <Link href={`/Product/${product._id}`} className="group-hover:text-primary transition-colors line-clamp-1 font-medium text-foreground">
-                        {product.name}
-                    </Link>
-                    {showRating && (
-                        <div className="flex items-center gap-1 text-xs text-yellow-500">
-                            <Star className="w-3 h-3 fill-current" />
-                            <span>4.5</span>
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-2 text-sm">
-                    <span className="font-bold text-foreground">${finalPrice}</span>
-                    {discount > 0 && (
-                        <span className="text-muted-foreground line-through text-xs">${price.toFixed(2)}</span>
-                    )}
+            {/* Information Section */}
+            <div className="space-y-2 px-1">
+                <div className="flex justify-between items-end">
+                    <div className="space-y-1">
+                        <p className="typography-display !text-[7px] !text-muted-foreground">
+                            {product.category || 'Exclusive Selection'}
+                        </p>
+                        <Link href={`/Product/${product._id}`}>
+                            <h3 className="text-xl font-serif font-bold text-foreground hover:text-accent transition-colors leading-tight">
+                                {product.name}
+                            </h3>
+                        </Link>
+                    </div>
+                    <div className="flex flex-col items-end">
+                        {discount > 0 && (
+                          <span className="text-[10px] text-muted-foreground line-through decoration-accent/50">${price.toFixed(2)}</span>
+                        )}
+                        <span className="text-sm font-black tracking-tighter text-foreground">${finalPrice}</span>
+                    </div>
                 </div>
             </div>
         </motion.div>

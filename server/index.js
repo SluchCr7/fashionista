@@ -9,11 +9,34 @@ const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 // Connect DB 
 connectDB()
 
-// Middleware
-app.use(express.json())
+// Middleware - Enhanced CORS for professional connection
+const allowedOrigins = [
+    process.env.FRONT_URL,
+    'http://localhost:3000',
+    'http://127.0.01:3000'
+].filter(Boolean);
+
 app.use(cors({
-    origin: process.env.FRONT_URL,
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }))
+
+app.use(express.json())
+
+// Health Check Endpoint
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'OK', message: 'Professional server connection active' });
+})
 
 // Routes
 app.get('/', (req, res) => {
@@ -36,4 +59,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Listen Server
-app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`))
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

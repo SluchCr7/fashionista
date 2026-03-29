@@ -1,44 +1,54 @@
 const jwt = require("jsonwebtoken");
+const { errorResponse } = require("../utils/responseFormatter");
 
+/**
+ * @desc Verify JWT Token
+ */
 const verifyToken = (req, res, next) => {
-    const authHeader = req.headers.authorization
-    if (authHeader) {
-        const token = authHeader.split(' ')[1]
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
         try {
-            const decoded = jwt.verify(token, process.env.TOKEN_SECRET)
-            req.user = decoded
-            next()
+            const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+            req.user = decoded;
+            next();
         } catch (error) {
-            return res.status(401).json({ message: "Invalid token" })
+            return errorResponse(res, "Invalid token. Please log in again.", 401);
         }
     } else {
-        return res.status(401).json({ message: "No token provided" })
+        return errorResponse(res, "No token provided. Authorization denied.", 401);
     }
-}
+};
 
+/**
+ * @desc Verify Admin privileges
+ */
 const verifyAdmain = (req, res, next) => {
     verifyToken(req, res, () => {
-        if (req.user.isAdmin) {
+        if (req.user && req.user.isAdmin) {
             next();
         } else {
-            return res.status(403).json({ message: "Access denied. Administrative privileges required." });
+            return errorResponse(res, "Access denied. Administrative privileges required.", 403);
         }
     });
-}
+};
 
-const verifyTokenAndAdmin = verifyAdmain; // Alias for convenience as used in orderRoute
+const verifyTokenAndAdmin = verifyAdmain;
 
+/**
+ * @desc Verify User is owner or Admin
+ */
 const verifyUser = (req, res, next) => {
     verifyToken(req, res, () => {
-        if (req.user._id === req.params.id || req.user.isAdmin) {
+        if (req.user && (req.user._id === req.params.id || req.user.isAdmin)) {
             next();
         } else {
-            return res.status(403).json({ message: "Access denied. You can only manage your own account." });
+            return errorResponse(res, "Access denied. You can only manage your own account.", 403);
         }
     });
-}
+};
 
-const verifyAdmainUser = verifyUser; // Alias or similar logic
+const verifyAdmainUser = verifyUser;
 
 module.exports = {
     verifyToken,

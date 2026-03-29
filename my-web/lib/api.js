@@ -1,10 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_BACK_URL || 'http://localhost:5000',
+    baseURL: process.env.NEXT_PUBLIC_BACK_URL || 'http://localhost:3001',
     headers: {
         'Content-Type': 'application/json'
-    }
+    },
+    timeout: 10000 // Add a timeout for professional failure handling
 });
 
 // Request interceptor to add token
@@ -13,9 +14,14 @@ api.interceptors.request.use(
         if (typeof window !== 'undefined') {
             const data = localStorage.getItem('Data');
             if (data) {
-                const { accessToken } = JSON.parse(data);
-                if (accessToken) {
-                    config.headers.Authorization = `Bearer ${accessToken}`;
+                try {
+                    const parsedData = JSON.parse(data);
+                    const accessToken = parsedData.accessToken;
+                    if (accessToken) {
+                        config.headers.Authorization = `Bearer ${accessToken}`;
+                    }
+                } catch (e) {
+                    console.error('API Context Error: Invalid storage format');
                 }
             }
         }
@@ -26,9 +32,15 @@ api.interceptors.request.use(
 
 // Response interceptor to handle errors and token refresh
 api.interceptors.response.use(
-    (response) => response.data, // Return data directly
+    (response) => response.data,
     async (error) => {
         const originalRequest = error.config;
+
+        // Connection Error / Server Down
+        if (!error.response) {
+            console.error('API Connectivity Error: Server is unreachable.');
+            return Promise.reject({ message: 'The fashion server is currently offline. Please try again later.' });
+        }
 
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
@@ -44,11 +56,11 @@ api.interceptors.response.use(
                         localStorage.setItem('Data', JSON.stringify(newData));
 
                         api.defaults.headers.common['Authorization'] = `Bearer ${res.data.data.accessToken}`;
+                        originalRequest.headers['Authorization'] = `Bearer ${res.data.data.accessToken}`;
                         return api(originalRequest);
                     }
                 }
             } catch (refreshError) {
-                // Refresh failed, logout user
                 if (typeof window !== 'undefined') {
                     localStorage.removeItem('Data');
                     window.location.href = '/Login';
@@ -56,8 +68,17 @@ api.interceptors.response.use(
             }
         }
 
-        return Promise.reject(error.response?.data || error.message);
+        return Promise.reject(error.response?.data || { message: error.message });
     }
 );
+
+api.checkConnection = async () => {
+    try {
+        const res = await api.get('/api/health');
+        return res;
+    } catch (err) {
+        return { success: false, message: 'Disconnected' };
+    }
+};
 
 export default api;

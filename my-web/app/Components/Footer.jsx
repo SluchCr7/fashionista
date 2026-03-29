@@ -6,77 +6,69 @@ import { motion } from 'framer-motion';
 
 const Footer = () => {
   const footerLinks = {
-    Shop: [
-      { name: "New Arrivals", link: "/Shop?sort=new" },
-      { name: "Best Sellers", link: "/Shop?sort=best" },
-      { name: "Men's Collection", link: "/Men" },
-      { name: "Women's Collection", link: "/Women" },
-      { name: "Accessories", link: "/Shop/Accessories" },
-    ],
-    Company: [
-      { name: "About Us", link: "/About" },
-      { name: "Careers", link: "/Careers" },
+    Maison: [
+      { name: "Our Heritage", link: "/About" },
       { name: "Sustainability", link: "/Sustainability" },
-      { name: "Press", link: "/Press" },
+      { name: "Archive", link: "/Shop" },
+      { name: "Careers", link: "/Careers" },
     ],
-    Support: [
-      { name: "Help Center", link: "/FAQ" },
-      { name: "Shipping & Returns", link: "/Shipping" },
-      { name: "Size Guide", link: "/SizeGuide" },
-      { name: "Contact Us", link: "/Contact" },
+    Services: [
+      { name: "Concierge", link: "/Contact" },
+      { name: "Logistics", link: "/Shipping" },
+      { name: "Private Viewings", link: "/Contact" },
+      { name: "Gift Curation", link: "/GiftGuide" },
+    ],
+    Legal: [
+      { name: "Privacy Protocol", link: "/Privacy" },
+      { name: "Terms of Engagement", link: "/Terms" },
+      { name: "Intellectual Property", link: "/Terms" },
     ]
   };
 
   return (
-    <footer className="bg-background border-t border-border text-foreground pt-24 pb-12 relative overflow-hidden transition-colors duration-300">
-      {/* Background Texture */}
-      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.07] pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,var(--foreground),transparent_70%)]" />
+    <footer className="bg-background border-t border-border/5 text-foreground pt-32 pb-16 relative overflow-hidden">
+      {/* Massive Brand Watermark */}
+      <div className="absolute -bottom-24 left-0 w-full text-center pointer-events-none select-none opacity-[0.02] dark:opacity-[0.05]">
+        <h2 className="text-[20vw] font-serif font-black leading-none tracking-tighter uppercase">FASHIONISTA</h2>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
-          {/* Brand Section */}
-          <div className="lg:col-span-4 space-y-6">
-            <Link href="/" className="inline-block">
-              <h2 className="text-3xl font-serif font-bold tracking-tighter">
-                FASHION<span className="text-muted-foreground italic">ISTA</span>
-              </h2>
-            </Link>
-            <p className="text-muted-foreground leading-relaxed max-w-sm">
-              Curating the finest in luxury fashion since 2025. We believe in style that speaks, quality that lasts, and a sustainable future for fashion.
-            </p>
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-20 mb-32">
+          {/* Brand & Newsletter */}
+          <div className="md:col-span-5 space-y-12">
+            <div className="space-y-4">
+              <Link href="/">
+                <h2 className="text-4xl font-serif font-black tracking-tighter italic">FASHIONISTA.</h2>
+              </Link>
+              <p className="text-muted-foreground text-sm font-medium leading-relaxed max-w-sm uppercase tracking-widest !text-[10px]">
+                Defining the intersection of avant-garde design and timeless craftsmanship since 2025.
+              </p>
+            </div>
 
-            {/* Newsletter */}
-            <div className="pt-4">
-              <h3 className="text-sm font-bold uppercase tracking-widest mb-4">Subscribe to our newsletter</h3>
-              <div className="flex max-w-sm relative group">
+            <div className="space-y-6 pt-4 border-t border-border/10 max-w-sm">
+              <p className="typography-display !text-accent">Maison Updates</p>
+              <div className="relative group">
                 <input
                   type="email"
-                  placeholder="Your email address"
-                  className="w-full bg-secondary/50 border-b border-border py-3 pr-12 text-sm text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-primary transition-colors"
+                  placeholder="CONSULT YOUR EMAIL"
+                  className="w-full bg-transparent border-b border-border/20 py-4 text-[10px] font-black uppercase tracking-[0.3em] outline-none focus:border-accent transition-all placeholder:text-muted-foreground/30"
                 />
-                <button
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground group-hover:text-primary transition-colors p-2"
-                  aria-label="Subscribe"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
+                <button className="absolute right-0 bottom-4 typography-display hover:text-accent transition-colors">Join</button>
               </div>
             </div>
           </div>
 
-          {/* Links Sections */}
-          <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-8">
+          {/* Links */}
+          <div className="md:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-12">
             {Object.entries(footerLinks).map(([category, links]) => (
-              <div key={category}>
-                <h3 className="font-serif font-bold text-lg mb-6">{category}</h3>
+              <div key={category} className="space-y-8">
+                <h3 className="typography-display !text-muted-foreground">{category}</h3>
                 <ul className="space-y-4">
                   {links.map((link) => (
                     <li key={link.name}>
                       <Link
                         href={link.link}
-                        className="text-muted-foreground hover:text-primary transition-colors text-sm hover:translate-x-1 inline-block duration-200"
+                        className="text-[10px] font-black uppercase tracking-[0.2em] hover:text-accent transition-all inline-block"
                       >
                         {link.name}
                       </Link>
@@ -88,28 +80,23 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs text-muted-foreground/60">
-            &copy; {new Date().getFullYear()} Fashionista. All rights reserved.
+        {/* Bottom Bar */}
+        <div className="pt-12 border-t border-border/5 flex flex-col md:flex-row justify-between items-center gap-8">
+          <p className="typography-display !text-[8px] text-muted-foreground">
+            &copy; {new Date().getFullYear()} FASHIONISTA MAISON. ALL PRIVILEGES RESERVED.
           </p>
 
-          {/* Socials */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-12">
             {[Facebook, Instagram, Twitter, Linkedin].map((Icon, i) => (
-              <Link
-                key={i}
-                href="#"
-                className="text-muted-foreground hover:text-primary transition-colors hover:scale-110 transform duration-200"
-              >
-                <Icon className="w-5 h-5" />
+              <Link key={i} href="#" className="text-muted-foreground hover:text-accent transition-all">
+                <Icon size={16} strokeWidth={1} />
               </Link>
             ))}
           </div>
 
-          <div className="flex gap-6 text-xs text-muted-foreground/60">
-            <Link href="/Privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
-            <Link href="/Terms" className="hover:text-primary transition-colors">Terms of Service</Link>
+          <div className="typography-display !text-[8px] text-muted-foreground space-x-8">
+            <Link href="/Privacy" className="hover:text-accent transition-colors">PRIVACY POLICY</Link>
+            <Link href="/Terms" className="hover:text-accent transition-colors">TERMS & CONDITIONS</Link>
           </div>
         </div>
       </div>

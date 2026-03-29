@@ -98,10 +98,24 @@ const ProductProvider = ({ children }) => {
         }
     };
 
-    useEffect(() => {
-        // Initial fetch on mount
-        fetchProducts();
-    }, []);
+    const updateProduct = async (id, formData) => {
+        setLoading(true);
+        try {
+            const res = await api.put(`/api/product/${id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            if (res.success) {
+                toast.success('Product updated successfully');
+                await fetchProducts();
+                return true;
+            }
+        } catch (err) {
+            toast.error(err.message || 'Failed to update product');
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const value = {
         products,
@@ -114,7 +128,8 @@ const ProductProvider = ({ children }) => {
         fetchProducts,
         getProductById,
         addProduct,
-        deleteProduct
+        deleteProduct,
+        updateProduct
     };
 
     return (

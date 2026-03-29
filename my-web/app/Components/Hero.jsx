@@ -42,75 +42,87 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 const Hero = () => {
-    const slides = [
-        {
-            image: "/Hero/home-slider1.jpg",
-            title: <>Grab Up To <span className="text-yellow-400">50% Off</span> on Selected Products</>,
-            desc: "Limited-time offer on our best-selling collections. Don’t miss out on this exclusive deal!",
-        },
-        {
-            image: "/Hero/home-slider2.jpg",
-            title: <>New <span className="text-yellow-400">Summer Collection</span> 2025</>,
-            desc: "Fresh styles for Men, Women & Kids. Upgrade your wardrobe with the latest trends.",
-        },
-        {
-            image: "/Hero/home-slider3.jpg",
-            title: <>Exclusive <span className="text-yellow-400">Limited Edition</span> Pieces</>,
-            desc: "Stand out with our premium limited releases. Once gone, they’re gone forever!",
-        }
-    ];
-
-    return (
-        <div className="w-full min-h-[100vh]">
-            <Carousel
-                showThumbs={false}
-                autoPlay
-                infiniteLoop
-                showStatus={false}
-                interval={5000}
-                transitionTime={1000}
-            >
-                {slides.map((slide, index) => (
-                    <div
-                        key={index}
-                        style={{ backgroundImage: `url(${slide.image})` }}
-                        className="w-full min-h-[100vh] flex items-center justify-center bg-cover bg-center relative"
-                    >
-                        {/* Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
-
-                        {/* Content */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 40 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 1, delay: 0.3 }}
-                            className="relative z-10 text-center px-6 max-w-[800px]"
-                        >
-                            <h1 className="font-extrabold text-white text-3xl sm:text-5xl md:text-6xl leading-tight drop-shadow-lg">
-                                {slide.title}
-                            </h1>
-                            <p className="text-gray-200 text-md md:text-lg mt-4">
-                                {slide.desc}
-                            </p>
-
-                            {/* CTA Buttons */}
-                            <div className="flex flex-wrap justify-center gap-4 mt-10">
-                                <Link href="/Shop/Men" className="bg-primary text-primary-foreground font-bold text-sm uppercase tracking-widest py-4 px-10 rounded-full shadow-2xl hover:scale-105 transition-all duration-300 border border-white/10">
-                                    Shop Men
-                                </Link>
-                                <Link href="/Shop/Women" className="bg-background/20 backdrop-blur-md text-white border border-white/30 font-bold text-sm uppercase tracking-widest py-4 px-10 rounded-full shadow-2xl hover:bg-white hover:text-black transition-all duration-300">
-                                    Shop Women
-                                </Link>
-                                <Link href="/Shop/Kids" className="bg-accent text-accent-foreground font-bold text-sm uppercase tracking-widest py-4 px-10 rounded-full shadow-2xl hover:scale-105 transition-all duration-300">
-                                    Shop Kids
-                                </Link>
-                            </div>
-                        </motion.div>
-                    </div>
-                ))}
-            </Carousel>
+  return (
+    <div className="relative w-full h-[110vh] overflow-hidden bg-black flex flex-col lg:flex-row">
+      {/* Men Section */}
+      <motion.div 
+        initial={{ width: '100%', opacity: 0 }}
+        animate={{ width: '50%', opacity: 1 }}
+        transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+        className="relative h-1/2 lg:h-full group cursor-pointer overflow-hidden border-r border-white/5"
+      >
+        <Image 
+          src="/Hero/bg_man.webp" 
+          alt="Male Collection" 
+          fill 
+          className="object-cover grayscale hover:grayscale-0 transition-all duration-[2s] scale-105 group-hover:scale-100"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-700" />
+        
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8, duration: 1 }}
+          >
+            <p className="typography-display !text-white/60 mb-4">L'Homme Archive</p>
+            <h2 className="text-5xl md:text-8xl font-serif font-black text-white italic tracking-tighter mb-8">Ethereal.</h2>
+            <Link href="/Shop/Men" className="button-luxury !bg-white !text-black hover:!bg-black hover:!text-white border-none py-6 px-12">
+              Explore Men
+            </Link>
+          </motion.div>
         </div>
-    );
+      </motion.div>
+
+      {/* Women Section */}
+      <motion.div 
+        initial={{ width: '100%', opacity: 0 }}
+        animate={{ width: '50%', opacity: 1 }}
+        transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+        className="relative h-1/2 lg:h-full group cursor-pointer overflow-hidden"
+      >
+        <Image 
+          src="/Hero/bg-woman.webp" 
+          alt="Female Collection" 
+          fill 
+          className="object-cover grayscale hover:grayscale-0 transition-all duration-[2s] scale-105 group-hover:scale-100"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-700" />
+
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1, duration: 1 }}
+          >
+            <p className="typography-display !text-white/60 mb-4">La Femme Edition</p>
+            <h2 className="text-5xl md:text-8xl font-serif font-black text-white italic tracking-tighter mb-8">Noir.</h2>
+            <Link href="/Shop/Women" className="button-luxury !bg-white !text-black hover:!bg-black hover:!text-white border-none py-6 px-12">
+              Explore Women
+            </Link>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Boutique Signature Overlay */}
+      <div className="absolute bottom-12 left-12 z-20 hidden lg:block">
+        <p className="typography-display !text-[8px] text-white/40 max-w-[200px] leading-relaxed">
+          ARCHIVE 3.2 — CURATED IN MILAN FOR THE DISCERNING INDIVIDUAL. EST. 2025.
+        </p>
+      </div>
+      
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
+        <motion.div 
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+          className="w-px h-64 bg-white/20 hidden lg:block"
+        />
+      </div>
+    </div>
+  );
 };
 
 export default Hero;

@@ -36,86 +36,56 @@ const getIcon = (iconName) => {
   return IconMap[iconName] || <CiPlane />; // Default fallback
 };
 
+import { Truck, ShieldCheck, HeartPulse, Clock } from "lucide-react";
+
 const Features = () => {
-  const { features: dynamicFeatures, loading } = useContext(FeatureContext);
+  const { features: dynamicFeatures } = useContext(FeatureContext);
+  const displayFeatures = (dynamicFeatures && dynamicFeatures.length > 0) ? dynamicFeatures : staticFeatures;
 
-  // Preference: Dynamic > Static
-  // Only use dynamic if they exist, otherwise fallback to static for initial state
-  const displayFeatures = (dynamicFeatures && dynamicFeatures.length > 0)
-    ? dynamicFeatures
-    : staticFeatures;
-
-  // Use a skeleton or loading state? 
-  // Since we have a fallback, we can just show that immediately. 
-  // But if loading is true, maybe we wait? 
-  // Better UX: Show static immediately if dynamic is empty/loading, then swap? 
-  // To avoid layout shift, let's just use displayFeatures logic directly. 
-  // If dynamic loads and is not empty, it will re-render.
+  const getLucideIcon = (idx) => {
+    const icons = [<Truck key="1" />, <ShieldCheck key="2" />, <HeartPulse key="3" />, <Clock key="4" />];
+    return icons[idx % icons.length];
+  };
 
   return (
-    <section className="py-24 bg-secondary/20 relative overflow-hidden">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-primary/5 rounded-full blur-3xl opacity-50" />
-        <div className="absolute top-[30%] right-[0%] w-[30%] h-[30%] bg-secondary rounded-full blur-3xl opacity-50" />
-      </div>
-
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-xs font-bold uppercase tracking-widest text-primary mb-3 block"
-          >
-            Why Shop With Us
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-3xl md:text-5xl font-serif font-bold mb-6 text-foreground"
-          >
-            The Fashionista Promise
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-muted-foreground text-lg leading-relaxed"
-          >
-            We are committed to providing an exceptional shopping experience,
-            combining luxury with reliability and world-class support.
-          </motion.p>
+    <section className="py-44 bg-background relative overflow-hidden border-t border-border/5">
+      <div className="container mx-auto px-6">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-32 gap-12 text-foreground">
+          <div className="space-y-4">
+            <p className="typography-display !text-accent">Our Foundations</p>
+            <h2 className="text-4xl md:text-7xl font-serif font-black tracking-tighter italic">The Promise of Excellence.</h2>
+          </div>
+          <p className="text-muted-foreground text-sm font-medium leading-relaxed max-w-sm uppercase tracking-widest !text-[10px]">
+            We are committed to delivering an unparalleled experience that transcends traditional luxury.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {displayFeatures.map((feature, idx) => {
-            // Handle ID: MongoDB has _id, Static has id.
-            const key = feature._id || feature.id || idx;
-            const icon = getIcon(feature.icon);
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-1px lg:bg-border/10">
+          {displayFeatures.map((feature, idx) => (
+            <motion.div
+              key={feature._id || feature.id || idx}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-background p-12 space-y-8 group hover:bg-black hover:text-white transition-all duration-700 text-foreground hover:z-10"
+            >
+              <div className="text-accent group-hover:text-white transition-colors">
+                {React.cloneElement(getLucideIcon(idx), { size: 48, strokeWidth: 0.5 })}
+              </div>
 
-            return (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1, duration: 0.5 }}
-                whileHover={{ y: -8 }}
-                className="bg-background rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all text-center border border-border group"
-              >
-                <div className="w-20 h-20 mx-auto flex items-center justify-center rounded-2xl bg-secondary/50 text-foreground text-4xl mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-inner">
-                  {icon}
-                </div>
+              <div className="space-y-4">
+                <h3 className="text-xl font-serif font-black italic tracking-tight">{feature.text}</h3>
+                <p className="text-muted-foreground group-hover:text-white/60 text-xs font-medium leading-relaxed uppercase tracking-widest !text-[9px] transition-colors">
+                  {feature.paragraph}
+                </p>
+              </div>
 
-                <h3 className="text-xl font-bold mb-3 font-serif group-hover:text-primary transition-colors">{feature.text}</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm">{feature.paragraph}</p>
-              </motion.div>
-            );
-          })}
+              <div className="pt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                <p className="typography-display !text-[8px] text-accent">LEARN MORE —</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

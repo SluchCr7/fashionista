@@ -86,19 +86,19 @@ const ProductValidate = (obj) => {
         description: joi.string(),
         quantity: joi.number().required(),
         material: joi.string(),
-        sizes: joi.array().required(),
-        colors: joi.array().required(),
+        sizes: joi.array().items(joi.string()).required(),
+        colors: joi.array().items(joi.string()).required(),
         collections: joi.string(),
         gender: joi.string().required(),
-        // rating : joi.number(),
-        averageRating: joi.number(),
-        reviewsCount: joi.number(),
-        ratingBreakdown: joi.object(),
+        category: joi.string().required(),
         model: joi.string(),
-        category: joi.string(),
-    })
+        Photo: joi.array().items(joi.object({
+            url: joi.string().required(),
+            publicId: joi.string().allow(null)
+        }))
+    });
     return schema.validate(obj);
-}
+};
 
 const UpdateProductValidate = (obj) => {
     const schema = joi.object({
@@ -106,11 +106,15 @@ const UpdateProductValidate = (obj) => {
         price: joi.number(),
         description: joi.string(),
         quantity: joi.number(),
-        // rating : joi.number(),
-        model: joi.string(),
+        material: joi.string(),
+        sizes: joi.array().items(joi.string()),
+        colors: joi.array().items(joi.string()),
+        collections: joi.string(),
+        gender: joi.string(),
         category: joi.string(),
-    })
+        model: joi.string(),
+    });
     return schema.validate(obj);
-}
+};
 
 module.exports = { Product, ProductValidate, UpdateProductValidate }

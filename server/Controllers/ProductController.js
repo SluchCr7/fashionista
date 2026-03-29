@@ -16,9 +16,9 @@ const NewProduct = asyncHandler(async (req, res) => {
         return errorResponse(res, "Image file is required.", 400);
     }
 
-    let image = req.files.image;
-    if (Array.isArray(image)) {
-        image = image[0];
+    let images = req.files.image;
+    if (!Array.isArray(images)) {
+        images = [images];
     }
 
     const { error } = ProductValidate(req.body);
@@ -26,19 +26,24 @@ const NewProduct = asyncHandler(async (req, res) => {
         return errorResponse(res, error.details[0].message, 400);
     }
 
-    // Upload the image to Cloudinary
-    const result = await v2.uploader.upload(image.path, { resource_type: "image" });
+    const uploadedPhotos = [];
 
-    const product = new Product({
-        Photo: {
+    // Upload images to Cloudinary
+    for (const image of images) {
+        const result = await v2.uploader.upload(image.path, { resource_type: "image" });
+        uploadedPhotos.push({
             url: result.secure_url,
             publicId: result.public_id
-        },
+        });
+        fs.unlinkSync(image.path); // Clean up temp file
+    }
+
+    const product = new Product({
+        Photo: uploadedPhotos,
         ...req.body
     });
 
     await product.save();
-    fs.unlinkSync(image.path);
 
     return successResponse(res, "Product created successfully", { product }, 201);
 });
@@ -60,20 +65,19 @@ const getAllProduct = asyncHandler(async (req, res) => {
         material,
         colors,
         sizes,
-        search
+        search,
+        collection
     } = req.query;
 
     const filters = {};
     if (category) {
         filters.category = category;
-    } else {
-        // Exclude Shoes by default to prioritize clothes in the main shop and homepage
-        filters.category = { $ne: 'Shoes' };
     }
-    if (gender) filters.gender = { $regex: new RegExp(`^${gender}$`, 'i') }; // Case-insensitive gender
+    if (gender) filters.gender = { $regex: new RegExp(`^${gender}$`, 'i') };
     if (material) filters.material = material;
     if (colors) filters.colors = { $in: colors.split(',') };
     if (sizes) filters.sizes = { $in: sizes.split(',') };
+    if (collection) filters.collections = collection;
 
     if (minPrice || maxPrice) {
         filters.price = {};
@@ -112,6 +116,60 @@ const getProduct = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc Update Product
+ * @route PUT /api/product/:id
+ * @access Private (Admin)
+ */
+const updateProduct = asyncHandler(async (req, res) => {
+    const { error } = UpdateProductValidate(req.body);
+    if (error) {
+        return errorResponse(res, error.details[0].message, 400);
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+        return errorResponse(res, "Product Not Found", 404);
+    }
+
+    // Handle new images if provided
+    if (req.files && req.files.image) {
+        let images = req.files.image;
+        if (!Array.isArray(images)) {
+            images = [images];
+        }
+
+        const uploadedPhotos = [];
+        for (const image of images) {
+            const result = await v2.uploader.upload(image.path, { resource_type: "image" });
+            uploadedPhotos.push({
+                url: result.secure_url,
+                publicId: result.public_id
+            });
+            fs.unlinkSync(image.path);
+        }
+
+        // Optional: Remove old images from Cloudinary
+        if (product.Photo && Array.isArray(product.Photo)) {
+            for (const photo of product.Photo) {
+                if (photo.publicId) {
+                    await v2.uploader.destroy(photo.publicId).catch(err => console.error("Cloudinary Error:", err));
+                }
+            }
+        }
+
+        req.body.Photo = uploadedPhotos;
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+        req.params.id,
+        { $set: req.body },
+        { new: true, runValidators: true }
+    );
+
+    return successResponse(res, "Product updated successfully", { product: updatedProduct });
+});
+
+/**
  * @desc Delete Product
  * @route DELETE /api/product/:id
  * @access Private (Admin)
@@ -122,14 +180,23 @@ const deleteProduct = asyncHandler(async (req, res) => {
         return errorResponse(res, "Product Not Found", 404);
     }
 
-    await Product.findByIdAndDelete(req.params.id);
-    if (product.Photo && product.Photo.publicId) {
-        await v2.uploader.destroy(product.Photo.publicId);
+    // Delete photos from Cloudinary
+    if (product.Photo && Array.isArray(product.Photo)) {
+        for (const photo of product.Photo) {
+            if (photo.publicId) {
+                await v2.uploader.destroy(photo.publicId).catch(err => console.error("Cloudinary Error:", err));
+            }
+        }
+    } else if (product.Photo && product.Photo.publicId) {
+        // Fallback for old single object structure
+        await v2.uploader.destroy(product.Photo.publicId).catch(err => console.error("Cloudinary Error:", err));
     }
+
+    await Product.findByIdAndDelete(req.params.id);
 
     return successResponse(res, "Product Deleted Successfully");
 });
 
-module.exports = { NewProduct, getAllProduct, getProduct, deleteProduct };
+module.exports = { NewProduct, getAllProduct, getProduct, updateProduct, deleteProduct };
 
 

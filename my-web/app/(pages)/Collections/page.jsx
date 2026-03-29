@@ -1,137 +1,157 @@
 'use client';
-
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
 
 const collections = [
     {
         id: 1,
         title: "Urban Streetwear",
-        subtitle: "Bold looks for the concrete jungle",
-        image: "/Hero/bg_men.jpg", // Reusing existing asset
+        subtitle: "Bold looks for the concrete jungle.",
+        image: "/Hero/bg_men.jpg", 
         cName: "col-span-1 md:col-span-2 row-span-2",
-        link: "/Shop?category=Men"
+        link: "/Shop?category=Men",
+        tag: "Vol. 01"
     },
     {
         id: 2,
         title: "Summer Breeze",
-        subtitle: "Light, airy, and effortlessly chic",
-        image: "/Hero/bg_shoes_wom.jpg", // Reusing existing asset
+        subtitle: "Light, airy, and effortlessly chic.",
+        image: "/Hero/bg_shoes_wom.jpg", 
         cName: "col-span-1 md:col-span-1 row-span-1",
-        link: "/Shop?category=Women"
+        link: "/Shop?category=Women",
+        tag: "Vol. 02"
     },
     {
         id: 3,
         title: "Sport & Active",
-        subtitle: "Performance meets style",
-        image: "/Hero/bg_men.jpg", // Fallback/Reuse
+        subtitle: "Performance meets high style.",
+        image: "/assets/mens-collection.webp", 
         cName: "col-span-1 md:col-span-1 row-span-1",
-        link: "/Shop?category=Sport"
+        link: "/Shop?category=Sport",
+        tag: "Vol. 03"
     },
     {
         id: 4,
         title: "Evening Elegance",
-        subtitle: "Sophisticated attire for special nights",
-        image: "/Hero/bg_shoes_wom.jpg", // Fallback/Reuse
+        subtitle: "Sophisticated attire for exclusive nights.",
+        image: "/Hero/h1_hero2.jpg.webp",
         cName: "col-span-1 md:col-span-2 row-span-1",
-        link: "/Shop?category=Women"
+        link: "/Shop?category=Women",
+        tag: "Vol. 04"
     }
 ];
 
-const CollectionItem = ({ item, index }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
-            viewport={{ once: true }}
-            className={`relative group overflow-hidden rounded-2xl ${item.cName} h-[400px] md:h-auto min-h-[300px]`}
-        >
-            <Link href={item.link} className="block h-full w-full">
-                <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
-                />
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-300" />
-
-                {/* Content */}
-                <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12">
-                    <motion.h2
-                        initial={{ y: 20, opacity: 0 }}
-                        whileInView={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-3xl md:text-5xl font-bold text-white mb-2 transform group-hover:translate-x-2 transition-transform duration-300"
-                    >
-                        {item.title}
-                    </motion.h2>
-                    <motion.p
-                        initial={{ y: 20, opacity: 0 }}
-                        whileInView={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="text-gray-200 text-lg md:text-xl transform group-hover:translate-x-2 transition-transform duration-300 delay-75"
-                    >
-                        {item.subtitle}
-                    </motion.p>
-
-                    <div className="mt-6 overflow-hidden">
-                        <span className="inline-block px-6 py-3 bg-white text-black font-semibold rounded-full transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                            Shop Collection
-                        </span>
-                    </div>
-                </div>
-            </Link>
-        </motion.div>
-    );
-};
-
 export default function CollectionsPage() {
     return (
-        <div className="min-h-screen bg-neutral-900 text-white">
-            {/* Hero */}
-            <section className="relative py-20 px-6 text-center">
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                >
-                    <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter mb-6 text-transparent bg-clip-text bg-gradient-to-br from-white via-gray-400 to-gray-600">
-                        Curated <br className="md:hidden" /> Editions
-                    </h1>
-                    <p className="max-w-2xl mx-auto text-gray-400 text-lg md:text-xl">
-                        Explore our exclusively selected sets, defining the trends of tomorrow with timeless aesthetics.
-                    </p>
-                </motion.div>
+        <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-black dark:text-white selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
+            
+            {/* HERO CAMPAIGN */}
+            <section className="relative h-[90vh] md:h-screen w-full flex flex-col justify-end bg-[#0a0a0a] pb-12 md:pb-24 px-6 md:px-12 overflow-hidden">
+                <div className="absolute inset-0 w-full h-full">
+                    <Image
+                        src="/assets/generated/collections-hero.png"
+                        alt="Fashionista Collections Campaign"
+                        fill
+                        className="object-cover opacity-90 scale-105"
+                        priority
+                    />
+                </div>
+                {/* Vignette & Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-black/10 to-transparent" />
+                
+                <div className="relative z-10 max-w-7xl mx-auto w-full">
+                    <motion.div
+                        initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
+                    >
+                        <h1 className="text-7xl md:text-[10vw] font-serif font-black uppercase text-white tracking-tighter leading-[0.85] mix-blend-overlay">
+                            Curated <br/> <span className="italic font-light">Editions.</span>
+                        </h1>
+                    </motion.div>
+                    
+                    <motion.p 
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 1 }}
+                        className="max-w-xl text-white/70 text-lg md:text-xl font-light leading-relaxed mt-8 mix-blend-plus-lighter"
+                    >
+                        Explore our exclusively selected sets, defining the trends of tomorrow with timeless, unapologetic aesthetics.
+                    </motion.p>
+                </div>
             </section>
 
-            {/* Grid */}
-            <section className="max-w-[1600px] mx-auto px-4 md:px-8 pb-24">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[300px] md:auto-rows-[400px]">
+            {/* BENTO GRID COLLECTIONS */}
+            <section className="py-24 md:py-32 px-4 md:px-8 max-w-[1800px] mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[400px] md:auto-rows-[450px]">
                     {collections.map((item, index) => (
-                        <CollectionItem key={item.id} item={item} index={index} />
+                        <motion.div
+                            key={item.id}
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            className={`group relative overflow-hidden rounded-[2rem] bg-black/5 dark:bg-white/5 ${item.cName}`}
+                        >
+                            <Link href={item.link} className="absolute inset-0 w-full h-full block">
+                                <Image
+                                    src={item.image}
+                                    alt={item.title}
+                                    fill
+                                    className="object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-700 opacity-60 group-hover:opacity-80" />
+                                
+                                <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-between">
+                                    <div className="flex justify-between items-start">
+                                        <span className="bg-black/30 backdrop-blur-md text-white text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-full">
+                                            {item.tag}
+                                        </span>
+                                        <span className="bg-white text-black p-3 rounded-full opacity-0 -translate-x-4 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-x-0">
+                                            <ArrowUpRight size={20} strokeWidth={2.5}/>
+                                        </span>
+                                    </div>
+                                    
+                                    <div>
+                                        <h2 className="text-3xl md:text-5xl font-serif font-black text-white mb-3 leading-tight tracking-tight">
+                                            {item.title}
+                                        </h2>
+                                        <p className="text-white/70 text-lg md:text-xl font-light transform translate-y-4 opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+                                            {item.subtitle}
+                                        </p>
+                                    </div>
+                                </div>
+                            </Link>
+                        </motion.div>
                     ))}
                 </div>
             </section>
 
-            {/* Newsletter */}
-            <section className="py-24 bg-white text-black px-6">
-                <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-3xl md:text-5xl font-bold mb-6">Never Miss a Drop</h2>
-                    <p className="text-gray-600 mb-8">Subscribe to get notified about new collections and exclusive offers.</p>
-                    <form className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <input
-                            type="email"
-                            placeholder="Enter your email"
-                            className="px-6 py-4 bg-gray-100 rounded-full w-full sm:w-96 focus:outline-none focus:ring-2 focus:ring-black"
-                        />
-                        <button className="px-8 py-4 bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-colors">
-                            Subscribe
-                        </button>
-                    </form>
+            {/* MINIMAL NEWSLETTER */}
+            <section className="py-24 md:py-40 bg-black text-white px-6">
+                <div className="max-w-3xl mx-auto text-center">
+                    <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                        <h2 className="text-5xl md:text-7xl font-serif font-black tracking-tighter mb-8">
+                            Never Miss a <span className="italic text-white/50">Drop.</span>
+                        </h2>
+                        <p className="text-white/60 mb-12 text-lg md:text-xl font-light">
+                            Subscribe to the inner circle and receive early access to new collections, exclusive editorials, and private sales.
+                        </p>
+                        
+                        <form className="flex flex-col sm:flex-row gap-0 max-w-xl mx-auto relative group">
+                            <input
+                                type="email"
+                                placeholder="Your private email address"
+                                className="w-full bg-transparent border-b border-white/20 px-4 py-5 text-center sm:text-left focus:outline-none focus:border-white transition-colors text-lg placeholder:text-white/30"
+                                required
+                            />
+                            <button 
+                                type="button"
+                                className="mt-6 sm:mt-0 sm:absolute sm:right-0 sm:bottom-0 sm:p-5 uppercase text-[10px] font-bold tracking-[0.2em] text-white hover:text-white/60 transition-colors"
+                            >
+                                Subscribe
+                            </button>
+                        </form>
+                    </motion.div>
                 </div>
             </section>
         </div>
