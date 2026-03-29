@@ -111,9 +111,9 @@ const Shop = () => {
             </h1>
           </div>
           <div className="max-w-xs text-right">
-             <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.2em] leading-relaxed">
-               Discover our meticulously curated selection of seasonal offerings and timeless essentials.
-             </p>
+            <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.2em] leading-relaxed">
+              Discover our meticulously curated selection of seasonal offerings and timeless essentials.
+            </p>
           </div>
         </motion.div>
       </div>
@@ -147,7 +147,7 @@ const Shop = () => {
               </div>
             ))}
           </div>
-          
+
           <div className="mt-20 py-12 border-t border-border/10">
             <h3 className="typography-display !text-[9px] text-muted-foreground mb-8">Price Threshold</h3>
             <div className="flex flex-col gap-4">
@@ -171,40 +171,42 @@ const Shop = () => {
           <div className="flex justify-between items-center mb-16 border-b border-border/10 pb-12">
             <p className="typography-display !text-[9px]">{pagination.total} Selected Pieces</p>
             <div className="flex items-center gap-12">
-               <button onClick={() => setShowFilters(true)} className="lg:hidden typography-display border border-border px-6 py-2">Refine</button>
-               <select
-                  value={sortPrice}
-                  onChange={(e) => {
-                    setSortPrice(e.target.value);
-                    updateUrlParams({ ...filters, sort: e.target.value });
-                  }}
-                  className="bg-transparent text-[8px] font-black uppercase tracking-[0.4em] focus:outline-none cursor-pointer"
-                >
-                  <option value="-createdAt">Newest Drops</option>
-                  <option value="price">Price ascending</option>
-                  <option value="-price">Price descending</option>
-                </select>
+              <button onClick={() => setShowFilters(true)} className="lg:hidden typography-display border border-border px-6 py-2">Refine</button>
+              <select
+                value={sortPrice}
+                onChange={(e) => {
+                  setSortPrice(e.target.value);
+                  updateUrlParams({ ...filters, sort: e.target.value });
+                }}
+                className="bg-transparent text-[8px] font-black uppercase tracking-[0.4em] focus:outline-none cursor-pointer"
+              >
+                <option value="-createdAt">Newest Drops</option>
+                <option value="price">Price ascending</option>
+                <option value="-price">Price descending</option>
+              </select>
             </div>
           </div>
 
           {loading ? (
-             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
-               {[1,2,3,4,5,6].map(i => <div key={i} className="aspect-[3/4] bg-muted/20 animate-pulse" />)}
-             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
+              {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="aspect-[3/4] bg-muted/20 animate-pulse" />)}
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-24">
               <AnimatePresence>
-                {products.map((prod, idx) => (
-                  <motion.div
-                    key={prod._id}
-                    layout
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: idx * 0.05 }}
-                  >
-                    <ProductCard product={prod} />
-                  </motion.div>
-                ))}
+                {products
+                  .filter(prod => prod.category !== 'Shoes')
+                  .map((prod, idx) => (
+                    <motion.div
+                      key={prod._id}
+                      layout
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.8, delay: idx * 0.05 }}
+                    >
+                      <ProductCard product={prod} />
+                    </motion.div>
+                  ))}
               </AnimatePresence>
             </div>
           )}
@@ -220,15 +222,15 @@ const Shop = () => {
                 Previous
               </button>
               <div className="flex gap-6">
-                 {[...Array(pagination.pages).keys()].map(i => (
-                   <button 
-                     key={i} 
-                     onClick={() => handlePageChange(i + 1)}
-                     className={`text-[10px] font-black ${pagination.page === i+1 ? 'text-accent border-b border-accent' : 'text-muted-foreground'}`}
-                   >
-                     {i+1}
-                   </button>
-                 ))}
+                {[...Array(pagination.pages).keys()].map(i => (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`text-[10px] font-black ${pagination.page === i + 1 ? 'text-accent border-b border-accent' : 'text-muted-foreground'}`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
               </div>
               <button
                 disabled={pagination.page >= pagination.pages}
