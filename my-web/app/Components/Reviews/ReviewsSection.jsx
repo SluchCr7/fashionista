@@ -1,6 +1,7 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
-import { ReviewContext } from "@/app/Context/ReviewContext";
+import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { getProductReviews } from '@/lib/redux/slices/reviewSlice';
 import RatingSummary from "./RatingSummary";
 import ReviewCard from "./ReviewCard";
 import ReviewForm from "./ReviewForm";
@@ -8,17 +9,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
 
 const ReviewsSection = ({ product }) => {
-    const { reviews, loading, pagination, getProductReviews } = useContext(ReviewContext);
+    const dispatch = useAppDispatch();
+    const { reviews, loading, pagination } = useAppSelector(state => state.review);
     const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
         if (product?._id) {
-            getProductReviews(product._id);
+            dispatch(getProductReviews({ productId: product._id }));
         }
-    }, [product?._id, getProductReviews]);
+    }, [product?._id, dispatch]);
 
     const handlePageChange = (newPage) => {
-        getProductReviews(product._id, newPage);
+        dispatch(getProductReviews({ productId: product._id, page: newPage }));
         // Scroll to section top
         const element = document.getElementById("reviews-header");
         if (element) element.scrollIntoView({ behavior: "smooth", block: "start" });

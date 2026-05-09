@@ -1,23 +1,21 @@
 'use client';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { ShoppingBag, Minus, Plus, ArrowRight, X, Trash2, ShoppingCart, Sparkles } from 'lucide-react';
-import { CartContext } from '../Context/CartContext';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { removeFromCart, addToCart, clearCart, setIsCartOpen } from '@/lib/redux/slices/cartSlice';
 
 const CartShop = () => {
-  const {
-    cartItems,
-    cartTotal,
-    removeFromCart,
-    addToCart,
-    clearCart,
-    discount,
-    isCartOpen,
-    setIsCartOpen
-  } = useContext(CartContext);
+  const dispatch = useAppDispatch();
+  const { cartItems, discount, isCartOpen } = useAppSelector(state => state.cart);
+  const cartTotal = cartItems.reduce((total, item) => {
+    const price = item.product?.price || 0;
+    const discountedPrice = price - (price * discount) / 100;
+    return total + (discountedPrice * item.quantity);
+  }, 0);
 
   const FREE_SHIPPING_THRESHOLD = 500;
   const progressPercentage = Math.min((cartTotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
@@ -42,9 +40,9 @@ const CartShop = () => {
 
   const handleQuantityChange = (item, change) => {
     if (change === -1 && item.quantity === 1) {
-      removeFromCart(item.product._id, item.size, item.color);
+      dispatch(removeFromCart({ productId: item.product._id, size: item.size, color: item.color }));
     } else {
-      addToCart(item.product, change, item.size, item.color);
+      dispatch(addToCart({ product: item.product, quantity: change, size: item.size, color: item.color }));
     }
   };
 
@@ -59,7 +57,7 @@ const CartShop = () => {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => setIsCartOpen(true)}
+        onClick={() => dispatch(setIsCartOpen(true))}
         className="relative group p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
         aria-label="Open Cart"
       >
@@ -86,7 +84,7 @@ const CartShop = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                onClick={() => setIsCartOpen(false)}
+                onClick={() => dispatch(setIsCartOpen(false))}
                 className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998]"
               />
 
@@ -110,7 +108,7 @@ const CartShop = () => {
                   <motion.button 
                     whileHover={{ rotate: 90, scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsCartOpen(false)}
+                    onClick={() => dispatch(setIsCartOpen(false))}
                     className="p-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors"
                   >
                     <X size={18} strokeWidth={2} />
@@ -160,7 +158,7 @@ const CartShop = () => {
                       <h3 className="text-xl font-medium tracking-wide">Your cart is empty</h3>
                       <p className="text-sm max-w-[250px]">Looks like you haven&apos;t added any items to your bag yet.</p>
                       <button 
-                        onClick={() => setIsCartOpen(false)}
+                        onClick={() => dispatch(setIsCartOpen(false))}
                         className="mt-6 px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-full text-sm font-medium hover:scale-105 transition-transform"
                       >
                         Start Shopping
@@ -196,7 +194,7 @@ const CartShop = () => {
                                 {item.product.name}
                               </h3>
                               <button 
-                                onClick={() => removeFromCart(item.product._id, item.size, item.color)}
+                                onClick={() => dispatch(removeFromCart({ productId: item.product._id, size: item.size, color: item.color }))}
                                 className="text-black/40 hover:text-red-500 dark:text-white/40 dark:hover:text-red-500 transition-colors p-1 -mr-1"
                                 aria-label="Remove item"
                               >
@@ -284,7 +282,7 @@ const CartShop = () => {
 
                     <div className="flex gap-3">
                       <button
-                        onClick={clearCart}
+                        onClick={() => dispatch(clearCart())}
                         className="px-4 py-4 rounded-xl border border-black/10 dark:border-white/10 text-black/60 hover:text-red-500 dark:text-white/60 dark:hover:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-500/10 hover:border-red-200 dark:hover:border-red-500/30 transition-all w-14 flex justify-center items-center shrink-0"
                         title="Clear Cart"
                       >
@@ -295,7 +293,7 @@ const CartShop = () => {
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          onClick={() => setIsCartOpen(false)}
+                          onClick={() => dispatch(setIsCartOpen(false))}
                           className="w-full bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-medium tracking-wide flex items-center justify-center gap-2 group shadow-xl shadow-black/20 dark:shadow-white/10 hover:shadow-black/30 transition-all hover:ring-2 ring-offset-2 ring-black dark:ring-white dark:ring-offset-[#0a0a0a]"
                         >
                           Checkout 

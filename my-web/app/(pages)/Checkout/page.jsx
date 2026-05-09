@@ -1,19 +1,25 @@
 'use client';
 import Image from 'next/image';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { ArrowRight, Lock, ShieldCheck, ShoppingBag, CheckCircle, Truck, X } from 'lucide-react';
-import { CartContext } from '@/app/Context/CartContext';
-import { OrderContext } from '@/app/Context/OrderContext';
-import { AuthContext } from '@/app/Context/AuthContext';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { clearCart, applyCoupon, removeCoupon } from '@/lib/redux/slices/cartSlice';
+import { placeOrder } from '@/lib/redux/slices/orderSlice';
 import { easeOut, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/lib/toast';
 
 export default function CheckoutPage() {
     const router = useRouter();
-    const { cartItems, cartTotal, clearCart, loading: cartLoading, appliedCoupon, applyCoupon, removeCoupon, isApplyingCoupon, discount } = useContext(CartContext);
-    const { placeOrder, loading: orderLoading } = useContext(OrderContext);
-    const { isAuthenticated } = useContext(AuthContext);
+    const dispatch = useAppDispatch();
+    const { cartItems, appliedCoupon, isApplyingCoupon, discount, loading: cartLoading } = useAppSelector(state => state.cart);
+    const cartTotal = cartItems.reduce((total, item) => {
+        const price = item.product?.price || 0;
+        const discountedPrice = price - (price * discount) / 100;
+        return total + (discountedPrice * item.quantity);
+    }, 0);
+    const orderLoading = useAppSelector(state => state.order.loading);
+    const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated);
 
     const isLoading = cartLoading || orderLoading;
 
@@ -24,7 +30,7 @@ export default function CheckoutPage() {
     const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
     const grandTotal = Math.max(0, cartTotal + shippingFee - discountAmount);
 
-    const handleApplyCoupon = async () => { if (couponCode) { if (await applyCoupon(couponCode)) setCouponCode(""); } };
+    const handleApplyCoupon = async () => { if (couponCode) { if (await dispatch(applyCoupon(couponCode)).unwrap()) setCouponCode(""); } };
     const handleInputChange = (e) => setFormData(p => ({ ...p, [e.target.id]: e.target.value }));
 
     const handleCheckOut = async (e) => {
@@ -61,7 +67,7 @@ export default function CheckoutPage() {
             ...(appliedCoupon && { coupon: { code: appliedCoupon.code, discountValue: appliedCoupon.discountValue, discountType: appliedCoupon.discountType } })
         };
 
-        if (await placeOrder(orderData)) { await clearCart(); router.push('/Order'); }
+        if (await dispatch(placeOrder(orderData)).unwrap()) { await dispatch(clearCart()); router.push('/Order'); }
     };
 
     if (cartItems.length === 0 && !isLoading) {
@@ -180,7 +186,7 @@ export default function CheckoutPage() {
                             <div className="flex justify-between"><span className="text-black/60 dark:text-white/60">Shipping</span><span>{shippingFee === 0 ? 'Complimentary' : `$${shippingFee.toFixed(2)}`}</span></div>
                             {appliedCoupon && (
                                 <div className="flex justify-between text-black dark:text-white font-bold">
-                                    <span className="flex items-center gap-2">Promo Style <button onClick={removeCoupon}><X size={12} className="opacity-50 hover:opacity-100"/></button></span>
+                                    <span className="flex items-center gap-2">Promo Style <button type="button" onClick={() => dispatch(removeCoupon())}><X size={12} className="opacity-50 hover:opacity-100"/></button></span>
                                     <span>-${discountAmount.toFixed(2)}</span>
                                 </div>
                             )}
@@ -193,7 +199,7 @@ export default function CheckoutPage() {
                         {!appliedCoupon && (
                             <div className="mt-12 pt-8 border-t border-black/10 dark:border-white/10 flex gap-4">
                                 <input type="text" placeholder="Promo Code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} className="flex-1 bg-transparent border-b border-black/20 dark:border-white/20 pb-2 text-sm uppercase tracking-widest font-bold focus:outline-none focus:border-black dark:focus:border-white placeholder:text-black/30 dark:placeholder:text-white/30" />
-                                <button onClick={handleApplyCoupon} disabled={isApplyingCoupon || !couponCode} className="text-[10px] font-black tracking-[0.2em] uppercase border-b border-black dark:border-white pb-2 hover:opacity-50 transition-opacity">Apply</button>
+                                <button type="button" onClick={handleApplyCoupon} disabled={isApplyingCoupon || !couponCode} className="text-[10px] font-black tracking-[0.2em] uppercase border-b border-black dark:border-white pb-2 hover:opacity-50 transition-opacity">Apply</button>
                             </div>
                         )}
 

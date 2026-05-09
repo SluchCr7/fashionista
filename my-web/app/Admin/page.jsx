@@ -1,5 +1,5 @@
 'use client';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -16,10 +16,11 @@ import {
 } from 'react-icons/md';
 import { FaUpload, FaBoxOpen } from 'react-icons/fa6';
 import { IoMdClose } from 'react-icons/io';
-import { ProductContext } from '../Context/ProductContext';
-import { AuthContext } from '../Context/AuthContext';
-import { OrderContext } from '../Context/OrderContext';
-import { AdContext } from '../Context/AdsContext';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { fetchProducts, addProduct, updateProduct, deleteProduct } from '@/lib/redux/slices/productSlice';
+import { fetchAllUsers, deleteUser } from '@/lib/redux/slices/authSlice';
+import { fetchOrders, updateOrderStatus, cancelOrder } from '@/lib/redux/slices/orderSlice';
+import { addNewAd } from '@/lib/redux/slices/adsSlice';
 
 import { toast, ecommerceToasts } from '@/lib/toast';
 
@@ -51,17 +52,17 @@ const SectionTitle = ({ title, subtitle }) => (
 );
 
 const AdminPanel = () => {
-  // Contexts
-  const { products = [], addProduct, updateProduct, deleteProduct, fetchProducts } = useContext(ProductContext);
-  const { allUsers: users = [], fetchAllUsers, deleteUser } = useContext(AuthContext);
-  const { orders = [], fetchOrders, updateOrderStatus, cancelOrder } = useContext(OrderContext);
-  const { ads = [], addNewAd } = useContext(AdContext);
+  const dispatch = useAppDispatch();
+  const products = useAppSelector(state => state.product.products);
+  const users = useAppSelector(state => state.auth.allUsers);
+  const orders = useAppSelector(state => state.order.orders);
+  const ads = useAppSelector(state => state.ads.ads);
 
   useEffect(() => {
-    fetchProducts();
-    fetchOrders();
-    fetchAllUsers();
-  }, [fetchProducts, fetchOrders, fetchAllUsers]);
+    dispatch(fetchProducts());
+    dispatch(fetchOrders());
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
 
 
   // Navigation
@@ -116,9 +117,9 @@ const AdminPanel = () => {
 
       let success;
       if (isEdit) {
-        success = await updateProduct(editingProduct._id, formData);
+        success = await dispatch(updateProduct({ id: editingProduct._id, productData: formData })).unwrap();
       } else {
-        success = await addProduct(formData);
+        success = await dispatch(addProduct(formData)).unwrap();
       }
 
       if (success) {
@@ -356,7 +357,7 @@ const AdminPanel = () => {
                       <td className="px-4">
                         <div className="flex gap-2">
                           <button onClick={() => handleEditClick(p)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"><MdEdit size={18} /></button>
-                          <button onClick={() => deleteProduct(p._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><MdDeleteOutline size={18} /></button>
+                          <button onClick={() => dispatch(deleteProduct(p._id))} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><MdDeleteOutline size={18} /></button>
                         </div>
                       </td>
                     </tr>
@@ -473,7 +474,7 @@ const AdminPanel = () => {
                         </span>
                       </td>
                       <td className="px-4">
-                        <button onClick={() => deleteUser(u._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><MdDeleteOutline size={18} /></button>
+                        <button onClick={() => dispatch(deleteUser(u._id))} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><MdDeleteOutline size={18} /></button>
                       </td>
                     </tr>
                   ))}
@@ -500,10 +501,10 @@ const AdminPanel = () => {
                       <td className="px-4 font-bold text-sm">{o.user?.name}</td>
                       <td className="px-4 font-black text-gray-800">${o.total}</td>
                       <td className="px-4">
-                        <StatusBadge status={o.status} onUpdate={(s) => updateOrderStatus(o._id, s)} />
+                        <StatusBadge status={o.status} onUpdate={(s) => dispatch(updateOrderStatus({ id: o._id, status: s }))} />
                       </td>
                       <td className="px-4">
-                        <button onClick={() => cancelOrder(o._id)} className="p-2 text-gray-400 hover:text-red-500 rounded-lg transition"><MdDeleteOutline size={18} /></button>
+                        <button onClick={() => dispatch(cancelOrder(o._id))} className="p-2 text-gray-400 hover:text-red-500 rounded-lg transition"><MdDeleteOutline size={18} /></button>
                       </td>
                     </tr>
                   ))}

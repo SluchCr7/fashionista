@@ -1,8 +1,9 @@
 'use client';
-import { AuthContext } from '@/app/Context/AuthContext';
+import { useAppDispatch } from '@/lib/redux/hooks';
+import { login } from '@/lib/redux/slices/authSlice';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from '@/lib/toast';
@@ -11,7 +12,7 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPass] = useState("");
     const [loading, setLoading] = useState(false);
-    const { login } = useContext(AuthContext);
+    const dispatch = useAppDispatch();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -21,7 +22,11 @@ export default function LoginPage() {
         }
 
         setLoading(true);
-        await login(email, password);
+        try {
+            await dispatch(login({ email, password })).unwrap();
+        } catch (error) {
+            // Error handled in slice/toast
+        }
         setLoading(false);
     }
 

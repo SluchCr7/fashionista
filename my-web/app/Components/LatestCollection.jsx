@@ -1,6 +1,6 @@
 'use client';
-import React, { useContext } from 'react';
-import { ProductContext } from '../Context/ProductContext';
+import React from 'react';
+import { useAppSelector } from '@/lib/redux/hooks';
 import ProductCard from './ProductCard';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, ArrowRight } from 'lucide-react';
@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const LatestCollection = () => {
-  const { products } = useContext(ProductContext);
+  const products = useAppSelector(state => state.product.products);
   const latest = products.slice(0, 4);
   const featured = latest[0];
   const items = latest.slice(1);

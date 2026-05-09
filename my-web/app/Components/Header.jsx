@@ -1,13 +1,12 @@
 'use client';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Search, Heart, User, Menu, Sun, Moon, X, ArrowUpRight } from 'lucide-react';
 
-import { AuthContext } from '../Context/AuthContext';
-import { ProductContext } from '../Context/ProductContext';
-import { useTheme } from '../Context/ThemeContext';
+import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks';
+import { setTheme } from '@/lib/redux/slices/themeSlice';
 
 import ProductNavSearch from './ProductNavSearch';
 import CartShop from './CartShop';
@@ -32,9 +31,10 @@ const Header = () => {
 
   const { scrollY } = useScroll();
   const pathname = usePathname();
-  const { user } = useContext(AuthContext);
-  const { products } = useContext(ProductContext);
-  const { theme, setTheme } = useTheme();
+  const user = useAppSelector(state => state.auth.user);
+  const products = useAppSelector(state => state.product.products);
+  const theme = useAppSelector(state => state.theme.theme);
+  const dispatch = useAppDispatch();
 
   // Handle scroll events
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -70,7 +70,7 @@ const Header = () => {
   }, [search, products]);
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    dispatch(setTheme(theme === 'dark' ? 'light' : 'dark'));
   };
 
   return (

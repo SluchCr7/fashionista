@@ -1,19 +1,20 @@
 "use client";
-import React, { useState, useMemo, useEffect, useContext } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Heart, SlidersHorizontal, ChevronDown, ChevronUp, Check, X, Grid, List, Search, Filter } from "lucide-react";
-import { ProductContext } from "@/app/Context/ProductContext";
-import { CartContext } from "@/app/Context/CartContext";
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { fetchProducts } from '@/lib/redux/slices/productSlice';
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/app/Components/ProductCard";
 
 const Shop = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { products, pagination, fetchProducts, loading } = useContext(ProductContext);
-  const { discount } = useContext(CartContext);
+  const dispatch = useAppDispatch();
+  const { products, pagination, loading } = useAppSelector(state => state.product);
+  const discount = useAppSelector(state => state.cart.discount);
 
   const [filters, setFilters] = useState({
     category: "",
@@ -56,8 +57,8 @@ const Shop = () => {
     setPriceRange([updatedFilters.minPrice, updatedFilters.maxPrice]);
     if (params.sort) setSortPrice(params.sort);
 
-    fetchProducts(updatedFilters);
-  }, [searchParams, fetchProducts]);
+    dispatch(fetchProducts(updatedFilters));
+  }, [searchParams, dispatch]);
 
   const updateUrlParams = (newFilters) => {
     const params = new URLSearchParams();

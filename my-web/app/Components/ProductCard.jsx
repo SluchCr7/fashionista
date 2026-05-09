@@ -1,16 +1,18 @@
 'use client';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingBag, Star } from 'lucide-react';
-import { CartContext } from '../Context/CartContext';
-import { AuthContext } from '../Context/AuthContext';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { addToCart } from '@/lib/redux/slices/cartSlice';
+import { toggleFavorite } from '@/lib/redux/slices/authSlice';
 import { toast, ecommerceToasts } from '@/lib/toast';
 
 const ProductCard = ({ product, showRating = false }) => {
-    const { addToCart, discount } = useContext(CartContext);
-    const { toggleFavorite, user } = useContext(AuthContext);
+    const dispatch = useAppDispatch();
+    const discount = useAppSelector(state => state.cart.discount);
+    const user = useAppSelector(state => state.auth.user);
     const [isHovered, setIsHovered] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
 
@@ -28,7 +30,7 @@ const ProductCard = ({ product, showRating = false }) => {
         }
         setIsAdding(true);
         try {
-            await addToCart(product, 1);
+            await dispatch(addToCart({ product, quantity: 1 })).unwrap();
         } catch (error) {
             toast.error("Process interrupted. Please try again.");
         } finally {
@@ -39,7 +41,7 @@ const ProductCard = ({ product, showRating = false }) => {
     const handleWishlist = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        await toggleFavorite(product._id);
+        await dispatch(toggleFavorite(product._id));
     };
 
     return (

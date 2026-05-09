@@ -1,16 +1,16 @@
 'use client'
-import React, { useContext, useEffect, useState } from 'react'
-import { OrderContext } from '@/app/Context/OrderContext'
-import { AuthContext } from '@/app/Context/AuthContext';
+import React, { useEffect, useState } from 'react'
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { fetchOrders } from '@/lib/redux/slices/orderSlice';
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function OrderPage() {
-    const { orders: myOrders, loading, fetchOrders } = useContext(OrderContext);
-    const [expandedOrder, setExpandedOrder] = useState(null);
-    const { user } = useContext(AuthContext);
+    const dispatch = useAppDispatch();
+    const { orders: myOrders, loading } = useAppSelector(state => state.order);
+    const user = useAppSelector(state => state.auth.user);
 
-    useEffect(() => { if (user) fetchOrders(); }, [user, fetchOrders]);
+    useEffect(() => { if (user) dispatch(fetchOrders()); }, [user, dispatch]);
 
     if (loading) return <OrdersSkeleton />;
 

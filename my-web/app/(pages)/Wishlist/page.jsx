@@ -1,6 +1,7 @@
 'use client';
-import { AuthContext } from '@/app/Context/AuthContext';
-import React, { useContext, useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { toggleFavorite } from '@/lib/redux/slices/authSlice';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,7 +9,8 @@ import { X, ArrowRight } from 'lucide-react';
 import api from '@/lib/api';
 
 export default function WishlistPage() {
-    const { user, toggleFavorite } = useContext(AuthContext);
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(state => state.auth.user);
     const [myProducts, setMyProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -73,7 +75,7 @@ export default function WishlistPage() {
                                             <Image src={product.Photo[0]?.url || '/placeholder.png'} alt={product.name} fill className="object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-[1.5s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105" />
                                         </Link>
                                         
-                                        <button onClick={() => toggleFavorite(product._id)} className="absolute top-4 right-4 w-10 h-10 bg-white/80 dark:bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110">
+                                        <button onClick={() => dispatch(toggleFavorite(product._id))} className="absolute top-4 right-4 w-10 h-10 bg-white/80 dark:bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110">
                                             <X size={16} className="text-black dark:text-white" />
                                         </button>
                                         

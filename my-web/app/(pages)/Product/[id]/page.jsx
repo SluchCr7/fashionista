@@ -1,8 +1,8 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
-import { ProductContext } from "@/app/Context/ProductContext";
-import { AuthContext } from "@/app/Context/AuthContext";
-import { CartContext } from "@/app/Context/CartContext";
+import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { addToCart } from '@/lib/redux/slices/cartSlice';
+import { toggleFavorite } from '@/lib/redux/slices/authSlice';
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,9 +14,9 @@ import ReviewsSection from "@/app/Components/Reviews/ReviewsSection";
 
 const Product = ({ params }) => {
   const { id } = params;
-  const { products } = useContext(ProductContext);
-  const { addToCart } = useContext(CartContext);
-  const { user, toggleFavorite } = useContext(AuthContext);
+  const dispatch = useAppDispatch();
+  const products = useAppSelector(state => state.product.products);
+  const user = useAppSelector(state => state.auth.user);
 
   const [product, setProduct] = useState({});
   const [activeImage, setActiveImage] = useState(0);
@@ -39,7 +39,7 @@ const Product = ({ params }) => {
   const handleAddToCart = async () => {
     setAdding(true);
     try {
-      await addToCart(product, quantity, size || 'M', color || 'Default');
+      await dispatch(addToCart({ product, quantity, size: size || 'M', color: color || 'Default' })).unwrap();
     } catch (error) {
       toast.error("Process interrupted. Please try again.");
     } finally {
@@ -96,7 +96,7 @@ const Product = ({ params }) => {
               </div>
 
               <button
-                onClick={() => toggleFavorite(product._id)}
+                onClick={() => dispatch(toggleFavorite(product._id))}
                 className="absolute top-8 right-8 p-4 transition-transform duration-500 hover:scale-110 active:scale-95"
               >
                 <Heart size={24} strokeWidth={1} className={isFavorite ? "fill-accent text-accent" : "text-black"} />

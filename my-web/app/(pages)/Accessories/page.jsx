@@ -1,16 +1,14 @@
 'use client';
-import React, { useState, useMemo, useContext, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, X, ChevronDown } from 'lucide-react';
-import { ProductContext } from '@/app/Context/ProductContext';
-import { ReviewContext } from '@/app/Context/ReviewContext';
+import { useAppSelector } from '@/lib/redux/hooks';
 import ProductCard from '@/app/Components/ProductCard';
 import api from '@/lib/api';
 
 export default function AccessoriesPage() {
-    const { fetchProducts } = useContext(ProductContext);
-    const { Reviews = [] } = useContext(ReviewContext);
+    const Reviews = useAppSelector(state => state.review.reviews);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 

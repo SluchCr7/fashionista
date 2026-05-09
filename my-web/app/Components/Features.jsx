@@ -1,8 +1,8 @@
 'use client';
-import React, { useContext } from "react";
+import React from "react";
 import { features as staticFeatures } from "../Data";
 import { motion } from "framer-motion";
-import { FeatureContext } from "../Context/FeatureContext";
+import { useAppSelector } from "@/lib/redux/hooks";
 
 // Icon Imports for Mapping
 import { CiPlane, CiMoneyCheck1, CiTimer, CiDeliveryTruck, CiCreditCard1 } from "react-icons/ci";
@@ -39,7 +39,7 @@ const getIcon = (iconName) => {
 import { Truck, ShieldCheck, HeartPulse, Clock } from "lucide-react";
 
 const Features = () => {
-  const { features: dynamicFeatures } = useContext(FeatureContext);
+  const dynamicFeatures = useAppSelector(state => state.feature.features);
   const displayFeatures = (dynamicFeatures && dynamicFeatures.length > 0) ? dynamicFeatures : staticFeatures;
 
   const getLucideIcon = (idx) => {
