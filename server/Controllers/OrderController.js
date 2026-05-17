@@ -46,14 +46,16 @@ const GetAllOrder = asyncHandler(async (req, res) => {
  * @desc Get a single order
  */
 const GetOrder = asyncHandler(async (req, res) => {
-    const order = await (await orderService.getOrders({ _id: req.params.id }))[0];
+    const orders = await orderService.getOrders({ _id: req.params.id });
+    const order = orders[0];
 
     if (!order) {
         return errorResponse(res, "Order Not Found", 404);
     }
 
-    // Authorization check
-    if (!req.user.isAdmin && order.user._id.toString() !== req.user._id.toString()) {
+    // Authorization check - compare as strings
+    const orderUserId = order.user._id ? order.user._id.toString() : order.user.toString();
+    if (!req.user.isAdmin && orderUserId !== req.user._id.toString()) {
         return errorResponse(res, "Access denied", 403);
     }
 
@@ -83,9 +85,16 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
  * @desc Delete Order
  */
 const deleteOrder = asyncHandler(async (req, res) => {
-    const order = await (await orderService.getOrders({ _id: req.params.id }))[0];
+    const orders = await orderService.getOrders({ _id: req.params.id });
+    const order = orders[0];
+    
     if (!order) {
         return errorResponse(res, "Order Not Found", 404);
+    }
+
+    // Restore inventory if order was not already cancelled
+    if (order.status !== 'Cancelled' && order.items) {
+        await orderService.restoreInventory(order.items);
     }
 
     await order.deleteOne();

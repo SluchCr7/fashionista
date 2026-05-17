@@ -4,7 +4,8 @@ const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BACK_URL || 'http://localhost:5000',
     headers: {
         'Content-Type': 'application/json'
-    }
+    },
+    timeout: 15000 // 15 second timeout
 });
 
 // Request interceptor to add token
@@ -37,13 +38,14 @@ api.interceptors.response.use(
                 const data = localStorage.getItem('Data');
                 if (data) {
                     const { refreshToken } = JSON.parse(data);
-                    const res = await axios.post(`${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/refresh`, { token: refreshToken });
+                    const baseURL = process.env.NEXT_PUBLIC_BACK_URL || 'http://localhost:5000';
+                    const res = await axios.post(`${baseURL}/api/auth/refresh`, { token: refreshToken });
 
-                    if (res.data.success) {
+                    if (res.data?.success) {
                         const newData = { ...JSON.parse(data), ...res.data.data };
                         localStorage.setItem('Data', JSON.stringify(newData));
 
-                        api.defaults.headers.common['Authorization'] = `Bearer ${res.data.data.accessToken}`;
+                        originalRequest.headers['Authorization'] = `Bearer ${res.data.data.accessToken}`;
                         return api(originalRequest);
                     }
                 }
@@ -56,7 +58,9 @@ api.interceptors.response.use(
             }
         }
 
-        return Promise.reject(error.response?.data || error.message);
+        // Return structured error
+        const errorData = error.response?.data;
+        return Promise.reject(errorData || { message: error.message || 'Network error' });
     }
 );
 

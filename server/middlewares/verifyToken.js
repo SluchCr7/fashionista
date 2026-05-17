@@ -9,31 +9,32 @@ const verifyToken = (req, res, next) => {
             req.user = decoded
             next()
         } catch (error) {
-            return res.status(401).json({ message: "Invalid token" })
+            return res.status(401).json({ success: false, message: "Invalid token" })
         }
     } else {
-        return res.status(401).json({ message: "No token provided" })
+        return res.status(401).json({ success: false, message: "No token provided" })
     }
 }
 
-const verifyAdmain = (req, res, next) => {
+const verifyAdmin = (req, res, next) => {
     verifyToken(req, res, () => {
         if (req.user.isAdmin) {
             next();
         } else {
-            return res.status(403).json({ message: "Access denied. Administrative privileges required." });
+            return res.status(403).json({ success: false, message: "Access denied. Administrative privileges required." });
         }
     });
 }
 
-const verifyTokenAndAdmin = verifyAdmain; // Alias for convenience as used in orderRoute
+const verifyTokenAndAdmin = verifyAdmin; // Alias for convenience as used in orderRoute
 
 const verifyUser = (req, res, next) => {
     verifyToken(req, res, () => {
-        if (req.user._id === req.params.id || req.user.isAdmin) {
+        // Fix: Convert ObjectId to string for proper comparison
+        if (req.user._id.toString() === req.params.id || req.user.isAdmin) {
             next();
         } else {
-            return res.status(403).json({ message: "Access denied. You can only manage your own account." });
+            return res.status(403).json({ success: false, message: "Access denied. You can only manage your own account." });
         }
     });
 }
@@ -42,8 +43,8 @@ const verifyAdmainUser = verifyUser; // Alias or similar logic
 
 module.exports = {
     verifyToken,
-    verifyAdmain,
-    verifyTokenAndAdmin,
+    verifyAdmin,
+    verifyTokenAndAdmin: verifyAdmin,
     verifyUser,
-    verifyAdmainUser
+    verifyAdmainUser: verifyUser
 }

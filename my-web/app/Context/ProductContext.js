@@ -11,6 +11,7 @@ const ProductProvider = ({ children }) => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(false);
     const [loadingProduct, setLoadingProduct] = useState(false);
+    const [error, setError] = useState(null);
     const [filters, setFilters] = useState({
         page: 1,
         limit: 12,
@@ -22,6 +23,7 @@ const ProductProvider = ({ children }) => {
 
     const fetchProducts = useCallback(async (customFilters = {}) => {
         setLoading(true);
+        setError(null);
         try {
             const activeFilters = { ...filters, ...customFilters };
 
@@ -47,6 +49,8 @@ const ProductProvider = ({ children }) => {
             }
         } catch (err) {
             console.error('Fetch products error:', err);
+            setError(err.message || 'Failed to fetch products');
+            toast.error(err.message || 'Failed to load products');
         } finally {
             setLoading(false);
         }
@@ -109,6 +113,7 @@ const ProductProvider = ({ children }) => {
         product,
         loading,
         loadingProduct,
+        error,
         filters,
         setFilters,
         fetchProducts,

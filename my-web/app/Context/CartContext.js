@@ -13,17 +13,20 @@ const CartProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [error, setError] = useState(null);
   const { user, isAuthenticated } = useContext(AuthContext);
 
   // Fetch latest discount percentage
   const fetchDiscount = useCallback(async () => {
     try {
       const res = await api.get('/api/discount');
-      const data = Array.isArray(res) ? res : (res.data || []);
+      // Handle both array and object response formats
+      const data = Array.isArray(res) ? res : (res.data || res?.data?.discounts || []);
       const latestDiscount = data[data.length - 1]?.discount || 0;
       setDiscount(latestDiscount);
     } catch (err) {
       console.error('Fetch discount error:', err);
+      // Silently fail for discount - not critical
     }
   }, []);
 

@@ -37,6 +37,33 @@ const AuthProvider = ({ children }) => {
         setUser(res.data);
         localStorage.setItem('Data', JSON.stringify(res.data));
         toast.success(`Welcome back, ${res.data.name}`);
+        
+        // Cart migration: merge localStorage cart with backend cart
+        const localCart = localStorage.getItem('cart');
+        if (localCart) {
+          try {
+            const localItems = JSON.parse(localCart);
+            if (localItems.length > 0) {
+              // Add each item from localStorage to backend cart
+              for (const item of localItems) {
+                if (item.product?._id) {
+                  await api.post('/api/cart', {
+                    product: item.product._id,
+                    quantity: item.quantity,
+                    size: item.size,
+                    color: item.color
+                  }).catch(() => {}); // Ignore individual failures
+                }
+              }
+              // Clear local cart after migration
+              localStorage.removeItem('cart');
+              toast.success('Your cart has been synced');
+            }
+          } catch (e) {
+            // Ignore parse errors
+          }
+        }
+        
         router.push('/');
         return true;
       }

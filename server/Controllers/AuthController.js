@@ -3,6 +3,7 @@ const { User, UserLogin, UserValidate } = require('../models/User');
 const { Product } = require('../models/Product');
 const asyncHandler = require('express-async-handler');
 const { successResponse, errorResponse } = require('../utils/responseFormatter');
+const jwt = require('jsonwebtoken');
 
 /**
  * @desc Register New User
@@ -44,6 +45,11 @@ const LoginUser = asyncHandler(async (req, res) => {
  * @access Private (Admin)
  */
 const getAllUsers = asyncHandler(async (req, res) => {
+  // Only admins can get all users
+  if (!req.user.isAdmin) {
+    return errorResponse(res, "Access denied. Admin privileges required.", 403);
+  }
+  
   const users = await User.find()
     .select("-password")
     .populate({

@@ -130,6 +130,56 @@ const deleteProduct = asyncHandler(async (req, res) => {
     return successResponse(res, "Product Deleted Successfully");
 });
 
-module.exports = { NewProduct, getAllProduct, getProduct, deleteProduct };
+/**
+ * @desc Update Product
+ * @route PUT /api/product/:id
+ * @access Private (Admin)
+ */
+const updateProduct = asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+        return errorResponse(res, "Product Not Found", 404);
+    }
+
+    const { error } = UpdateProductValidate(req.body);
+    if (error) {
+        return errorResponse(res, error.details[0].message, 400);
+    }
+
+    // Handle image update if provided
+    let photoUpdate = {};
+    if (req.files && req.files.image) {
+        let image = req.files.image;
+        if (Array.isArray(image)) {
+            image = image[0];
+        }
+        
+        // Delete old image from Cloudinary
+        if (product.Photo && product.Photo.publicId) {
+            await v2.uploader.destroy(product.Photo.publicId);
+        }
+
+        // Upload new image
+        const result = await v2.uploader.upload(image.path, { resource_type: "image" });
+        fs.unlinkSync(image.path);
+        
+        photoUpdate = {
+            Photo: {
+                url: result.secure_url,
+                publicId: result.public_id
+            }
+        };
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+        req.params.id,
+        { ...req.body, ...photoUpdate },
+        { new: true, runValidators: true }
+    );
+
+    return successResponse(res, "Product updated successfully", { product: updatedProduct });
+});
+
+module.exports = { NewProduct, getAllProduct, getProduct, deleteProduct, updateProduct };
 
 

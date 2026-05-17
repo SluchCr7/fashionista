@@ -1,4 +1,5 @@
 const { Order } = require('../models/Order');
+const { Product } = require('../models/Product');
 const productService = require('./productService');
 const { User } = require('../models/User');
 const { Coupon } = require('../models/Coupon');
@@ -67,9 +68,26 @@ class OrderService {
         const order = await Order.findById(orderId);
         if (!order) throw new Error("Order not found");
 
+        // If cancelling order, restore inventory
+        if (status === 'Cancelled' && order.status !== 'Cancelled') {
+            await this.restoreInventory(order.items);
+        }
+
         order.status = status;
         await order.save();
         return order;
+    }
+
+    async restoreInventory(items) {
+        if (!items || !Array.isArray(items)) return;
+        
+        for (const item of items) {
+            if (item.product && item.quantity) {
+                await Product.findByIdAndUpdate(item.product, {
+                    $inc: { quantity: item.quantity }
+                });
+            }
+        }
     }
 }
 

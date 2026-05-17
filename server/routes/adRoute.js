@@ -2,13 +2,14 @@ const { getAd, newAd, getAllAds, deleteAd } = require('../Controllers/AdControll
 const express = require('express')
 const route = express.Router()
 const photoUpload = require('../middlewares/uploadPhoto')
+const { verifyToken, verifyAdmin } = require('../middlewares/verifyToken')
 
 route.route('/')
     .get(getAllAds)
-    .post(photoUpload.fields([{ name: 'image', maxCount: 3 }]), newAd)
+    .post(verifyToken, verifyAdmin, photoUpload.fields([{ name: 'image', maxCount: 3 }]), newAd)
 
 route.route('/:id')
     .get(getAd)
-    .delete(deleteAd)
+    .delete(verifyToken, verifyAdmin, deleteAd)
 
 module.exports = route
