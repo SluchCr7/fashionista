@@ -39,7 +39,7 @@ const ClothesGender = memo(({ gender, title, Para }) => {
   }
 
   return (
-    <section className="w-full px-6 md:px-12 py-16 bg-white">
+    <section className="w-full px-6 md:px-12 py-16 ">
       {/* Introduction Header */}
       {title && (
         <div className="mb-12">
@@ -49,17 +49,19 @@ const ClothesGender = memo(({ gender, title, Para }) => {
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 w-full">
-        {genderProducts.map((prod, index) => (
-          <motion.div
-            key={prod._id || index}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.05 }}
-            viewport={{ once: true }}
-          >
-            <ProductCard product={prod} />
-          </motion.div>
-        ))}
+        {genderProducts
+          .filter(prod => prod.category !== 'Shoes')
+          .map((prod, index) => (
+            <motion.div
+              key={prod._id || index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.05 }}
+              viewport={{ once: true }}
+            >
+              <ProductCard product={prod} />
+            </motion.div>
+          ))}
       </div>
 
       {/* CTA Button */}

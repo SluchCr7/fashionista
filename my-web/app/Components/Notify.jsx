@@ -1,15 +1,25 @@
-import React, { memo } from 'react'
-import { IoInformation } from "react-icons/io5";
+import { motion, AnimatePresence } from 'framer-motion';
+import { memo } from 'react';
 
-const Notify =memo(({Notify}) => {
+const Notify = memo(({ Notify: message }) => {
   return (
-    <div className={`${Notify === "" ? "opacity-0 pointer-events-none w-0" : "opacity-100 w-[90%] md:w-[350px]"} transition-all border-l-[2px] border-DarkRed duration-1000 flex items-center gap-2 bg-white z-[1000] py-4 px-7 rounded-md text-black shadow-xl fixed top-10 right-6`}>
-        <IoInformation className='text-2xl bg-black text-white w-5 h-5 rounded-full'/>
-        <span className='text-black text-sm'>{Notify}</span>
-    </div>
-  )
-})
+    <AnimatePresence>
+      {message && (
+        <motion.div
+           initial={{ opacity: 0, y: 50 }}
+           animate={{ opacity: 1, y: 0 }}
+           exit={{ opacity: 0, y: 50 }}
+           transition={{ type: "spring", stiffness: 400, damping: 30 }}
+           className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[9999] flex items-center justify-center gap-4 bg-black dark:bg-white text-white dark:text-black px-6 py-4 border-none shadow-2xl pointer-events-none"
+        >
+          <div className="w-2 h-2 rounded-full bg-white dark:bg-black animate-pulse" />
+          <p className="text-[11px] font-black uppercase tracking-[0.3em]">{message}</p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+});
 
-Notify.displayName = "Notify"
+Notify.displayName = "Notify";
 
-export default Notify
+export default Notify;

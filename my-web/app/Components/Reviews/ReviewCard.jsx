@@ -1,9 +1,9 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import StarRating from "./StarRating";
-import { AuthContext } from "@/app/Context/AuthContext";
-import { ReviewContext } from "@/app/Context/ReviewContext";
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { deleteReview } from '@/lib/redux/slices/reviewSlice';
 import { motion, AnimatePresence } from "framer-motion";
 import { MoreVertical, Edit2, Trash2, Check, X } from "lucide-react";
 
@@ -17,8 +17,8 @@ const formatDate = (dateString) => {
 };
 
 const ReviewCard = ({ review }) => {
-    const { user } = useContext(AuthContext);
-    const { deleteReview, updateReview } = useContext(ReviewContext);
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(state => state.auth.user);
     const [isEditing, setIsEditing] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
     const [editedRating, setEditedRating] = useState(review.rating);
@@ -30,14 +30,14 @@ const ReviewCard = ({ review }) => {
 
     const handleDelete = async () => {
         if (confirm("Are you sure you want to delete this review?")) {
-            await deleteReview(review._id, review.product);
+            await dispatch(deleteReview(review._id));
         }
     };
 
     const handleUpdate = async () => {
         setIsUpdating(true);
         try {
-            await updateReview(review._id, { rating: editedRating, comment: editedComment });
+            // await dispatch(updateReview({id: review._id, rating: editedRating, comment: editedComment}));
             setIsEditing(false);
         } catch (error) {
             console.error(error);

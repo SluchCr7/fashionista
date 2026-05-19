@@ -1,9 +1,9 @@
 const authService = require('../services/authService');
+const jwt = require('jsonwebtoken');
 const { User, UserLogin, UserValidate } = require('../models/User');
 const { Product } = require('../models/Product');
 const asyncHandler = require('express-async-handler');
 const { successResponse, errorResponse } = require('../utils/responseFormatter');
-const jwt = require('jsonwebtoken');
 
 /**
  * @desc Register New User

@@ -1,268 +1,153 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Sparkles, TrendingUp, Award } from 'lucide-react';
+import { ArrowRight, ArrowLeft } from 'lucide-react';
 
 const HeroPage = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [direction, setDirection] = useState(0);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [isAnimating, setIsAnimating] = useState(false);
 
-  const slides = [
-    {
-      id: 1,
-      image: "/Hero/home-slider1.jpg",
-      badge: "New Season",
-      title: "Luxury Fashion",
-      subtitle: "Redefined",
-      description: "Discover our exclusive collection of premium designer pieces",
-      cta: "Explore Collection",
-      link: "/Shop",
-      accent: "from-amber-400 to-yellow-600",
-    },
-    {
-      id: 2,
-      image: "/Hero/home-slider2.jpg",
-      badge: "Limited Edition",
-      title: "Summer Elegance",
-      subtitle: "2025",
-      description: "Fresh styles for the modern wardrobe",
-      cta: "Shop Now",
-      link: "/Shop",
-      accent: "from-rose-400 to-pink-600",
-    },
-    {
-      id: 3,
-      image: "/Hero/home-slider3.jpg",
-      badge: "Exclusive",
-      title: "Timeless Classics",
-      subtitle: "For You",
-      description: "Curated pieces that never go out of style",
-      cta: "View Collection",
-      link: "/Shop",
-      accent: "from-blue-400 to-indigo-600",
-    },
-  ];
+    const slides = [
+        {
+            id: 1,
+            image: "https://images.unsplash.com/photo-1492447166138-50c3889fccb1?q=80&w=1974&auto=format&fit=crop",
+            subtitle: "Chapter I",
+            title: "Modern",
+            titleItalic: "Tailoring.",
+            link: "/Shop?gender=Men",
+        },
+        {
+            id: 2,
+            image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2070&auto=format&fit=crop",
+            subtitle: "Chapter II",
+            title: "Summer",
+            titleItalic: "Elegance.",
+            link: "/Shop?gender=Women",
+        },
+        {
+            id: 3,
+            image: "https://images.unsplash.com/photo-1509319117193-57bab727e09d?q=80&w=2000&auto=format&fit=crop",
+            subtitle: "Chapter III",
+            title: "Timeless",
+            titleItalic: "Classics.",
+            link: "/Shop",
+        },
+    ];
 
-  const nextSlide = React.useCallback(() => {
-    setDirection(1);
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  }, [slides.length]);
+    const nextSlide = () => {
+        if (isAnimating) return;
+        setIsAnimating(true);
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+        setTimeout(() => setIsAnimating(false), 1000);
+    };
 
-  const prevSlide = React.useCallback(() => {
-    setDirection(-1);
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  }, [slides.length]);
+    const prevSlide = () => {
+        if (isAnimating) return;
+        setIsAnimating(true);
+        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+        setTimeout(() => setIsAnimating(false), 1000);
+    };
 
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 6000);
-    return () => clearInterval(timer);
-  }, [nextSlide]);
+    useEffect(() => {
+        const timer = setInterval(nextSlide, 7000);
+        return () => clearInterval(timer);
+    }, [currentSlide]);
 
-  const slideVariants = {
-    enter: (direction) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0,
-      scale: 0.8,
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-      scale: 1,
-    },
-    exit: (direction) => ({
-      zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0,
-      scale: 0.8,
-    }),
-  };
-
-  const contentVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut",
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  return (
-    <section className="relative h-screen w-full overflow-hidden bg-black">
-      {/* Slides */}
-      <AnimatePresence initial={false} custom={direction}>
-        <motion.div
-          key={currentSlide}
-          custom={direction}
-          variants={slideVariants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{
-            x: { type: "spring", stiffness: 300, damping: 30 },
-            opacity: { duration: 0.5 },
-            scale: { duration: 0.5 },
-          }}
-          className="absolute inset-0"
-        >
-          {/* Background Image */}
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${slides[currentSlide].image})`,
-            }}
-          >
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
-
-            {/* Animated Mesh Gradient */}
-            <div className="absolute inset-0 opacity-30">
-              <div className={`absolute inset-0 bg-gradient-to-br ${slides[currentSlide].accent} mix-blend-overlay animate-pulse`} />
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="relative z-10 h-full flex items-center">
-            <div className="container mx-auto px-4 md:px-6 lg:px-8">
-              <motion.div
-                variants={contentVariants}
-                initial="hidden"
-                animate="visible"
-                className="max-w-3xl"
-              >
-                {/* Badge */}
-                <motion.div variants={itemVariants} className="mb-6">
-                  <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${slides[currentSlide].accent} text-white text-sm font-semibold uppercase tracking-wider shadow-lg`}>
-                    <Sparkles className="w-4 h-4" />
-                    {slides[currentSlide].badge}
-                  </span>
-                </motion.div>
-
-                {/* Title */}
-                <motion.h1
-                  variants={itemVariants}
-                  className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-white mb-4 leading-none"
-                >
-                  {slides[currentSlide].title}
-                  <br />
-                  <span className="gradient-text">
-                    {slides[currentSlide].subtitle}
-                  </span>
-                </motion.h1>
-
-                {/* Description */}
-                <motion.p
-                  variants={itemVariants}
-                  className="text-lg md:text-xl text-gray-200 mb-8 max-w-xl leading-relaxed"
-                >
-                  {slides[currentSlide].description}
-                </motion.p>
-
-                {/* CTA Buttons */}
+    return (
+        <section className="relative h-[100vh] min-h-[600px] w-full overflow-hidden bg-[#0a0a0a] text-white">
+            
+            <AnimatePresence mode="wait">
                 <motion.div
-                  variants={itemVariants}
-                  className="flex flex-wrap gap-4"
+                    key={currentSlide}
+                    initial={{ opacity: 0, scale: 1.05 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
+                    className="absolute inset-0"
                 >
-                  <Link
-                    href={slides[currentSlide].link}
-                    className={`group relative px-8 py-4 bg-gradient-to-r ${slides[currentSlide].accent} text-white font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl`}
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      {slides[currentSlide].cta}
-                      <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                    </span>
-                    <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
-                  </Link>
-
-                  <Link
-                    href="/Shop"
-                    className="px-8 py-4 bg-white/10 backdrop-blur-md text-white font-semibold rounded-full border-2 border-white/30 hover:bg-white/20 hover:border-white/50 transition-all duration-300 hover:scale-105"
-                  >
-                    Shop All
-                  </Link>
+                    <Image
+                        src={slides[currentSlide].image}
+                        alt={slides[currentSlide].title}
+                        fill priority unoptimized
+                        className="object-cover opacity-80"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-black/30" />
+                    <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
                 </motion.div>
+            </AnimatePresence>
 
-                {/* Features */}
-                <motion.div
-                  variants={itemVariants}
-                  className="mt-12 flex flex-wrap gap-6 text-white/80"
-                >
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
-                    <span className="text-sm font-medium">Trending Styles</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Award className="w-5 h-5" />
-                    <span className="text-sm font-medium">Premium Quality</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" />
-                    <span className="text-sm font-medium">Exclusive Designs</span>
-                  </div>
-                </motion.div>
-              </motion.div>
+            {/* CONTENT OVERLAY */}
+            <div className="relative z-10 h-full flex flex-col justify-end pb-12 sm:pb-20 px-6 md:px-12 max-w-[1600px] mx-auto w-full">
+                
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentSlide}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.8, delay: 0.2, ease: [0.76, 0, 0.24, 1] }}
+                        className="max-w-4xl"
+                    >
+                        <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/60 mb-6 block">
+                            {slides[currentSlide].subtitle}
+                        </span>
+                        
+                        <h1 className="text-6xl sm:text-8xl md:text-[10rem] font-serif font-black uppercase tracking-tighter leading-[0.85] mb-12 mix-blend-overlay">
+                            {slides[currentSlide].title} <br/>
+                            <span className="italic font-light">{slides[currentSlide].titleItalic}</span>
+                        </h1>
+
+                        <Link
+                            href={slides[currentSlide].link}
+                            className="group flex items-center gap-6 w-fit text-sm font-bold uppercase tracking-widest border-b border-white/30 pb-3 hover:border-white transition-all"
+                        >
+                            <span>Explore Archive</span>
+                            <ArrowRight size={16} className="transform group-hover:translate-x-2 transition-transform" />
+                        </Link>
+                    </motion.div>
+                </AnimatePresence>
+
+                {/* CONTROLS */}
+                <div className="absolute right-6 md:right-12 bottom-12 sm:bottom-20 flex flex-col items-end gap-8">
+                    
+                    {/* Progress Typography */}
+                    <div className="text-xs font-bold tracking-widest uppercase flex items-center gap-4">
+                        <span className="text-white">0{currentSlide + 1}</span>
+                        <span className="w-12 h-[1px] bg-white/30 relative">
+                            <motion.span 
+                                key={currentSlide}
+                                initial={{ width: "0%" }}
+                                animate={{ width: "100%" }}
+                                transition={{ duration: 7, ease: "linear" }}
+                                className="absolute left-0 top-0 h-full bg-white"
+                            />
+                        </span>
+                        <span className="text-white/40">0{slides.length}</span>
+                    </div>
+
+                    {/* Navigation Arrows */}
+                    <div className="flex gap-4">
+                        <button 
+                            onClick={prevSlide}
+                            className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all group"
+                        >
+                            <ArrowLeft size={16} className="transform group-hover:-translate-x-1 transition-transform" />
+                        </button>
+                        <button 
+                            onClick={nextSlide}
+                            className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all group"
+                        >
+                            <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
+                        </button>
+                    </div>
+
+                </div>
             </div>
-          </div>
-        </motion.div>
-      </AnimatePresence>
 
-      {/* Navigation Arrows */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 p-3 md:p-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-300 hover:scale-110"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 p-3 md:p-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-300 hover:scale-110"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
-
-      {/* Slide Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => {
-              setDirection(index > currentSlide ? 1 : -1);
-              setCurrentSlide(index);
-            }}
-            className={`transition-all duration-300 rounded-full ${index === currentSlide
-              ? 'w-12 h-3 bg-white'
-              : 'w-3 h-3 bg-white/40 hover:bg-white/60'
-              }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 1, repeat: Infinity, repeatType: "reverse" }}
-        className="absolute bottom-8 right-8 z-20 hidden md:flex flex-col items-center gap-2 text-white/60"
-      >
-        <span className="text-xs uppercase tracking-wider">Scroll</span>
-        <div className="w-px h-12 bg-gradient-to-b from-white/60 to-transparent" />
-      </motion.div>
-    </section>
-  );
+        </section>
+    );
 };
 
 export default HeroPage;

@@ -1,12 +1,12 @@
 'use client';
-import React, { useContext } from 'react';
+import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Loader from './Loader';
-import { AuthContext } from '../Context/AuthContext';
+import { useAppSelector } from '@/lib/redux/hooks';
 
 const LayoutComponent = ({ children }) => {
-  const { isAuthChecked } = useContext(AuthContext);
+  const isAuthChecked = useAppSelector(state => state.auth.isAuthChecked);
 
   if (!isAuthChecked) {
     return (

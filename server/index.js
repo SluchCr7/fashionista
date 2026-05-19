@@ -1,15 +1,15 @@
 const express = require('express');
-const app = express()
-const connectDB = require('./Config/db')
-require('dotenv').config()
-const cors = require('cors')
-const path = require('path')
-const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
-
-// Security middleware
+const app = express();
+const connectDB = require('./Config/db');
+require('dotenv').config();
+const cors = require('cors');
+const path = require('path');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const xssClean = require('xss-clean');
+const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
+
+const PORT = process.env.PORT || 5000;
 
 // Request logging (simple console logging)
 const requestLogger = (req, res, next) => {
@@ -20,28 +20,6 @@ const requestLogger = (req, res, next) => {
     });
     next();
 };
-
-const startServer = async () => {
-    try {
-        await connectDB(); // ⬅️ استنى الاتصال
-
-        const server = app.listen(PORT, () => 
-            console.log(`Server running on port ${PORT}`)
-        );
-
-        // Handle unhandled promise rejections
-        process.on('unhandledRejection', (err) => {
-            console.error('Unhandled Rejection:', err.message);
-            server.close(() => process.exit(1));
-        });
-
-    } catch (error) {
-        console.error("Failed to start server:", error);
-        process.exit(1);
-    }
-};
-
-startServer();
 
 // Security middleware
 app.use(helmet({
@@ -61,21 +39,35 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Middleware
-app.use(express.json({ limit: '10mb' }))
-app.use(express.urlencoded({ extended: true, limit: '10mb' }))
-app.use(xssClean());
+// Middleware - Enhanced CORS for professional connection
+const allowedOrigins = [
+    process.env.FRONT_URL,
+    'http://localhost:3000',
+    'http://localhost:3001',
+].filter(Boolean);
+
 app.use(cors({
-    origin: process.env.FRONT_URL,
-    credentials: true
-}))
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1 && process.env.NODE_ENV !== 'development') {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json());
 app.use(requestLogger);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-    res.json({ 
-        success: true, 
-        message: 'Server is running',
+    res.json({
+        success: true,
+        message: 'Professional server connection active',
         timestamp: new Date().toISOString(),
         uptime: process.uptime()
     });
@@ -104,31 +96,50 @@ app.get('/api/info', (req, res) => {
 // Routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
-})
+});
 
-app.use("/api/auth", require('./routes/authRoute'))
-app.use("/api/product", require('./routes/productRoute'))
-app.use("/api/order", require('./routes/orderRoute'))
-app.use("/api/cart", require('./routes/cartRoute'))
-app.use("/api/ads", require('./routes/adRoute'))
-app.use("/api/review", require('./routes/reviewRoute'))
-app.use("/api/discount", require('./routes/discountRoute'))
-app.use("/api/feature", require('./routes/featureRoute'))
-app.use("/api/coupon", require('./routes/couponRoute'))
+app.use("/api/auth", require('./routes/authRoute'));
+app.use("/api/product", require('./routes/productRoute'));
+app.use("/api/order", require('./routes/orderRoute'));
+app.use("/api/cart", require('./routes/cartRoute'));
+app.use("/api/ads", require('./routes/adRoute'));
+app.use("/api/review", require('./routes/reviewRoute'));
+app.use("/api/discount", require('./routes/discountRoute'));
+app.use("/api/feature", require('./routes/featureRoute'));
+app.use("/api/coupon", require('./routes/couponRoute'));
 
-
-// Error Handling
+// Error Handling Middlewares
 app.use(notFound);
 app.use(errorHandler);
 
-// Listen Server
-const PORT = process.env.PORT || 5000;
+// Start server after connecting to Database
+const startServer = async () => {
+    try {
+        await connectDB();
+        console.log("Database connected successfully.");
+    } catch (error) {
+        console.error("WARNING: Database connection failed. Running server in fallback mode:", error.message);
+    }
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-    console.error('Unhandled Rejection:', err.message);
-    // Close server & exit process
-    server.close(() => process.exit(1));
-});
+    try {
+        const server = app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
 
-const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+        // Handle unhandled promise rejections
+        process.on('unhandledRejection', (err) => {
+            console.error('Unhandled Rejection:', err.message);
+            if (server && typeof server.close === 'function') {
+                server.close(() => process.exit(1));
+            } else {
+                process.exit(1);
+            }
+        });
+
+    } catch (error) {
+        console.error("Failed to start express server:", error);
+        process.exit(1);
+    }
+};
+
+startServer();

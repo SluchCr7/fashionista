@@ -1,14 +1,14 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import StarRating from "./StarRating";
-import { ReviewContext } from "@/app/Context/ReviewContext";
-import { AuthContext } from "@/app/Context/AuthContext";
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { addReview } from '@/lib/redux/slices/reviewSlice';
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, AlertCircle, CheckCircle2 } from "lucide-react";
 
 const ReviewForm = ({ productId, onFinish }) => {
-    const { user } = useContext(AuthContext);
-    const { addReview } = useContext(ReviewContext);
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(state => state.auth.user);
 
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
@@ -21,7 +21,7 @@ const ReviewForm = ({ productId, onFinish }) => {
 
         setIsSubmitting(true);
         try {
-            await addReview({ product: productId, rating, comment });
+            await dispatch(addReview({ product: productId, rating, comment }));
             setShowSuccess(true);
             setRating(0);
             setComment("");

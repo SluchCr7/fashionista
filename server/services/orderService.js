@@ -7,23 +7,76 @@ const mongoose = require('mongoose');
 
 class OrderService {
     async createOrder(userId, orderData) {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-
+        let session = null;
         try {
+            session = await mongoose.startSession();
+        } catch (e) {
+            console.log("Mongoose session creation failed (standalone DB). Using transactionless fallback.");
+        }
+
+        if (session) {
+            session.startTransaction();
+            try {
+                const { items, shippingDetails, paymentMethod, subtotal, shippingFee, total, coupon, discountAmount } = orderData;
+
+                // 1. Verify and Reduce Stock
+                for (const item of items) {
+                    await productService.updateStock(item.product, -item.quantity, session);
+                }
+
+                // 2. Handle Coupon Usage
+                if (coupon && coupon.code) {
+                    const dbCoupon = await Coupon.findOne({ code: coupon.code.toUpperCase() }).session(session);
+                    if (dbCoupon) {
+                        dbCoupon.usageCount += 1;
+                        await dbCoupon.save({ session });
+                    }
+                }
+
+                // 3. Create Order
+                const order = new Order({
+                    user: userId,
+                    items,
+                    shippingDetails,
+                    paymentMethod,
+                    subtotal,
+                    shippingFee,
+                    coupon,
+                    discountAmount,
+                    total,
+                    status: 'Pending'
+                });
+
+                await order.save({ session });
+
+                // 4. Link to User
+                await User.findByIdAndUpdate(userId, {
+                    $push: { orders: order._id }
+                }, { session });
+
+                await session.commitTransaction();
+                return order;
+            } catch (error) {
+                await session.abortTransaction();
+                throw error;
+            } finally {
+                session.endSession();
+            }
+        } else {
+            // Standalone Fallback
             const { items, shippingDetails, paymentMethod, subtotal, shippingFee, total, coupon, discountAmount } = orderData;
 
             // 1. Verify and Reduce Stock
             for (const item of items) {
-                await productService.updateStock(item.product, -item.quantity, session);
+                await productService.updateStock(item.product, -item.quantity, null);
             }
 
             // 2. Handle Coupon Usage
             if (coupon && coupon.code) {
-                const dbCoupon = await Coupon.findOne({ code: coupon.code.toUpperCase() }).session(session);
+                const dbCoupon = await Coupon.findOne({ code: coupon.code.toUpperCase() });
                 if (dbCoupon) {
                     dbCoupon.usageCount += 1;
-                    await dbCoupon.save({ session });
+                    await dbCoupon.save();
                 }
             }
 
@@ -41,20 +94,14 @@ class OrderService {
                 status: 'Pending'
             });
 
-            await order.save({ session });
+            await order.save();
 
-            // 3. Link to User
+            // 4. Link to User
             await User.findByIdAndUpdate(userId, {
                 $push: { orders: order._id }
-            }, { session });
+            });
 
-            await session.commitTransaction();
             return order;
-        } catch (error) {
-            await session.abortTransaction();
-            throw error;
-        } finally {
-            session.endSession();
         }
     }
 

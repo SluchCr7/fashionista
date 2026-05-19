@@ -1,9 +1,8 @@
 'use client';
-import { CartContext } from '@/app/Context/CartContext';
-
-import { AuthContext } from '@/app/Context/AuthContext';
-import { OrderContext } from '@/app/Context/OrderContext';
-import React, { useContext, useEffect, useState, useMemo } from 'react';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { fetchOrders, cancelOrder } from '@/lib/redux/slices/orderSlice';
+import { logout } from '@/lib/redux/slices/authSlice';
+import React, { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,12 +22,13 @@ import {
 import { toast, ecommerceToasts } from '@/lib/toast';
 
 const Profile = () => {
-  const { fetchOrders, orders: myOrders, loading, cancelOrder } = useContext(OrderContext);
-  const { user, logout } = useContext(AuthContext);
+  const dispatch = useAppDispatch();
+  const { orders: myOrders, loading } = useAppSelector(state => state.order);
+  const user = useAppSelector(state => state.auth.user);
 
   useEffect(() => {
     if (user) {
-      fetchOrders();
+      dispatch(fetchOrders());
     }
   }, [user, fetchOrders]);
 
@@ -129,7 +129,7 @@ const Profile = () => {
                   </Link>
 
                   <button
-                    onClick={logout}
+                    onClick={() => dispatch(logout())}
                     className="w-full p-4 rounded-xl border border-destructive/20 text-destructive hover:bg-destructive/10 transition-colors flex items-center justify-center gap-2 font-medium mt-4"
                   >
 
@@ -209,7 +209,7 @@ const Profile = () => {
                               <button
                                 onClick={() => {
                                   if (confirm("Are you sure you wish to cancel this order?")) {
-                                    cancelOrder(order._id);
+                                    dispatch(cancelOrder(order._id));
                                   }
                                 }}
                                 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-destructive transition-colors px-3 py-2 rounded-full hover:bg-destructive/10"

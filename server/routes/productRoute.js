@@ -2,15 +2,15 @@ const { getAllProduct, getProduct, deleteProduct, NewProduct, updateProduct } = 
 const express = require('express')
 const route = express.Router()
 const photoUpload = require('../middlewares/uploadPhoto')
-const { verifyToken, verifyAdmin } = require('../middlewares/verifyToken')
+const { verifyTokenAndAdmin } = require('../middlewares/verifyToken')
 
 route.route('/')
     .get(getAllProduct)
-    .post(verifyToken, verifyAdmin, photoUpload.fields([{ name: 'image', maxCount: 1 }]), NewProduct)
+    .post(verifyTokenAndAdmin, photoUpload.fields([{ name: 'image', maxCount: 5 }]), NewProduct)
 
 route.route('/:id')
     .get(getProduct)
-    .delete(verifyToken, verifyAdmin, deleteProduct)
-    .put(verifyToken, verifyAdmin, updateProduct)
+    .put(verifyTokenAndAdmin, photoUpload.fields([{ name: 'image', maxCount: 5 }]), updateProduct)
+    .delete(verifyTokenAndAdmin, deleteProduct)
 
 module.exports = route

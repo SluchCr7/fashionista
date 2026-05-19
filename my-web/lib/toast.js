@@ -1,131 +1,120 @@
 import { toast as hotToast } from 'react-toastify';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  CheckCircle2,
-  AlertCircle,
-  Info,
-  TriangleAlert,
-  Loader2,
-  ShoppingBag,
-  Heart,
-  User,
-  Lock,
-  LogOut,
-  Bell
-} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Check, X, Info, AlertTriangle, Loader2 } from 'lucide-react';
 
 /**
- * Premium Toast UI Component
+ * Editorial Luxury Toast UI Component
+ * Ultra-minimalist, high-end design matching the new Atelier aesthetic.
  */
-const PremiumToast = ({ title, message, icon: Icon, type }) => {
-  const typeStyles = {
-    success: 'border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-    error: 'border-rose-500/30 bg-rose-50/50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400',
-    info: 'border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400',
-    warning: 'border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400',
-    loading: 'border-primary/30 bg-primary/5 dark:bg-primary/10 text-primary',
+const EditorialToast = ({ title, message, type }) => {
+  const typeConfig = {
+    success: { 
+      icon: <Check size={14} strokeWidth={2} />, 
+      dotColor: 'bg-green-500'
+    },
+    error: { 
+      icon: <X size={14} strokeWidth={2} />, 
+      dotColor: 'bg-red-500'
+    },
+    info: { 
+      icon: <Info size={14} strokeWidth={2} />, 
+      dotColor: 'bg-black dark:bg-white'
+    },
+    warning: { 
+      icon: <AlertTriangle size={14} strokeWidth={2} />, 
+      dotColor: 'bg-orange-500'
+    },
+    loading: { 
+      icon: <Loader2 size={14} strokeWidth={2} className="animate-spin" />, 
+      dotColor: 'bg-black/20 dark:bg-white/20'
+    },
   };
 
-  const iconColors = {
-    success: 'text-emerald-500',
-    error: 'text-rose-500',
-    info: 'text-sky-500',
-    warning: 'text-amber-500',
-    loading: 'text-primary animate-spin',
-  };
+  const current = typeConfig[type] || typeConfig.info;
 
   return (
-    <div className={`flex items-start gap-4 p-4 min-w-[320px] rounded-2xl border backdrop-blur-xl shadow-2xl transition-all ${typeStyles[type]}`}>
-      <div className={`flex-shrink-0 p-2 rounded-xl bg-background/50 shadow-sm ${iconColors[type]}`}>
-        <Icon size={20} />
+    <motion.div
+      initial={{ opacity: 0, x: 50, scale: 0.98 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 20, scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+      className="relative flex flex-col justify-center px-6 py-5 bg-white dark:bg-[#0a0a0a] border border-black dark:border-white shadow-[10px_10px_0px_rgba(0,0,0,1)] dark:shadow-[10px_10px_0px_rgba(255,255,255,1)] w-[360px] pointer-events-auto overflow-hidden group mb-4 transition-colors"
+    >
+      <div className="flex items-start justify-between mb-3 border-b border-black/10 dark:border-white/10 pb-3">
+        <div className="flex items-center gap-3">
+          <div className={`w-1.5 h-1.5 rounded-full ${current.dotColor} animate-pulse`} />
+          <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-black dark:text-white leading-none">
+            {title}
+          </h4>
+        </div>
+        <div className="text-black/40 dark:text-white/40">
+           {current.icon}
+        </div>
       </div>
-      <div className="flex-1 space-y-1">
-        {title && <h4 className="text-sm font-black uppercase tracking-widest">{title}</h4>}
-        <p className="text-xs font-medium leading-relaxed opacity-90">{message}</p>
-      </div>
-    </div>
+      
+      {message && (
+        <p className="text-sm font-serif italic text-black/70 dark:text-white/70 leading-relaxed pr-4">
+          {message}
+        </p>
+      )}
+    </motion.div>
   );
 };
 
 export const ifiitoast = {
-  success: (message, title = 'Success') => {
+  success: (message, title = 'Confirmed') => {
     hotToast(({ closeToast }) => (
-      <PremiumToast
-        type="success"
-        icon={CheckCircle2}
-        title={title}
-        message={message}
-      />
+      <EditorialToast type="success" title={title} message={message} />
     ), {
-      className: 'p-0 bg-transparent shadow-none !rounded-2xl overflow-hidden',
-      bodyClassName: 'p-0 m-0',
+      className: 'bg-transparent shadow-none p-0 !m-0 overflow-visible',
+      bodyClassName: 'p-0 m-0 overflow-visible',
       icon: false,
-      closeButton: false
+      closeButton: false,
     });
   },
 
   error: (message, title = 'Error') => {
     hotToast(({ closeToast }) => (
-      <PremiumToast
-        type="error"
-        icon={AlertCircle}
-        title={title}
-        message={message}
-      />
+      <EditorialToast type="error" title={title} message={message} />
     ), {
-      className: 'p-0 bg-transparent shadow-none !rounded-2xl overflow-hidden',
-      bodyClassName: 'p-0 m-0',
-      icon: false,
-      closeButton: false
-    });
-  },
-
-  info: (message, title = 'Notification') => {
-    hotToast(({ closeToast }) => (
-      <PremiumToast
-        type="info"
-        icon={Info}
-        title={title}
-        message={message}
-      />
-    ), {
-      className: 'p-0 bg-transparent shadow-none !rounded-2xl overflow-hidden',
-      bodyClassName: 'p-0 m-0',
-      icon: false,
-      closeButton: false
-    });
-  },
-
-  warning: (message, title = 'Attention') => {
-    hotToast(({ closeToast }) => (
-      <PremiumToast
-        type="warning"
-        icon={TriangleAlert}
-        title={title}
-        message={message}
-      />
-    ), {
-      className: 'p-0 bg-transparent shadow-none !rounded-2xl overflow-hidden',
-      bodyClassName: 'p-0 m-0',
-      icon: false,
-      closeButton: false
-    });
-  },
-
-  loading: (message, title = 'Please Wait') => {
-    return hotToast(({ closeToast }) => (
-      <PremiumToast
-        type="loading"
-        icon={Loader2}
-        title={title}
-        message={message}
-      />
-    ), {
-      className: 'p-0 bg-transparent shadow-none !rounded-2xl overflow-hidden',
-      bodyClassName: 'p-0 m-0',
+      className: 'bg-transparent shadow-none p-0 !m-0 overflow-visible',
+      bodyClassName: 'p-0 m-0 overflow-visible',
       icon: false,
       closeButton: false,
-      autoClose: false
+    });
+  },
+
+  info: (message, title = 'Notice') => {
+    hotToast(({ closeToast }) => (
+      <EditorialToast type="info" title={title} message={message} />
+    ), {
+      className: 'bg-transparent shadow-none p-0 !m-0 overflow-visible',
+      bodyClassName: 'p-0 m-0 overflow-visible',
+      icon: false,
+      closeButton: false,
+    });
+  },
+
+  warning: (message, title = 'Warning') => {
+    hotToast(({ closeToast }) => (
+      <EditorialToast type="warning" title={title} message={message} />
+    ), {
+      className: 'bg-transparent shadow-none p-0 !m-0 overflow-visible',
+      bodyClassName: 'p-0 m-0 overflow-visible',
+      icon: false,
+      closeButton: false,
+    });
+  },
+
+  loading: (message, title = 'Processing') => {
+    return hotToast(({ closeToast }) => (
+      <EditorialToast type="loading" title={title} message={message} />
+    ), {
+      className: 'bg-transparent shadow-none p-0 !m-0 overflow-visible',
+      bodyClassName: 'p-0 m-0 overflow-visible',
+      icon: false,
+      closeButton: false,
+      autoClose: false,
     });
   },
 
@@ -137,80 +126,80 @@ export const toast = ifiitoast;
 // Premium E-commerce Preset Notifications
 export const ecommerceToasts = {
   addedToCart: (productName) =>
-    ifiitoast.success(`${productName} successfully added to your private selection.`, "Basket Updated"),
+    ifiitoast.success(`${productName} added to your bag.`, "Item Added"),
 
   removedFromCart: (productName) =>
-    ifiitoast.info(`${productName} has been removed from your selection.`, "Basket Updated"),
+    ifiitoast.info(`${productName} removed from your bag.`, "Bag Updated"),
 
   updatedQuantity: (productName) =>
-    ifiitoast.success(`The quantity for ${productName} has been refined.`, "Basket Updated"),
+    ifiitoast.success(`Quantity updated for ${productName}.`, "Bag Updated"),
 
   addedToWishlist: (productName) =>
-    ifiitoast.success(`${productName} saved to your curated favorites.`, "Wishlist"),
+    ifiitoast.success(`${productName} saved to your Wishlist.`, "Saved"),
 
   removedFromWishlist: (productName) =>
-    ifiitoast.info(`${productName} has been removed from your favorites.`, "Wishlist"),
+    ifiitoast.info(`${productName} removed from your Wishlist.`, "Removed"),
 
   orderPlaced: () =>
-    ifiitoast.success('Your exquisite selection is now being prepared for shipment.', "Order Confirmed"),
+    ifiitoast.success('Your order has been placed successfully.', "Order Confirmed"),
 
   orderCancelled: () =>
-    ifiitoast.info('The order has been successfully voided as requested.', "Order Cancelled"),
+    ifiitoast.info('Your order has been cancelled.', "Order Cancelled"),
 
   loginSuccess: (userName) =>
-    ifiitoast.success(`Welcome back, ${userName}. Your personalized experience is ready.`, "Authenticated"),
+    ifiitoast.success(`Welcome back, ${userName}.`, "Signed In"),
 
   logoutSuccess: () =>
-    ifiitoast.info('Your session has been securely terminated.', "Logged Out"),
+    ifiitoast.info('You have been securely logged out.', "Signed Out"),
 
   registrationSuccess: () =>
-    ifiitoast.success('Welcome to the inner circle. Your account is now active.', "Member Service"),
+    ifiitoast.success('Your account has been created successfully.', "Welcome"),
 
   profileUpdated: () =>
-    ifiitoast.success('Your account credentials have been successfully refined.', "Profile Sync"),
+    ifiitoast.success('Your profile details have been saved.', "Profile Updated"),
 
   passwordChanged: () =>
-    ifiitoast.success('Security update complete. Your new passphrase is now active.', "Secure Sync"),
+    ifiitoast.success('Your password has been changed successfully.', "Security Updated"),
 
   reviewSubmitted: () =>
-    ifiitoast.success('Your valuable feedback has been recorded in our archives.', "Review Received"),
+    ifiitoast.success('Thank you for your feedback.', "Review Submitted"),
 
   deletedReview: () =>
-    ifiitoast.info('Your feedback has been removed from the public record.', "Review Deleted"),
+    ifiitoast.info('Your review has been deleted.', "Review Deleted"),
 
   invalidCredentials: () =>
-    ifiitoast.error('Authentication failed. Please verify your private access keys.', "Access Denied"),
+    ifiitoast.error('Incorrect email or password. Please try again.', "Sign In Failed"),
 
   sessionExpired: () =>
-    ifiitoast.warning('Your session has expired for security reasons. Please re-authenticate.', "Security Breach"),
+    ifiitoast.warning('Your session expired. Please sign in again.', "Session Expired"),
 
   networkError: () =>
-    ifiitoast.error('Uplink failed. Please verify your connection to the grid.', "Offline"),
+    ifiitoast.error('Please check your internet connection and try again.', "Network Error"),
 
   serverError: () =>
-    ifiitoast.error('We are currently experiencing a slight technical anomaly.', "Infrastructure Issue"),
+    ifiitoast.error('We are experiencing technical difficulties.', "System Error"),
 
   validationError: (message) =>
-    ifiitoast.warning(message, "Validation Check"),
+    ifiitoast.warning(message, "Action Failed"),
 
   outOfStock: (productName) =>
-    ifiitoast.warning(`${productName} is currently unavailable in our inventory.`, "Out of Stock"),
+    ifiitoast.warning(`${productName} is currently out of stock.`, "Unavailable"),
 
   lowStock: (productName, quantity) =>
-    ifiitoast.warning(`Only ${quantity} remaining pieces of ${productName}.`, "Limited Availability"),
+    ifiitoast.warning(`Only ${quantity} remaining in stock.`, "Low Stock"),
 
   discountApplied: (discount) =>
-    ifiitoast.success(`${discount}% privilege discount successfully active.`, "Offer Applied"),
+    ifiitoast.success(`${discount}% discount applied to your order.`, "Discount Applied"),
 
   copiedToClipboard: () =>
-    ifiitoast.success('Selection details have been synchronized to your clipboard.', "Data Copied"),
+    ifiitoast.success('Link copied to clipboard.', "Copied"),
 
   cartCleared: () =>
-    ifiitoast.info('Your shopping selection has been reset to default state.', "Sanitized"),
+    ifiitoast.info('Your bag has been emptied.', "Bag Cleared"),
 
   mustLogin: () =>
-    ifiitoast.error('Membership required to finalize this transaction.', "Authentication Required"),
+    ifiitoast.error('Please sign in to continue.', "Authentication Required"),
 
   emptyCartError: () =>
-    ifiitoast.error('Your selection is currently empty. Please add items.', "Empty Basket"),
+    ifiitoast.error('Your bag is empty.', "Cannot Proceed"),
 };

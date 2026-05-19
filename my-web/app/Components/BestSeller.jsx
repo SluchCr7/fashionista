@@ -1,12 +1,12 @@
 'use client';
-import React, { useContext, useRef } from 'react';
-import { ProductContext } from '../Context/ProductContext';
+import React, { useRef } from 'react';
+import { useAppSelector } from '@/lib/redux/hooks';
 import ProductCard from './ProductCard';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const BestSeller = () => {
-  const { products } = useContext(ProductContext);
+  const products = useAppSelector(state => state.product.products);
   // Ideally filter by rating/sales. Using slice for demo.
   const bestSellers = products.slice(0, 8);
   const scrollContainerRef = useRef(null);

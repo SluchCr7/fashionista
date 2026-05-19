@@ -1,6 +1,6 @@
 'use client';
-import React, { useContext } from "react";
-import { CartContext } from "./Context/CartContext";
+import React from "react";
+import { useAppSelector } from "@/lib/redux/hooks";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -15,7 +15,7 @@ import Opinions from "./Components/Opinions";
 import Sponsers from "./Components/Sponsers";
 
 export default function Home() {
-  const { discount } = useContext(CartContext);
+  const discount = useAppSelector(state => state.cart.discount);
 
   return (
     <div className="flex flex-col min-h-screen">

@@ -1,12 +1,13 @@
 'use client';
-import React, { useContext, useState, useEffect, memo, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, memo, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoMdHeart, IoMdAdd, IoMdRemove } from 'react-icons/io';
 import { FaHeart, FaStar } from 'react-icons/fa';
-import { CartContext } from '../Context/CartContext';
-import { AuthContext } from '../Context/AuthContext';
-import { ReviewContext } from '../Context/ReviewContext';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { addToCart } from '@/lib/redux/slices/cartSlice';
+import { toggleFavorite } from '@/lib/redux/slices/authSlice';
+import { addReview } from '@/lib/redux/slices/reviewSlice';
 import { ChevronRight, Share2, ShieldCheck } from 'lucide-react';
 
 const ProductCont = memo(({ product }) => {
@@ -17,16 +18,17 @@ const ProductCont = memo(({ product }) => {
   const [productReviews, setProductReviews] = useState([]);
   const [activeImg, setActiveImg] = useState(0);
 
-  const { addToCart, discount } = useContext(CartContext);
-  const { user, toggleFavorite } = useContext(AuthContext);
-  const { addReview, reviews } = useContext(ReviewContext);
+  const dispatch = useAppDispatch();
+  const discount = useAppSelector(state => state.cart.discount);
+  const user = useAppSelector(state => state.auth.user);
+  const reviews = useAppSelector(state => state.review.reviews);
 
   const FinalPrice = useMemo(() => (product?.price * (1 - discount / 100)).toFixed(2), [product?.price, discount]);
 
   // 🛒 Handle Add to Cart
   const handleCart = useCallback(() => {
     if (!color || !size) return setNotify('Please select color and size');
-    addToCart(product, num, size, color);
+    dispatch(addToCart({ product, quantity: num, size, color }));
     setNotify('Added to cart successfully');
     setColor('');
     setSize('');
@@ -38,7 +40,7 @@ const ProductCont = memo(({ product }) => {
   const handleStarClick = useCallback(
     (rating) => {
       if (!user) return setNotify('Please login to review');
-      addReview({ product: product?._id, rating });
+      dispatch(addReview({ product: product?._id, rating }));
       setNotify(`Thank you for your ${rating}-star review!`);
       setTimeout(() => setNotify(''), 3000);
     },
@@ -106,7 +108,7 @@ const ProductCont = memo(({ product }) => {
             </div>
 
             <button
-              onClick={() => toggleFavorite(product?._id)}
+              onClick={() => dispatch(toggleFavorite(product?._id))}
               className="absolute top-6 right-6 p-3 bg-white/80 backdrop-blur-md rounded-full shadow-sm hover:scale-110 transition-transform"
             >
               {user?.favorites?.includes(product?._id) ? <FaHeart size={18} className="text-red-500" /> : <IoMdHeart size={20} />}
