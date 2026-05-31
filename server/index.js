@@ -118,9 +118,9 @@ const startServer = async () => {
         await connectDB();
         console.log("Database connected successfully.");
     } catch (error) {
-        console.error("WARNING: Database connection failed. Running server in fallback mode:", error.message);
+        console.error("Database connection failed:", error.message);
+        process.exit(1);
     }
-
     try {
         const server = app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);

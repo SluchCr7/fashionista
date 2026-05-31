@@ -199,10 +199,12 @@ const AdminPanel = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-sans text-gray-800">
+    <div className="relative flex min-h-screen bg-slate-950/5 font-sans text-slate-900">
+      <div className="absolute inset-x-0 top-0 h-72 bg-gradient-to-r from-slate-900/10 via-slate-700/10 to-slate-900/10" />
+      <div className="absolute left-1/2 top-24 h-48 w-48 -translate-x-1/2 rounded-full bg-slate-900/10 blur-3xl" />
 
       {/* SIDEBAR */}
-      <aside className="w-20 lg:w-72 bg-white border-r border-gray-100 flex flex-col fixed h-screen z-20 transition-all duration-300">
+      <aside className="w-20 lg:w-72 bg-white border-r border-gray-100 flex flex-col fixed h-screen z-20 transition-all duration-300 shadow-xl shadow-slate-900/5">
         <div className="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-gray-50">
           <div className="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center font-bold text-xl mr-0 lg:mr-3">F</div>
           <span className="hidden lg:block font-bold text-xl tracking-tight">Fashionista<span className="text-gray-400">.</span></span>
@@ -243,10 +245,11 @@ const AdminPanel = () => {
       {/* MAIN CONTENT */}
       <main className="flex-1 ml-20 lg:ml-72 p-6 lg:p-10 transition-all duration-300 max-w-[1920px]">
         {/* Top Navbar */}
-        <header className="flex justify-between items-center mb-10">
+        <header className="flex flex-col gap-6 mb-10 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl font-bold">{tabs.find(t => t.id === activeTab)?.label}</h1>
-            <p className="text-sm text-gray-400">Manage your store activities.</p>
+            <p className="text-sm uppercase tracking-[0.35em] text-gray-400">Admin Control Center</p>
+            <h1 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-slate-900">{tabs.find(t => t.id === activeTab)?.label}</h1>
+            <p className="mt-3 max-w-2xl text-sm text-gray-500">Your isolated command center for orders, products, customers, and marketing — designed for clarity and action.</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative hidden md:block">
@@ -254,7 +257,7 @@ const AdminPanel = () => {
               <input
                 type="text"
                 placeholder="Search everything..."
-                className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-black/5 block w-64"
+                className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-black/5 block w-72"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
