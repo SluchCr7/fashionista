@@ -35,7 +35,7 @@ const LatestCollection = () => {
           >
             <Link href={`/Product/${featured?._id}`} className="block w-full h-full relative">
               <Image
-                src={featured?.Photo[0]?.url || '/placeholder.jpg'}
+                src={featured?.Photo[0]?.url || "../placeholder.jpg"}
                 alt="Featured Fragment"
                 fill
                 className="object-cover transition-transform duration-[3s] group-hover:scale-110"
