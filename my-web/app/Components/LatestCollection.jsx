@@ -12,6 +12,7 @@ const LatestCollection = () => {
   const latest = products.slice(0, 4);
   const featured = latest[0];
   const items = latest.slice(1);
+  const placeholderImage = '/assets/placeholder.jpg';
 
   return (
     <section className="py-44 bg-background relative overflow-hidden border-t border-border/5">
@@ -35,9 +36,10 @@ const LatestCollection = () => {
           >
             <Link href={`/Product/${featured?._id}`} className="block w-full h-full relative">
               <Image
-                src={featured?.Photo[0]?.url || "../placeholder.jpg"}
+                src={featured?.Photo[0]?.url || placeholderImage}
                 alt="Featured Fragment"
                 fill
+                onError={(event) => { event.currentTarget.src = placeholderImage; }}
                 className="object-cover transition-transform duration-[3s] group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-700" />
@@ -72,9 +74,10 @@ const LatestCollection = () => {
               >
                 <Link href={`/Product/${product._id}`} className="relative w-40 aspect-[3/4] overflow-hidden shrink-0 shadow-lg">
                   <Image
-                    src={product.Photo[0]?.url || '/placeholder.jpg'}
+                    src={product.Photo[0]?.url || placeholderImage}
                     alt={product.name}
                     fill
+                    onError={(event) => { event.currentTarget.src = placeholderImage; }}
                     className="object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110"
                   />
                 </Link>
