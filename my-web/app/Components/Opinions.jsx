@@ -3,7 +3,7 @@ import React, { memo } from 'react';
 import Image from 'next/image';
 import { Quote, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { testimonials } from '../Data';
+import { testimonials, Companies } from '../Data';
 
 const Opinions = memo(() => {
   const displayTestimonials = testimonials.slice(0, 3); // Take top 3 for clean layout

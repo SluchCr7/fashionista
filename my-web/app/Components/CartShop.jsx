@@ -49,8 +49,6 @@ const CartShop = () => {
   const finalTotal = cartTotal + (cartTotal >= FREE_SHIPPING_THRESHOLD ? 0 : 25);
   const discountAmount = discount > 0 ? (cartTotal * discount) / 100 : 0;
 
-  if (!isClient) return null;
-
   return (
     <>
       {/* Cart Button */}
@@ -74,7 +72,7 @@ const CartShop = () => {
       </motion.button>
 
       {/* Cart Drawer Portal */}
-      {createPortal(
+      {isClient && createPortal(
         <AnimatePresence>
           {isCartOpen && (
             <>

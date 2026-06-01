@@ -8,11 +8,13 @@ import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { addToCart } from '@/lib/redux/slices/cartSlice';
 import { toggleFavorite } from '@/lib/redux/slices/authSlice';
 import { toast, ecommerceToasts } from '@/lib/toast';
+import { useRouter } from 'next/navigation';
 
 const ProductCard = ({ product, showRating = false }) => {
     const dispatch = useAppDispatch();
     const discount = useAppSelector(state => state.cart.discount);
     const user = useAppSelector(state => state.auth.user);
+    const router = useRouter();
     const [isHovered, setIsHovered] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
 
@@ -25,7 +27,7 @@ const ProductCard = ({ product, showRating = false }) => {
         e.preventDefault();
         e.stopPropagation();
         if (product.sizes?.length > 0 || product.colors?.length > 0) {
-            window.location.href = `/Product/${product._id}`;
+            router.push(`/Product/${product._id}`);
             return;
         }
         setIsAdding(true);

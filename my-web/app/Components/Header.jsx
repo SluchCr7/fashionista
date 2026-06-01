@@ -65,7 +65,7 @@ const Header = () => {
       const results = products.filter((p) =>
         p.name.toLowerCase().includes(search.toLowerCase())
       );
-      setFilteredProducts(results.slice(0, 5));
+      setFilteredProducts(results);
     }
   }, [search, products]);
 

@@ -4,13 +4,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { Search, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const ProductNavSearch = ({ setShowSearch, search, setSearch, filteredProducts }) => {
+  const router = useRouter();
+
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (search.trim()) {
+      router.push(`/Shop?search=${encodeURIComponent(search.trim())}`);
+      setShowSearch(false);
+    }
+  };
   return (
     <div className="w-full max-w-[1200px] mx-auto pt-8 pb-16">
       
       {/* MASSIVE MINIMALIST SEARCH INPUT */}
-      <div className="relative mb-16 group">
+      <form onSubmit={handleSearchSubmit} className="relative mb-16 group">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -21,15 +31,22 @@ const ProductNavSearch = ({ setShowSearch, search, setSearch, filteredProducts }
         />
         {search ? (
           <button
+            type="button"
             onClick={() => setSearch('')}
             className="absolute right-0 top-1/2 -translate-y-1/2 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white hover:rotate-90 transition-all duration-300 p-4"
           >
             <X className="w-8 h-8 md:w-12 md:h-12" />
           </button>
         ) : (
-          <Search className="absolute right-0 top-1/2 -translate-y-1/2 text-black/10 dark:text-white/10 w-8 h-8 md:w-12 md:h-12 pointer-events-none transition-colors group-focus-within:text-black/40 dark:group-focus-within:text-white/40" />
+          <button
+            type="submit"
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-black/10 dark:text-white/10 hover:text-black/40 dark:hover:text-white/40 transition-colors p-4"
+            aria-label="Submit Search"
+          >
+            <Search className="w-8 h-8 md:w-12 md:h-12" />
+          </button>
         )}
-      </div>
+      </form>
 
       {/* RESULTS AREA */}
       <div className="min-h-[40vh]">
@@ -95,7 +112,10 @@ const ProductNavSearch = ({ setShowSearch, search, setSearch, filteredProducts }
                 
                 {filteredProducts.length > 8 && (
                    <div className="mt-16 text-center">
-                      <button className="flex items-center gap-4 mx-auto text-xs font-bold uppercase tracking-widest border-b border-black dark:border-white pb-2 hover:opacity-50 transition-opacity group">
+                      <button 
+                        onClick={handleSearchSubmit}
+                        className="flex items-center gap-4 mx-auto text-xs font-bold uppercase tracking-widest border-b border-black dark:border-white pb-2 hover:opacity-50 transition-opacity group"
+                      >
                          View All Results <ArrowRight size={14} className="transform group-hover:translate-x-2 transition-transform" />
                       </button>
                    </div>

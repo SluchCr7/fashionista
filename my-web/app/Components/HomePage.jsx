@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import React from 'react';
-import { ArrowRight, MoveDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -29,57 +29,7 @@ const HomePage = () => {
 
   return (
     <div className="bg-background">
-      {/* Cinematic Hero Section */}
-      <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/Hero/HeroWomen.jpg"
-            fill
-            className="object-cover opacity-60 scale-105 animate-reveal"
-            alt="Hero Background"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-background" />
-        </div>
 
-        <div className="container relative z-10 text-center px-4">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="typography-display text-white mb-6"
-          >
-            Spring / Summer 2024
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-            className="text-6xl md:text-9xl text-white font-serif italic font-light tracking-tight mb-12 drop-shadow-2xl"
-          >
-            The Art of <br /> <span className="not-italic font-bold">Presentation.</span>
-          </motion.h1>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1 }}
-          >
-            <Link href="/Shop" className="button-luxury">
-              Discover Selection
-            </Link>
-          </motion.div>
-        </div>
-
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-10 flex flex-col items-center text-white/40 gap-4"
-        >
-          <span className="typography-display text-[8px]">Scroll to explore</span>
-          <MoveDown size={14} />
-        </motion.div>
-      </section>
 
       {/* Editorial Content Grid */}
       <section className="py-32 px-4 md:px-0">
