@@ -39,7 +39,15 @@ const UserSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Product'
         }
-    ] // Store favorite product IDs
+    ], // Store favorite product IDs
+    passwordResetToken: {
+        type: String,
+        default: null
+    },
+    passwordResetExpires: {
+        type: Date,
+        default: null
+    }
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

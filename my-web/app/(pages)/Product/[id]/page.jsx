@@ -118,9 +118,9 @@ const Product = ({ params }) => {
 
               <button
                 onClick={() => dispatch(toggleFavorite(product._id))}
-                className="absolute top-8 right-8 p-4 transition-transform duration-500 hover:scale-110 active:scale-95"
+                className="absolute top-8 right-8 p-3 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 shadow-sm"
               >
-                <Heart size={24} strokeWidth={1} className={isFavorite ? "fill-accent text-accent" : "text-black"} />
+                <Heart size={18} strokeWidth={1.5} className={isFavorite ? "fill-accent text-accent animate-pulse" : "text-black dark:text-white"} />
               </button>
             </div>
 
@@ -176,7 +176,7 @@ const Product = ({ params }) => {
                         key={c}
                         onClick={() => setColor(c)}
                         className={`w-8 h-8 rounded-full transition-all duration-500 ring-offset-4 ${
-                          color === c ? 'ring-1 ring-black scale-110' : 'opacity-40 hover:opacity-100'
+                          color === c ? 'ring-2 ring-black dark:ring-white scale-110 opacity-100' : 'opacity-40 hover:opacity-100'
                         }`}
                         style={{ backgroundColor: c.toLowerCase() }}
                         title={c}
@@ -197,8 +197,8 @@ const Product = ({ params }) => {
                       <button
                         key={s}
                         onClick={() => setSize(s)}
-                        className={`py-4 text-[10px] font-black uppercase tracking-widest transition-all duration-500 border ${
-                          size === s ? "bg-black text-white border-black" : "bg-transparent text-muted-foreground border-border/20 hover:border-black"
+                        className={`py-4 text-[10px] font-black uppercase tracking-widest transition-all duration-500 border rounded-xl ${
+                          size === s ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white" : "bg-transparent text-muted-foreground border-black/10 dark:border-white/10 hover:border-black dark:hover:border-white"
                         }`}
                       >
                         {s}
@@ -214,7 +214,7 @@ const Product = ({ params }) => {
               <button
                 onClick={handleAddToCart}
                 disabled={adding || product.stock <= 0}
-                className="button-luxury w-full py-6 flex items-center justify-center gap-4 transition-all"
+                className="button-luxury w-full py-6 flex items-center justify-center gap-4 transition-all rounded-xl"
               >
                 {adding ? "Synchronizing Selection..." : (
                   <>
@@ -224,7 +224,7 @@ const Product = ({ params }) => {
                 )}
               </button>
               
-              <div className="divide-y divide-border/10 border-t border-b border-border/10">
+              <div className="divide-y divide-black/10 dark:divide-white/10 border-t border-b border-black/10 dark:border-white/10">
                 {['Craftsmanship', 'Logistics', 'Philosophy'].map((sect) => (
                   <div key={sect} className="py-6">
                     <button 

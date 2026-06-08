@@ -1,41 +1,61 @@
 'use client';
-import { useAppDispatch } from '@/lib/redux/hooks';
-import { login } from '@/lib/redux/slices/authSlice';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { ArrowRight, Loader2, KeyRound } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAppDispatch } from '@/lib/redux/hooks';
+import { resetPassword } from '@/lib/redux/slices/authSlice';
 import { toast } from '@/lib/toast';
 
-function LoginForm() {
-    const [email, setEmail] = useState("");
-    const [password, setPass] = useState("");
+function ResetForm() {
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const dispatch = useAppDispatch();
+    const [token, setToken] = useState("");
+    
     const searchParams = useSearchParams();
+    const router = useRouter();
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
-        const emailParam = searchParams.get('email');
-        if (emailParam) {
-            setEmail(emailParam);
-            toast.info("Access credentials pre-filled. Please type password.");
+        const tokenParam = searchParams.get('token');
+        if (tokenParam) {
+            setToken(tokenParam);
+        } else {
+            toast.error("Invalid recovery transmission. Token is missing.");
         }
     }, [searchParams]);
 
-    const handleLogin = async (e) => {
+    const handleReset = async (e) => {
         e.preventDefault();
-        if (!email || !password) {
-            toast.warning("Please provide your access credentials to continue.");
+        if (!token) {
+            toast.error("Cannot reset password: Token is missing.");
+            return;
+        }
+
+        if (!password || !confirmPassword) {
+            toast.warning("Please fill in all password fields.");
+            return;
+        }
+
+        if (password.length < 6) {
+            toast.warning("Password must be at least 6 characters.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            toast.error("Passwords do not match.");
             return;
         }
 
         setLoading(true);
         try {
-            await dispatch(login({ email, password })).unwrap();
-        } catch (error) {
-            // Error handled in slice/toast
+            await dispatch(resetPassword({ token, password })).unwrap();
+            router.push('/Login');
+        } catch (err) {
+            // Error already handled
         }
         setLoading(false);
     }
@@ -60,16 +80,16 @@ function LoginForm() {
                 className="hidden lg:block w-1/2 relative bg-[#0a0a0a]"
             >
                 <Image
-                    src="https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop"
-                    alt="Login Editorial Visual"
+                    src="https://images.unsplash.com/photo-1542295669297-4d352b042bce?q=80&w=2070&auto=format&fit=crop"
+                    alt="Reset Editorial Visual"
                     fill priority unoptimized
                     className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-[3s]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent flex flex-col justify-end p-20 text-white">
                     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 1 }}>
-                        <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/50 mb-4 block">Archive Chapter IV</span>
-                        <h2 className="text-6xl font-serif font-black mb-6 leading-[0.9] tracking-tighter uppercase">Resume <br/><span className="italic text-white/45">Journey.</span></h2>
-                        <p className="text-sm font-medium uppercase tracking-widest opacity-80 max-w-sm">Access your curated profile and private collections.</p>
+                        <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/50 mb-4 block">Archive Chapter V</span>
+                        <h2 className="text-6xl font-serif font-black mb-6 leading-[0.9] tracking-tighter uppercase">Reset <br/><span className="italic text-white/45">Credentials.</span></h2>
+                        <p className="text-sm font-medium uppercase tracking-widest opacity-80 max-w-sm">Re-establish account security settings.</p>
                     </motion.div>
                 </div>
             </motion.div>
@@ -118,48 +138,45 @@ function LoginForm() {
                         <Link href="/" className="inline-block mb-10">
                             <h1 className="text-xl font-serif font-black tracking-[0.15em] uppercase hover:italic transition-all">Fashionista.</h1>
                         </Link>
-                        <h2 className="text-3xl font-serif font-black mb-3 uppercase tracking-tighter">Sign In</h2>
-                        <p className="text-black/40 dark:text-white/40 text-[10px] font-bold uppercase tracking-widest">Enter your private credentials below.</p>
+                        <h2 className="text-3xl font-serif font-black mb-3 uppercase tracking-tighter">New Password</h2>
+                        <p className="text-black/40 dark:text-white/40 text-[10px] font-bold uppercase tracking-widest">Establish a secure password for your account.</p>
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-10">
+                    <form onSubmit={handleReset} className="space-y-10">
                         
                         <div className="relative group">
                             <input
-                                type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
+                                type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
                                 className="peer w-full bg-transparent border-b border-black/10 dark:border-white/10 py-3 text-sm focus:outline-none transition-colors placeholder-transparent text-black dark:text-white"
-                                placeholder="Email Address" id="login-email"
+                                placeholder="New Password" id="new-password"
                             />
-                            <label htmlFor="login-email" className="absolute left-0 top-3 text-[10px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40 peer-focus:-top-4 peer-focus:text-[9px] peer-focus:text-accent dark:peer-focus:text-accent peer-valid:-top-4 peer-valid:text-[9px] transition-all pointer-events-none">Email Address</label>
+                            <label htmlFor="new-password" className="absolute left-0 top-3 text-[10px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40 peer-focus:-top-4 peer-focus:text-[9px] peer-focus:text-accent dark:peer-focus:text-accent peer-valid:-top-4 peer-valid:text-[9px] transition-all pointer-events-none">New Password</label>
                             <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-accent peer-focus:w-full transition-all duration-500 ease-out" />
                         </div>
 
                         <div className="relative group">
-                            <div className="absolute right-0 -top-6">
-                                <Link href="/Forgot" className="text-[10px] font-bold uppercase tracking-widest text-accent hover:italic transition-all opacity-60 hover:opacity-100">Recover</Link>
-                            </div>
                             <input
-                                type="password" value={password} onChange={(e) => setPass(e.target.value)} required
+                                type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required
                                 className="peer w-full bg-transparent border-b border-black/10 dark:border-white/10 py-3 text-sm focus:outline-none transition-colors placeholder-transparent text-black dark:text-white"
-                                placeholder="Password" id="login-password"
+                                placeholder="Confirm New Password" id="confirm-password"
                             />
-                            <label htmlFor="login-password" className="absolute left-0 top-3 text-[10px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40 peer-focus:-top-4 peer-focus:text-[9px] peer-focus:text-accent dark:peer-focus:text-accent peer-valid:-top-4 peer-valid:text-[9px] transition-all pointer-events-none">Password</label>
+                            <label htmlFor="confirm-password" className="absolute left-0 top-3 text-[10px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40 peer-focus:-top-4 peer-focus:text-[9px] peer-focus:text-accent dark:peer-focus:text-accent peer-valid:-top-4 peer-valid:text-[9px] transition-all pointer-events-none">Confirm Password</label>
                             <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-accent peer-focus:w-full transition-all duration-500 ease-out" />
                         </div>
 
                         <button
-                            type="submit" disabled={loading}
+                            type="submit" disabled={loading || !token}
                             className="w-full bg-black text-white dark:bg-white dark:text-black py-4 border border-transparent rounded-xl uppercase font-bold text-[10px] tracking-[0.25em] hover:bg-accent hover:text-white dark:hover:bg-accent dark:hover:text-white transition-all duration-300 flex items-center justify-between px-8 disabled:opacity-50 mt-8"
                         >
-                            <span>{loading ? "Authenticating" : "Access Account"}</span>
+                            <span>{loading ? "Re-establishing Profile" : "Reset Password"}</span>
                             {loading ? <Loader2 className="animate-spin" size={16} /> : <ArrowRight size={16} />}
                         </button>
                     </form>
 
                     <div className="mt-12 pt-6 border-t border-black/5 dark:border-white/5 text-[9px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40">
-                        New Member?{" "}
-                        <Link href="/Register" className="text-black dark:text-white border-b border-black dark:border-white pb-0.5 ml-3 hover:text-accent dark:hover:text-accent hover:border-accent dark:hover:border-accent transition-colors">
-                            Apply
+                        Need help?{" "}
+                        <Link href="/Login" className="text-black dark:text-white border-b border-black dark:border-white pb-0.5 ml-3 hover:text-accent dark:hover:text-accent hover:border-accent dark:hover:border-accent transition-colors">
+                            Sign In
                         </Link>
                     </div>
                 </motion.div>
@@ -168,10 +185,10 @@ function LoginForm() {
     );
 }
 
-export default function LoginPage() {
+export default function ResetPage() {
     return (
         <Suspense fallback={<div className="min-h-screen bg-white dark:bg-[#0a0a0a] flex items-center justify-center"><Loader2 className="animate-spin text-accent" size={24} /></div>}>
-            <LoginForm />
+            <ResetForm />
         </Suspense>
     );
 }

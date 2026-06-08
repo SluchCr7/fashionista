@@ -1,7 +1,7 @@
 'use client';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { fetchOrders, cancelOrder } from '@/lib/redux/slices/orderSlice';
-import { logout } from '@/lib/redux/slices/authSlice';
+import { logout, updateProfile } from '@/lib/redux/slices/authSlice';
 import React, { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,7 +17,9 @@ import {
   MapPin,
   Calendar,
   ChevronRight,
-  Trash2
+  Trash2,
+  User,
+  Loader2
 } from 'lucide-react';
 import { toast, ecommerceToasts } from '@/lib/toast';
 
@@ -25,6 +27,27 @@ const Profile = () => {
   const dispatch = useAppDispatch();
   const { orders: myOrders, loading } = useAppSelector(state => state.order);
   const user = useAppSelector(state => state.auth.user);
+
+  // Editing profile states
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editProfileName, setEditProfileName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    if (!editName || !editEmail) return toast.warning("Name and Email are required");
+    
+    setIsSaving(true);
+    try {
+      await dispatch(updateProfile({ name: editName, ProfileName: editProfileName, email: editEmail })).unwrap();
+      setIsEditing(false);
+    } catch (err) {
+      // Error handled in slice/toast
+    }
+    setIsSaving(false);
+  };
 
   useEffect(() => {
     if (user) {
@@ -96,46 +119,115 @@ const Profile = () => {
                   )}
                 </div>
 
-                <div className="text-center mt-4 space-y-1">
-                  <h2 className="text-2xl font-serif font-bold truncate">{user?.name}</h2>
-                  <p className="text-muted-foreground text-sm truncate">{user?.email}</p>
-                </div>
-
-                <div className="flex justify-center gap-6 mt-8 py-6 border-y border-border">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">{stats.total}</div>
-                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Orders</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">{stats.delivered}</div>
-                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Delivered</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">{user?.favorites?.length || 0}</div>
-                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Wishlist</div>
-                  </div>
-                </div>
-
-                <nav className="mt-8 space-y-3">
-                  <Link
-                    href="/Wishlist"
-                    className="flex items-center justify-between w-full p-4 rounded-xl hover:bg-muted transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Heart className="w-5 h-5 text-muted-foreground group-hover:text-destructive transition-colors" />
-                      <span className="font-medium">My Wishlist</span>
+                {!isEditing ? (
+                  <>
+                    <div className="text-center mt-4 space-y-1">
+                      <h2 className="text-2xl font-serif font-bold truncate">{user?.name}</h2>
+                      {user?.ProfileName && <p className="text-[10px] uppercase tracking-widest font-black text-accent">{user.ProfileName}</p>}
+                      <p className="text-muted-foreground text-sm truncate">{user?.email}</p>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  </Link>
 
-                  <button
-                    onClick={() => dispatch(logout())}
-                    className="w-full p-4 rounded-xl border border-destructive/20 text-destructive hover:bg-destructive/10 transition-colors flex items-center justify-center gap-2 font-medium mt-4"
-                  >
+                    <div className="flex justify-center gap-6 mt-8 py-6 border-y border-border">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">{stats.total}</div>
+                        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Orders</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">{stats.delivered}</div>
+                        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Delivered</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">{user?.favorites?.length || 0}</div>
+                        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Wishlist</div>
+                      </div>
+                    </div>
 
-                    <LogOut size={18} /> Sign Out
-                  </button>
-                </nav>
+                    <nav className="mt-8 space-y-3">
+                      <button
+                        onClick={() => {
+                          setEditName(user?.name || "");
+                          setEditProfileName(user?.ProfileName || "");
+                          setEditEmail(user?.email || "");
+                          setIsEditing(true);
+                        }}
+                        className="flex items-center justify-between w-full p-4 rounded-xl hover:bg-muted transition-colors group text-left text-sm font-medium"
+                      >
+                        <span className="flex items-center gap-3">
+                          <User className="w-5 h-5 text-muted-foreground" />
+                          Edit Curation Profile
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      </button>
+
+                      <Link
+                        href="/Wishlist"
+                        className="flex items-center justify-between w-full p-4 rounded-xl hover:bg-muted transition-colors group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Heart className="w-5 h-5 text-muted-foreground group-hover:text-destructive transition-colors" />
+                          <span className="font-medium text-sm">My Wishlist</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      </Link>
+
+                      <button
+                        onClick={() => dispatch(logout())}
+                        className="w-full p-4 rounded-xl border border-destructive/20 text-destructive hover:bg-destructive/10 transition-colors flex items-center justify-center gap-2 font-medium mt-4 text-sm"
+                      >
+                        <LogOut size={16} /> Sign Out
+                      </button>
+                    </nav>
+                  </>
+                ) : (
+                  <form onSubmit={handleSaveProfile} className="mt-6 space-y-6 text-left">
+                    <div className="space-y-4">
+                      <div className="relative group w-full">
+                        <input
+                          type="text" value={editName} onChange={(e) => setEditName(e.target.value)} required
+                          className="peer w-full bg-transparent border-b border-border py-2 text-sm focus:outline-none focus:border-accent transition-colors placeholder-transparent text-foreground font-medium"
+                          placeholder="Full Name" id="edit-name"
+                        />
+                        <label htmlFor="edit-name" className="absolute left-0 top-2 text-[9px] font-bold uppercase tracking-widest text-muted-foreground peer-focus:-top-4 peer-focus:text-accent peer-valid:-top-4 transition-all pointer-events-none">Full Name</label>
+                      </div>
+
+                      <div className="relative group w-full">
+                        <input
+                          type="text" value={editProfileName} onChange={(e) => setEditProfileName(e.target.value)} required
+                          className="peer w-full bg-transparent border-b border-border py-2 text-sm focus:outline-none focus:border-accent transition-colors placeholder-transparent text-foreground font-medium"
+                          placeholder="Profile Handle" id="edit-profilename"
+                        />
+                        <label htmlFor="edit-profilename" className="absolute left-0 top-2 text-[9px] font-bold uppercase tracking-widest text-muted-foreground peer-focus:-top-4 peer-focus:text-accent peer-valid:-top-4 transition-all pointer-events-none">Profile Handle</label>
+                      </div>
+
+                      <div className="relative group w-full">
+                        <input
+                          type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} required
+                          className="peer w-full bg-transparent border-b border-border py-2 text-sm focus:outline-none focus:border-accent transition-colors placeholder-transparent text-foreground font-medium"
+                          placeholder="Email Address" id="edit-email"
+                        />
+                        <label htmlFor="edit-email" className="absolute left-0 top-2 text-[9px] font-bold uppercase tracking-widest text-muted-foreground peer-focus:-top-4 peer-focus:text-accent peer-valid:-top-4 transition-all pointer-events-none">Email Address</label>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditing(false)}
+                        disabled={isSaving}
+                        className="flex-1 py-3 text-xs uppercase tracking-widest font-bold border border-border rounded-xl hover:bg-muted transition-colors disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="flex-1 py-3 text-xs uppercase tracking-widest font-bold bg-black text-white dark:bg-white dark:text-black rounded-xl hover:opacity-85 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {isSaving ? <Loader2 className="animate-spin" size={14} /> : 'Save'}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </motion.div>
           </div>

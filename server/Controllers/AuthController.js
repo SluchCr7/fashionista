@@ -139,6 +139,60 @@ const refreshToken = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * @desc Forgot Password (Generate recovery link)
+ * @route POST /api/auth/forgot-password
+ * @access Public
+ */
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return errorResponse(res, "Email address is required", 400);
+  }
+
+  try {
+    const token = await authService.forgotPassword(email);
+    // In a production server, we would send an email here.
+    // For demo/connection simplicity, we return the token in response
+    return successResponse(res, "Password reset code generated", { token });
+  } catch (err) {
+    return errorResponse(res, err.message, 400);
+  }
+});
+
+/**
+ * @desc Reset Password using recovery link
+ * @route POST /api/auth/reset-password
+ * @access Public
+ */
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) {
+    return errorResponse(res, "Token and new password are required", 400);
+  }
+
+  try {
+    await authService.resetPassword(token, password);
+    return successResponse(res, "Password has been reset successfully");
+  } catch (err) {
+    return errorResponse(res, err.message, 400);
+  }
+});
+
+/**
+ * @desc Update User Profile details
+ * @route PUT /api/auth/profile/update
+ * @access Private
+ */
+const updateUser = asyncHandler(async (req, res) => {
+  try {
+    const updatedUser = await authService.updateUserProfile(req.user._id, req.body);
+    return successResponse(res, "Profile updated successfully", { user: updatedUser });
+  } catch (err) {
+    return errorResponse(res, err.message, 400);
+  }
+});
+
 module.exports = {
   DeleteUser,
   toggleFavorite,
@@ -146,5 +200,8 @@ module.exports = {
   RegisterNewUser,
   getAllUsers,
   getUserById,
-  refreshToken
+  refreshToken,
+  forgotPassword,
+  resetPassword,
+  updateUser
 };

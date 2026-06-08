@@ -77,6 +77,47 @@ export const deleteUser = createAsyncThunk('auth/deleteUser', async (userId, { r
     }
 });
 
+export const forgotPassword = createAsyncThunk('auth/forgotPassword', async ({ email }, { rejectWithValue }) => {
+    try {
+        const res = await api.post('/api/auth/forgot-password', { email });
+        if (res.success) {
+            return res.data; // contains token
+        }
+        return rejectWithValue('Failed to request recovery link');
+    } catch (err) {
+        toast.error(err.message || 'Failed to request recovery link');
+        return rejectWithValue(err.message);
+    }
+});
+
+export const resetPassword = createAsyncThunk('auth/resetPassword', async ({ token, password }, { rejectWithValue }) => {
+    try {
+        const res = await api.post('/api/auth/reset-password', { token, password });
+        if (res.success) {
+            toast.success('Password has been reset successfully. Please login.');
+            return res.data;
+        }
+        return rejectWithValue('Failed to reset password');
+    } catch (err) {
+        toast.error(err.message || 'Failed to reset password');
+        return rejectWithValue(err.message);
+    }
+});
+
+export const updateProfile = createAsyncThunk('auth/updateProfile', async (profileData, { rejectWithValue }) => {
+    try {
+        const res = await api.put('/api/auth/profile/update', profileData);
+        if (res.success) {
+            toast.success('Profile updated successfully');
+            return res.data.user;
+        }
+        return rejectWithValue('Failed to update profile');
+    } catch (err) {
+        toast.error(err.message || 'Failed to update profile');
+        return rejectWithValue(err.message);
+    }
+});
+
 const initialState = {
     user: null,
     loading: true,
@@ -148,6 +189,19 @@ const authSlice = createSlice({
             })
             .addCase(deleteUser.fulfilled, (state, action) => {
                 state.allUsers = state.allUsers.filter(u => u._id !== action.payload);
+            })
+            .addCase(updateProfile.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(updateProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                if (state.user) {
+                    state.user = { ...state.user, ...action.payload };
+                    localStorage.setItem('Data', JSON.stringify(state.user));
+                }
+            })
+            .addCase(updateProfile.rejected, (state) => {
+                state.loading = false;
             });
     },
 });

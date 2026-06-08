@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 const LayoutComponent = ({ children }) => {
   const pathname = usePathname();
   const isAdminPage = pathname?.toLowerCase().startsWith('/admin');
+  const isAuthPage = ['/login', '/register', '/forgot'].includes(pathname?.toLowerCase());
   const isAuthChecked = useAppSelector(state => state.auth.isAuthChecked);
 
   if (!isAuthChecked) {
@@ -23,6 +24,16 @@ const LayoutComponent = ({ children }) => {
     return (
       <div className="min-h-screen bg-slate-950/5 text-foreground">
         {children}
+      </div>
+    );
+  }
+
+  if (isAuthPage) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
+        <main className="flex-1 w-full flex flex-col">
+          {children}
+        </main>
       </div>
     );
   }

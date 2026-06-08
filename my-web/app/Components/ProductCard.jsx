@@ -56,26 +56,26 @@ const ProductCard = ({ product, showRating = false }) => {
             onMouseLeave={() => setIsHovered(false)}
         >
             {/* Visual Container */}
-            <div className="relative aspect-[3/4] overflow-hidden bg-[#F2F2F2] mb-6 shadow-sm">
+            <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 dark:bg-neutral-900/40 mb-6 shadow-sm rounded-xl">
                 <Link href={`/Product/${product._id}`}>
                     <Image
                         src={product.Photo?.[0]?.url || '/placeholder.jpg'}
                         alt={product.name}
                         fill
                         className={`object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                            isHovered ? 'scale-110' : 'scale-100'
+                            isHovered ? 'scale-105' : 'scale-100'
                         }`}
                         sizes="(max-width: 768px) 100vw, 33vw"
                     />
                     
                     {/* Subtle Overlay */}
-                    <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
+                    <div className="absolute inset-0 bg-black/5 dark:bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
                 </Link>
 
                 {/* Status Badges - Top Left */}
                 <div className="absolute top-4 left-4 flex flex-col gap-1 z-10">
                     {isNew && (
-                        <span className="typography-display !text-[8px] bg-white px-2 py-1 shadow-sm text-black">
+                        <span className="typography-display !text-[8px] bg-white dark:bg-black px-2 py-1 shadow-sm text-black dark:text-white">
                             New Arrival
                         </span>
                     )}
@@ -89,11 +89,11 @@ const ProductCard = ({ product, showRating = false }) => {
                 {/* Wishlist - Top Right */}
                 <button
                     onClick={handleWishlist}
-                    className="absolute top-4 right-4 p-2 transition-transform duration-500 z-10 group-hover:scale-110 active:scale-95"
+                    className="absolute top-4 right-4 p-2.5 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md transition-transform duration-500 z-10 hover:scale-110 active:scale-95 shadow-sm"
                 >
                     <Heart
-                        strokeWidth={1.2}
-                        className={`w-5 h-5 ${user?.favorites?.includes(product._id) ? 'fill-accent text-accent' : 'text-black'}`}
+                        strokeWidth={1.5}
+                        className={`w-4 h-4 ${user?.favorites?.includes(product._id) ? 'fill-accent text-accent' : 'text-black dark:text-white'}`}
                     />
                 </button>
 
@@ -102,7 +102,7 @@ const ProductCard = ({ product, showRating = false }) => {
                     <button
                         onClick={handleAddToCart}
                         disabled={isAdding || isOutOfStock}
-                        className="w-full bg-black text-white py-4 text-[9px] font-black uppercase tracking-[0.3em] hover:bg-accent transition-colors disabled:opacity-50"
+                        className="w-full bg-black text-white dark:bg-white dark:text-black py-4 rounded-xl text-[9px] font-black uppercase tracking-[0.3em] hover:bg-accent dark:hover:bg-accent dark:hover:text-white transition-colors disabled:opacity-50 shadow-lg"
                     >
                         {isAdding ? "Syncing..." : isOutOfStock ? "Unavailable" : "Acquire Piece"}
                     </button>
